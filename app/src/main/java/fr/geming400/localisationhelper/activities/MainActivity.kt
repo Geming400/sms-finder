@@ -1,4 +1,4 @@
-package fr.geming400.localisationhelper
+package fr.geming400.localisationhelper.activities
 
 import android.Manifest
 import android.app.AlertDialog
@@ -15,24 +15,28 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.app.ActivityCompat
+import fr.geming400.localisationhelper.LogTags
+import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.actions.Actions
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
-
 
 class MainActivity : ComponentActivity() {
     private val requestedPermissions = arrayOf(
@@ -77,10 +81,6 @@ class MainActivity : ComponentActivity() {
         ) {
             Log.i(LogTags.SMS_PERMISSIONS, "Showing user popup to grant %s permission".format(requestedPermissions.contentToString()))
             createPermissionsDialog().show()
-
-//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//                createLocationPermissionDialog().show()
-//            }
         } else {
             Log.i(LogTags.SMS_PERMISSIONS, "User already granted %s permissions".format(requestedPermissions.contentToString()))
         }
@@ -111,22 +111,12 @@ class MainActivity : ComponentActivity() {
         ) { _, _ -> requestLocationPermissions() }
         .create()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
         setContent {
             LocalisationHelperTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ActionInputComponent(Modifier.padding(innerPadding), this)
-                }
+                LocalisationHelperApp(this)
             }
         }
 
@@ -134,31 +124,59 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun LocalisationHelperApp(context: Context) {
+    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+
+    NavigationSuiteScaffold(
+        navigationSuiteItems = {
+            AppDestinations.entries.forEach {
+                item(
+                    icon = {
+                        Icon(
+                            painterResource(it.icon),
+                            contentDescription = it.label
+                        )
+                    },
+                    label = { Text(it.label) },
+                    selected = it == currentDestination,
+                    onClick = { currentDestination = it }
+                )
+            }
+        }
+    ) {
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            ActionInputComponent(
+                modifier = Modifier.padding(innerPadding),
+                context = context
+            )
+        }
+    }
+}
+
+enum class AppDestinations(
+    val label: String,
+    val icon: Int,
+) {
+    HOME("Home", R.drawable.ic_home),
+    FAVORITES("Favorites", R.drawable.ic_favorite),
+    PROFILE("Profile", R.drawable.ic_account_box),
 }
 
 @Composable
 fun ActionInputComponent(modifier: Modifier, context: Context) {
-    val inputState = rememberTextFieldState();
+    val inputState = rememberTextFieldState()
     var isPasswordFieldEnabled by remember { mutableStateOf(true) }
 
 
     Column(modifier = modifier) {
-        // TODO: turn this into a password like field
-        OutlinedTextField(
+        OutlinedSecureTextField(
             state = inputState,
             label = { Text("Action name") },
             enabled = isPasswordFieldEnabled,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password
-            ),
-            lineLimits = TextFieldLineLimits.SingleLine,
+            )
         )
 
         val action = Actions.getByNameTypeless(inputState.text.toString())
@@ -169,7 +187,8 @@ fun ActionInputComponent(modifier: Modifier, context: Context) {
         }
 
         Button(
-            onClick = { isPasswordFieldEnabled = false }
+            onClick = { isPasswordFieldEnabled = false },
+            enabled = isPasswordFieldEnabled
         ) {
             Text("Save password")
         }
@@ -178,7 +197,8 @@ fun ActionInputComponent(modifier: Modifier, context: Context) {
             onClick = {
                 inputState.clearText()
                 isPasswordFieldEnabled = true
-            }
+            },
+            enabled = !isPasswordFieldEnabled
         ) {
             Text("Reset password")
         }
