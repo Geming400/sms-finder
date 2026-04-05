@@ -1,4 +1,4 @@
-package fr.geming400.localisationhelper.ui.composable
+package fr.geming400.localisationhelper.ui.components
 
 import android.app.Activity
 import android.content.Context
@@ -7,6 +7,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.ui.activities.MainActivity
@@ -14,8 +16,11 @@ import fr.geming400.localisationhelper.ui.activities.SettingsActivity
 import fr.geming400.localisationhelper.ui.activities.TrackingActivity
 
 @Composable
-fun ActivitySelector(context: Context, currentDestination: AppDestinations, content: @Composable () -> Unit = {}) {
+fun ActivitySelector(currentDestination: AppDestinations, modifier: Modifier = Modifier, content: @Composable () -> Unit = {}) {
+    val context = LocalContext.current
+
     NavigationSuiteScaffold(
+        modifier = modifier,
         navigationSuiteItems = {
             AppDestinations.entries.forEach {
                 item(
