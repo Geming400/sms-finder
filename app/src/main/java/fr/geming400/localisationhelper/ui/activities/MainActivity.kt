@@ -2,7 +2,6 @@ package fr.geming400.localisationhelper.ui.activities
 
 import android.Manifest
 import android.app.AlertDialog
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -27,13 +26,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.app.ActivityCompat
 import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.actions.Actions
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
-import fr.geming400.localisationhelper.ui.composable.ActivitySelector
-import fr.geming400.localisationhelper.ui.composable.AppDestinations
+import fr.geming400.localisationhelper.ui.components.ActivitySelector
+import fr.geming400.localisationhelper.ui.components.AppDestinations
 
 class MainActivity : ComponentActivity() {
     private val requestedPermissions = arrayOf(
@@ -98,6 +98,7 @@ class MainActivity : ComponentActivity() {
         .setPositiveButton(
             "Ok"
         ) { _, _ -> requestBasePermissions() }
+        .setCancelable(false)
         .create()
 
     private fun createLocationPermissionDialog() : AlertDialog = AlertDialog.Builder(this)
@@ -114,7 +115,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LocalisationHelperTheme {
-                LocalisationHelperApp(this)
+                LocalisationHelperApp()
             }
         }
 
@@ -123,19 +124,20 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LocalisationHelperApp(context: Context) {
-    ActivitySelector(context, AppDestinations.HOME) {
+fun LocalisationHelperApp() {
+    ActivitySelector(AppDestinations.HOME) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             ActionInputComponent(
-                modifier = Modifier.padding(innerPadding),
-                context = context
+                modifier = Modifier.padding(innerPadding)
             )
         }
     }
 }
 
 @Composable
-fun ActionInputComponent(modifier: Modifier, context: Context) {
+fun ActionInputComponent(modifier: Modifier) {
+    val context = LocalContext.current
+
     val inputState = rememberTextFieldState()
     var isPasswordFieldEnabled by remember { mutableStateOf(true) }
 
