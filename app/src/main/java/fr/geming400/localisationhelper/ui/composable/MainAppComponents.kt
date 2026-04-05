@@ -28,7 +28,8 @@ fun ActivitySelector(context: Context, currentDestination: AppDestinations, cont
                     label = { Text(it.label) },
                     selected = it == currentDestination,
                     onClick = {
-                        it.startActivity(context)
+                        if (currentDestination != it)
+                            it.startActivity(context)
                     }
                 )
             }
