@@ -15,9 +15,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -141,7 +141,7 @@ fun BooleanSetting(modifier: Modifier = Modifier, setting: Setting<Boolean>) {
             style = MaterialTheme.typography.bodyLarge
         )
 
-        Checkbox(
+        Switch(
             checked = isVisuallyChecked,
             onCheckedChange = {
                 setting.askForPermissions(activity, it) {
