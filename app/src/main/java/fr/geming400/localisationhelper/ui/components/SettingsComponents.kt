@@ -69,7 +69,7 @@ fun SettingItem(modifier: Modifier = Modifier, setting: Setting<*>) {
         else -> {
             Text(
                 "Unsupported setting: ${setting.id}",
-                color = Color(255, 0, 0)
+                color = Color.Red
             )
         }
     }
