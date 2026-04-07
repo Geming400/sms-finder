@@ -197,7 +197,6 @@ fun FloatSetting(modifier: Modifier = Modifier, setting: Setting<Float>) {
             style = MaterialTheme.typography.bodyLarge
         )
 
-        // TODO: add setting description (when setting setup is finished)
         TextField(
             state = textState,
             keyboardOptions = KeyboardOptions(
