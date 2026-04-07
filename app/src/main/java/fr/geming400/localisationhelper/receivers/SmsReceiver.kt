@@ -16,7 +16,6 @@ import fr.geming400.localisationhelper.actions.Actions
 class SmsReceiver : BroadcastReceiver() {
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onReceive(context: Context, intent: Intent) {
-        Log.i(LogTags.SMS_RECEIVER, "Received broadcast %s (with context %s) !".format(intent, context))
         if (intent.action.equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
             val bundle = intent.extras
             if (bundle != null) {
