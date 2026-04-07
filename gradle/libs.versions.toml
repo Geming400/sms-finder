@@ -15,8 +15,8 @@ kotlin = "2.3.20"
 composeBom = "2026.03.01"
 workRuntimeKtx = "2.11.2"
 appcompat = "1.7.1"
-preference = "1.2.0"
-material = "1.4.0"
+preference = "1.2.1"
+material = "1.13.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
