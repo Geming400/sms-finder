@@ -57,6 +57,10 @@
             android:exported="true"
             android:theme="@style/Theme.LocalisationHelper" />
         <activity
+            android:name=".ui.activities.UserTrackingActivity"
+            android:exported="true"
+            android:theme="@style/Theme.LocalisationHelper" />
+        <activity
             android:name=".ui.activities.SettingsActivity"
             android:exported="true"
             android:theme="@style/Theme.LocalisationHelper" />
