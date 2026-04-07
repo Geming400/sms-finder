@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Localisation Helper</string>
+    <string name="destinations_tracking">Suivi</string>
+    <string name="destinations_settings">Paramètres</string>
+    <string name="destinations_home">Menu Principal</string>
+    <string name="linked_phone_number">Numéro de tel. rélié</string>
+    <string name="unknown_contact">Contact inconnu</string>
+    <string name="content_description_click_to_expand">Cliquez pour étendre</string>
+    <string name="no_viable_phone_number_error">Choisissez un numéro de tel. valide</string>
+</resources>

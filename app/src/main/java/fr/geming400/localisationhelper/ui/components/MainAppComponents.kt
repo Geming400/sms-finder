@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.ui.activities.MainActivity
 import fr.geming400.localisationhelper.ui.activities.SettingsActivity
@@ -27,10 +28,10 @@ fun ActivitySelector(currentDestination: AppDestinations, modifier: Modifier = M
                     icon = {
                         Icon(
                             painterResource(it.icon),
-                            contentDescription = it.label
+                            contentDescription = stringResource(it.label)
                         )
                     },
-                    label = { Text(it.label) },
+                    label = { Text(stringResource(it.label)) },
                     selected = it == currentDestination,
                     onClick = {
                         if (currentDestination != it)
@@ -45,24 +46,24 @@ fun ActivitySelector(currentDestination: AppDestinations, modifier: Modifier = M
 }
 
 enum class AppDestinations(
-    val label: String,
+    val label: Int,
     val icon: Int,
     val clazz: Class<out Activity>
 ) {
     /**
      * The main menu for the app
      */
-    HOME("Home", R.drawable.ic_home, MainActivity::class.java),
+    HOME(R.string.destinations_home, R.drawable.ic_home, MainActivity::class.java),
 
     /**
      * Where you can track someone
      */
-    TRACKING("Tracking", R.drawable.ic_radar, TrackingActivity::class.java),
+    TRACKING(R.string.destinations_tracking, R.drawable.ic_radar, TrackingActivity::class.java),
 
     /**
      * The settings menu
      */
-    SETTINGS("Settings", R.drawable.ic_settings, SettingsActivity::class.java);
+    SETTINGS(R.string.destinations_settings, R.drawable.ic_settings, SettingsActivity::class.java);
 
     /**
      * Starts the activity of this destination

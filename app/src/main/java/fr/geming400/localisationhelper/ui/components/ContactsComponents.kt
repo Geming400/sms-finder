@@ -30,7 +30,7 @@ import contacts.core.asc
 import contacts.core.desc
 import contacts.core.entities.Contact
 import fr.geming400.localisationhelper.R
-import fr.geming400.localisationhelper.ui.activities.UserTrackingActivity
+import java.util.Locale
 
 @Composable
 fun ContactProfile(contact: Contact) {
@@ -51,7 +51,7 @@ fun ContactProfile(contact: Contact) {
                 .padding(5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val displayName = contact.displayNamePrimary ?: "Unknown contact"
+            val displayName = contact.displayNamePrimary ?: stringResource(R.string.unknown_contact)
             val imageModifier = Modifier
                 .clip(CircleShape)
                 .size(75.dp)
@@ -59,14 +59,15 @@ fun ContactProfile(contact: Contact) {
             if (contact.photoThumbnailUri == null) {
                 Image(
                     painter = painterResource(R.drawable.ic_person),
-                    contentDescription = "The default photo of the contact $displayName",
+                    // contentDescription = "The default photo of the contact $displayName",
+                    contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = imageModifier
                 )
             } else {
                 AsyncImage(
                     model = contact.photoThumbnailUri,
-                    contentDescription = "The photo of the contact $displayName",
+                    contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = imageModifier
                 )
@@ -82,26 +83,18 @@ fun ContactProfile(contact: Contact) {
 }
 
 @Composable
-fun ContactsList(modifier: Modifier = Modifier) {
-    val context = LocalContext.current;
-
-    val projection = arrayOf(
-        ContactsContract.Profile._ID,
-        ContactsContract.Profile.DISPLAY_NAME_PRIMARY,
-        ContactsContract.Profile.LOOKUP_KEY,
-        ContactsContract.Profile.PHOTO_THUMBNAIL_URI
-    )
+fun ContactsList(modifier: Modifier = Modifier, contactsFilter: List<LookupQuery.LookupKeyWithId>, onContactClick: (contact: Contact) -> Unit = {}) {
+    val context = LocalContext.current
 
     val result = Contacts(context)
-        .broadQuery()
-        .include { Phone.all + DataId + Contact.DisplayNamePrimary + Contact.PhotoThumbnailUri }
+        .lookupQuery()
+        .include { Phone.all + DataId + Contact.DisplayNamePrimary + Contact.PhotoThumbnailUri + Contact.LookupKey }
         .orderBy(
             ContactsFields.Options.Starred.desc(),
             ContactsFields.DisplayNamePrimary.asc()
         )
+        .whereLookupKeyWithIdMatches(contactsFilter)
         .find()
-
-
 
     LazyColumn(
         modifier = modifier

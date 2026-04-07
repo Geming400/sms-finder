@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 
 import fr.geming400.localisationhelper.ui.activities.CustomActivity;
 
-// TODO: add required permissions
+// TODO: Add translation stuff
 public abstract class Setting<T> {
     protected final String id;
     protected String name;
