@@ -10,7 +10,8 @@ open class CustomActivity : ComponentActivity() {
 
     private var permissionCallbacks: MutableMap<Int, Array<Callback>> = mutableMapOf()
 
-    @Deprecated("I don't care")
+
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
