@@ -56,27 +56,27 @@ class SmsReceiver : BroadcastReceiver() {
 //            override fun onReceive(ctx: Context, intent: Intent) {
 //                when (resultCode) {
 //                    Activity.RESULT_OK -> {
-//                        Log.i("SMS", "SMS sent successfully")
+//                        Log.i(LogTags.SMS_RECEIVER, "SMS sent successfully")
 //                    }
 //
 //                    SmsManager.RESULT_ERROR_GENERIC_FAILURE -> {
-//                        Log.e("SMS", "Generic failure")
+//                        Log.e(LogTags.SMS_RECEIVER, "Generic failure")
 //                    }
 //
 //                    SmsManager.RESULT_ERROR_NO_SERVICE -> {
-//                        Log.e("SMS", "No service")
+//                        Log.e(LogTags.SMS_RECEIVER, "No service")
 //                    }
 //
 //                    SmsManager.RESULT_ERROR_NULL_PDU -> {
-//                        Log.e("SMS", "Null PDU")
+//                        Log.e(LogTags.SMS_RECEIVER, "Null PDU")
 //                    }
 //
 //                    SmsManager.RESULT_ERROR_RADIO_OFF -> {
-//                        Log.e("SMS", "Radio off")
+//                        Log.e(LogTags.SMS_RECEIVER, "Radio off")
 //                    }
 //
 //                    else -> {
-//                        Log.e("SMS", "Got other error code: $resultCode. Result data is $resultData")
+//                        Log.e(LogTags.SMS_RECEIVER, "Got other error code: $resultCode. Result data is $resultData")
 //                    }
 //                }
 //            }
