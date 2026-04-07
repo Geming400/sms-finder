@@ -49,8 +49,19 @@ enum class AppDestinations(
     val icon: Int,
     val clazz: Class<out Activity>
 ) {
+    /**
+     * The main menu for the app
+     */
     HOME("Home", R.drawable.ic_home, MainActivity::class.java),
+
+    /**
+     * Where you can track someone
+     */
     TRACKING("Tracking", R.drawable.ic_radar, TrackingActivity::class.java),
+
+    /**
+     * The settings menu
+     */
     SETTINGS("Settings", R.drawable.ic_settings, SettingsActivity::class.java);
 
     /**
