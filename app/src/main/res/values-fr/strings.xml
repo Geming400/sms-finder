@@ -8,4 +8,5 @@
     <string name="unknown_contact">Contact inconnu</string>
     <string name="content_description_click_to_expand">Cliquez pour étendre</string>
     <string name="no_viable_phone_number_error">Choisissez un numéro de tel. valide</string>
+    <string name="back_button_exit">Utiliser le boutton de retour pour sortir de la carte</string>
 </resources>

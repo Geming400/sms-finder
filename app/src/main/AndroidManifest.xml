@@ -6,6 +6,7 @@
         android:name="android.hardware.telephony"
         android:required="false" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="android.permission.READ_SMS"
         tools:ignore="SmsAndCallLogPolicy" />
@@ -20,7 +21,8 @@
         tools:ignore="SmsAndCallLogPolicy" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
+    <uses-permission
+        android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
         tools:ignore="BackgroundLocationPolicy" />
 
     <application
@@ -54,15 +56,25 @@
         </activity>
         <activity
             android:name=".ui.activities.TrackingActivity"
-            android:exported="true"
+            android:label="Tracking activity"
+            android:exported="false"
             android:theme="@style/Theme.LocalisationHelper" />
         <activity
             android:name=".ui.activities.UserTrackingActivity"
-            android:exported="true"
+            android:label="User Tracking activity"
+            android:exported="false"
             android:theme="@style/Theme.LocalisationHelper" />
         <activity
             android:name=".ui.activities.SettingsActivity"
-            android:exported="true"
+            android:label="Settings activity"
+            android:exported="false"
+            android:theme="@style/Theme.LocalisationHelper" />
+        <activity
+            android:name=".ui.activities.OSMActivity"
+            android:label="Open Street Map activity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/Theme.LocalisationHelper" />
     </application>
 

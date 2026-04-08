@@ -59,6 +59,8 @@ dependencies {
     implementation libs.contacts.android.core
     implementation libs.coil.compose
     implementation libs.coil.network.okhttp
+    implementation libs.osmdroid.android
+    implementation libs.osm.androd.compose
 
     testImplementation libs.junit
 
