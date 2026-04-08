@@ -3,6 +3,8 @@ package fr.geming400.localisationhelper.ui.components
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -46,7 +48,9 @@ fun ActivitySelector(currentDestination: AppDestinations, modifier: Modifier = M
 }
 
 enum class AppDestinations(
+    @field:StringRes
     val label: Int,
+    @field:DrawableRes
     val icon: Int,
     val clazz: Class<out Activity>
 ) {
