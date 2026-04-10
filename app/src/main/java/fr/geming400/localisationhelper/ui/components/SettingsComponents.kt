@@ -49,7 +49,7 @@ fun SettingScreen(modifier: Modifier) {
                 item {
                     SettingsCategory(title = category.name) {
                         settings.forEach {
-                            SettingItem(setting =  it)
+                            SettingItem(setting = it)
                             HorizontalDivider()
                         }
                     }
