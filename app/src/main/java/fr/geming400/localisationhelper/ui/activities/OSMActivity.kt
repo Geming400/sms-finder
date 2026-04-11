@@ -37,6 +37,22 @@ import org.osmdroid.util.GeoPoint
  * - longitude ([Double])
  * - zoom ([Double]) *(optional)* (defaults to `5`)
  * - markers ([Array]<[GeoPoint]>) *(optional)* (defaults to `emptyArray()`)
+ *
+ * Example on how to launch this activity:
+ *
+ * ```kotlin
+ * val intent = Intent(context, OSMActivity::class.java)
+ * val bundle = Bundle()
+ * bundle.putDouble("latitude", 5.2)
+ * bundle.putDouble("longitude", 5.0)
+ * bundle.putDouble("zoom", 18.5)
+ * bundle.putParcelableArray("markers", arrayOf(
+ *     GeoPoint(5.00001, 5.00001)
+ * ))
+ *
+ * intent.putExtras(bundle)
+ * startActivity(intent)
+ * ```
  */
 class OSMActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,21 +64,24 @@ class OSMActivity : ComponentActivity() {
         val longitude = bundle.getDouble("longitude")
         val zoom = bundle.getDouble("zoom", 5.0)
 
-        var markersPoints: Array<GeoPoint>
-        if (bundle.containsKey("markers")) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                markersPoints = bundle.getParcelableArray("markers", GeoPoint::class.java)!!
+        val markersPoints: Array<GeoPoint> =
+            if (bundle.containsKey("markers")) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    bundle.getParcelableArray("markers", GeoPoint::class.java)!!
+                } else {
+                    @Suppress("UNCHECKED_CAST", "DEPRECATION")
+                    bundle.getParcelableArray("markers") as Array<GeoPoint>
+                }
             } else {
-                @Suppress("UNCHECKED_CAST", "DEPRECATION")
-                markersPoints = bundle.getParcelableArray("markers") as Array<GeoPoint>
+                emptyArray()
             }
-        } else {
-            markersPoints = emptyArray()
-        }
 
         Log.i(LogTags.OSM_ACTIVITY, "Found geopoints $markersPoints")
 
-
+        // We force this orientation because then
+        // the zoom action buttons show outside
+        // the screen for my phone, so probably
+        // other phones too
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
         enableEdgeToEdge()
@@ -80,7 +99,7 @@ class OSMActivity : ComponentActivity() {
 }
 
 @Composable
-fun Map(
+private fun Map(
     latitude: Double,
     longitude: Double,
     zoom: Double = 5.0,
