@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">Localisation Helper</string>
-    <string name="title_activity_main" translatable="false">Main Activity</string>
+    <string name="app_name" translatable="false">SMS Finder</string>
     <string name="destinations_home">Home</string>
     <string name="destinations_tracking">Tracking</string>
     <string name="destinations_settings">Settings</string>
@@ -9,4 +8,7 @@
     <string name="content_description_click_to_expand">Click to expand</string>
     <string name="no_viable_phone_number_error">Please choose a valid phone number</string>
     <string name="back_button_exit">Use the back button to exit the map</string>
+    <string name="has_no_valid_numbers_error">This contact has no valid phone numbers !</string>
+    <string name="add_contacts">Add contacts by clicking on the \'+\' button</string>
+    <string name="delete">Delete</string>
 </resources>

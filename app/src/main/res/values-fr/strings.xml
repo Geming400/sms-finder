@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Localisation Helper</string>
     <string name="destinations_tracking">Suivi</string>
     <string name="destinations_settings">Paramètres</string>
     <string name="destinations_home">Menu Principal</string>
@@ -9,4 +8,7 @@
     <string name="content_description_click_to_expand">Cliquez pour étendre</string>
     <string name="no_viable_phone_number_error">Choisissez un numéro de tel. valide</string>
     <string name="back_button_exit">Utiliser le boutton de retour pour sortir de la carte</string>
+    <string name="has_no_valid_numbers_error">Ce contact n\'a aucun numéro de tel. valide !</string>
+    <string name="add_contacts">Rajoute des contacts avec le boutton \'+\'</string>
+    <string name="delete">Supprimer</string>
 </resources>
