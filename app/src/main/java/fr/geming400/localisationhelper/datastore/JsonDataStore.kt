@@ -1,6 +1,7 @@
 package fr.geming400.localisationhelper.datastore
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
@@ -8,6 +9,7 @@ import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.dataStore
 import contacts.core.LookupQuery
 import contacts.core.entities.Contact
+import fr.geming400.localisationhelper.LogTags
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -31,7 +33,7 @@ class JsonDataStore(val context: Context) {
         context.dataStore.updateData { savedData ->
             savedData.copy(
                 trackedContacts = savedData.trackedContacts.plus(
-                    TrackingData(lookupKeyWithId.lookupKey, lookupKeyWithId.contactId)
+                    TrackingData(lookupKeyWithId.lookupKey)
                 )
             )
         }
@@ -55,7 +57,12 @@ class JsonDataStore(val context: Context) {
         }
     }
 
+    /**
+     * @return if the operation succeeded
+     */
     suspend fun removeTrackedContact(contact: Contact): Boolean {
+        Log.d(LogTags.DATA_STORE, "Deleting contact $contact")
+
         var res = false
 
         context.dataStore.updateData { savedData ->
@@ -71,12 +78,19 @@ class JsonDataStore(val context: Context) {
     }
 
     fun getTrackedContact(contacts: Collection<TrackingData>, contact: Contact): TrackingData {
+        val trackingData = getTrackedContactOrNull(contacts, contact)
+            ?: throw NoSuchElementException("No elements correspond to '$contact' in '$contacts'")
+
+        return trackingData
+    }
+
+    fun getTrackedContactOrNull(contacts: Collection<TrackingData>, contact: Contact): TrackingData? {
         contacts.forEach {
             if (it.areContactInfoEqual(contact))
-                return@getTrackedContact it
+                return it
         }
 
-        throw NoSuchElementException("No elements correspond to '$contact' in '$contacts'")
+        return null
     }
 }
 

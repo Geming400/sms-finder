@@ -102,6 +102,7 @@ class SmsReceiver : BroadcastReceiver() {
                         "My last known location is %s° latitude and %s° longitude"
                             .format(location.latitude, location.longitude)
                     }
+
                     sendMessage(context, sender, text)
                 } finally {
                     pendingResult.finish()
