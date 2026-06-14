@@ -157,7 +157,7 @@ public abstract class Setting<T> {
     }
 
     public enum Category {
-        NONE("None", false, 0),
+        NONE("None", true, 0),
         BASIC("Basic", 1),
         TEST("test", 2);
 
@@ -172,7 +172,7 @@ public abstract class Setting<T> {
             this.weight = weight;
         }
         Category(String name, @IntRange(from = 0, to = Integer.MAX_VALUE) int weight) {
-            this(name, true, weight);
+            this(name, false, weight);
         }
 
         public String getName() {

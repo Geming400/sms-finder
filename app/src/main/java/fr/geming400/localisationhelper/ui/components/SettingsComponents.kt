@@ -45,7 +45,7 @@ fun SettingScreen(modifier: Modifier) {
             .scrollable(state = ScrollState(0), orientation = Orientation.Horizontal))
     {
         Settings.getSettingsByCategory().forEach { (category, settings) ->
-            if (category.isHidden) {
+            if (!category.isHidden) {
                 item {
                     SettingsCategory(title = category.name) {
                         settings.forEach {
