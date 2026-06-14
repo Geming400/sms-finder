@@ -9,10 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Objects;
 
-import fr.geming400.localisationhelper.Utils;
+import fr.geming400.localisationhelper.utils.Utils;
 
-public abstract class BaseAction<R> {
+public abstract class BaseAction<T, P> {
     private final String name;
 
     public BaseAction(String name) {
@@ -42,6 +43,18 @@ public abstract class BaseAction<R> {
         return Arrays.toString(md.digest(password.getBytes(StandardCharsets.US_ASCII)));
     }
 
+    public void sendSMS(@NonNull Context context, @NonNull String sender) {
+        this.sendSmsHelper(context, sender, Objects.toString(this.execute(context)));
+    }
+
+    protected void sendSmsHelper(@NonNull Context context, @NonNull String sender, @Nullable String content) {
+        String suffix = content == null ? "" : ":" + content;
+        Utils.sendSMS(context, sender, this.getName() + suffix);
+    }
+
+    @NonNull
+    public abstract P parse(String rawContent) throws MalformedRawActionException;
+
     /**
      * Checks if this action has no return type
      * @return if this action has no return type
@@ -51,10 +64,15 @@ public abstract class BaseAction<R> {
         return this instanceof VoidAction;
     }
 
-    public void sendSMS(@NonNull Context context, @NonNull String sender) {
-        Utils.sendSMS(context, sender, this.getName() + ":" + this.execute(context));
-    }
-
     @Nullable
-    public abstract R execute(Context context);
+    public abstract T execute(Context context);
+
+    @NonNull
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{" +
+                "name='" + this.name + '\'' +
+                "isVoid='" + this.isVoid() + '\'' +
+                '}';
+    }
 }
