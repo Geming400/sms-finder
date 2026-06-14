@@ -11,23 +11,22 @@ import kotlinx.serialization.Serializable
 data class TrackingData(
     // Contact info
     val lookupKey: String,
-    val contactID: Long,
     val linkedPhoneNumber: String? = null,
 
     // Tracking info
     val geolocation: SerializableGeolocation? = null
 ) {
     val lookupKeyWithId: LookupQuery.LookupKeyWithId
-        get() = LookupQuery.LookupKeyWithId(lookupKey, contactID)
+        get() = LookupQuery.LookupKeyWithId(lookupKey, 0)
 
     fun getContact(context: Context): Contact = Contacts(context)
         .lookupQuery()
-        .whereLookupKeyWithIdMatches(LookupQuery.LookupKeyWithId(lookupKey, contactID))
+        .whereLookupKeyWithIdMatches(LookupQuery.LookupKeyWithId(lookupKey, 0))
         .find()
         .first()
 
     fun areContactInfoEqual(contact: Contact) =
-        contact.lookupKey == lookupKey && contact.id == contactID
+        contact.lookupKey == lookupKey
 }
 
 @Serializable
