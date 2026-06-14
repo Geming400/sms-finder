@@ -1,4 +1,4 @@
-package fr.geming400.localisationhelper;
+package fr.geming400.localisationhelper.utils;
 
 import android.Manifest;
 import android.content.Context;
@@ -16,11 +16,13 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 import contacts.core.entities.Contact;
 import contacts.core.entities.Phone;
 import contacts.core.entities.RawContact;
+import fr.geming400.localisationhelper.LogTags;
 
 public final class Utils {
     private Utils() {}
@@ -138,15 +140,26 @@ public final class Utils {
     }
 
     @Unmodifiable
-    public static Collection<Phone> getPhones(@Nullable Contact contact, boolean mustBeValid) {
+    public static Collection<Phone> getPhones(@Nullable Contact contact, boolean mustBeValid, boolean ignoreCopies) {
         if (contact == null)
             return Set.of();
 
         Set<Phone> phones = new HashSet<>();
         for (RawContact rawContact : contact.getRawContacts()) {
             for (Phone phone : rawContact.getPhones()) {
-                if (mustBeValid && isNumberValid(phone))
+                boolean isPhoneDuplicate = phones
+                        .stream()
+                        .anyMatch(phoneElem -> Objects.equals(phoneElem.getNormalizedNumber(), phone.getNormalizedNumber()));
+                if (ignoreCopies && isPhoneDuplicate)
+                    continue;
+
+                if (mustBeValid) {
+                    if (isNumberValid(phone)) {
+                        phones.add(phone);
+                    }
+                } else {
                     phones.add(phone);
+                }
             }
         }
 
@@ -154,7 +167,7 @@ public final class Utils {
     }
 
     public static void sendSMS(@NonNull Context context, @NonNull String sender, String body) {
-        Log.i(LogTags.SMS_SENDER, "Sending sms to" + sender + "with body: " + body);
+        Log.d(LogTags.SMS_SENDER, "Sending sms to" + sender + "with body: " + body);
 
         var smsManager = context.getSystemService(SmsManager.class);
         smsManager.sendMultipartTextMessage(sender, null, smsManager.divideMessage(body), null, null);
