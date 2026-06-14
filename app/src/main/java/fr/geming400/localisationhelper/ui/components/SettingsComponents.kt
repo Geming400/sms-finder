@@ -33,7 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.preference.PreferenceManager
-import fr.geming400.localisationhelper.Utils
+import fr.geming400.localisationhelper.utils.Utils
 import fr.geming400.localisationhelper.ui.activities.CustomActivity
 import fr.geming400.localisationhelper.ui.settings.Setting
 import fr.geming400.localisationhelper.ui.settings.Settings

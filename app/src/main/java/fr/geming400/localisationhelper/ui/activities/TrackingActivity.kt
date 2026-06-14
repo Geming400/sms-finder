@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.em
 import contacts.core.Contacts
 import contacts.core.LookupQuery
 import fr.geming400.localisationhelper.R
-import fr.geming400.localisationhelper.Utils
+import fr.geming400.localisationhelper.utils.Utils
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations

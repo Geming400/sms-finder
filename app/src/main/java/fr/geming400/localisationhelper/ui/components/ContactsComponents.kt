@@ -50,7 +50,7 @@ import contacts.core.entities.Contact
 import contacts.core.entities.Phone
 import contacts.core.entities.RawContact
 import fr.geming400.localisationhelper.R
-import fr.geming400.localisationhelper.Utils
+import fr.geming400.localisationhelper.utils.Utils
 import fr.geming400.localisationhelper.set
 
 @Composable
