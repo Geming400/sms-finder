@@ -13,6 +13,8 @@ import androidx.core.app.ActivityCompat;
 
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
@@ -171,5 +173,9 @@ public final class Utils {
 
         var smsManager = context.getSystemService(SmsManager.class);
         smsManager.sendMultipartTextMessage(sender, null, smsManager.divideMessage(body), null, null);
+    }
+
+    public static long getCurrentEpoch() {
+        return LocalDateTime.now().toEpochSecond(OffsetDateTime.now().getOffset());
     }
 }
