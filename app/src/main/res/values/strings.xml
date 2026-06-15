@@ -11,4 +11,9 @@
     <string name="has_no_valid_numbers_error">This contact has no valid phone numbers !</string>
     <string name="add_contacts">Add contacts by clicking on the \'+\' button</string>
     <string name="delete">Delete</string>
+    <string name="delete_error">An error occurred while trying to delete %1$s</string>
+    <string name="confirmation_text">Are you sure ?</string>
+    <string name="deletion_confirmation">Deleting this contact from \'SMS Finder\' will delete all of its info. You can always add them back !</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
 </resources>

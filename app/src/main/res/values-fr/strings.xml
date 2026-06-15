@@ -9,6 +9,11 @@
     <string name="no_viable_phone_number_error">Choisissez un numéro de tel. valide</string>
     <string name="back_button_exit">Utiliser le boutton de retour pour sortir de la carte</string>
     <string name="has_no_valid_numbers_error">Ce contact n\'a aucun numéro de tel. valide !</string>
-    <string name="add_contacts">Rajoute des contacts avec le boutton \'+\'</string>
+    <string name="add_contacts">Rajoutez des contacts avec le boutton \'+\'</string>
     <string name="delete">Supprimer</string>
+    <string name="delete_error">Une erreur c\'est produite en essayant de supprimer %1$s</string>
+    <string name="confirmation_text">Est-tu sûr ?</string>
+    <string name="deletion_confirmation">Supprimer ce contact de \'SMS Finder\' va supprimer tout ses infos. Vous pouvez toujours les rajouter de nouveau !</string>
+    <string name="confirm">Confirmer</string>
+    <string name="cancel">Annuler</string>
 </resources>

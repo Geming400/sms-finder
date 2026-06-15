@@ -61,7 +61,7 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name) {
                 LocationManager.GPS_PROVIDER,
                 LocationRequestCompat.PASSIVE_INTERVAL,
                 Int.MAX_VALUE.toFloat()
-            ) { location: Location? ->
+            ) { location ->
                 completableFuture.complete(
                     SimpleLocation.ofLocation(
                         location
@@ -75,7 +75,6 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name) {
         return null
     }
 
-    // TODO:
     override fun onReceive(context: Context, sender: String, pendingResult: PendingResult, stage: Stage, rawContent: String) {
         if (stage == Stage.RECEIVE_OTHER_PHONE) {
 
