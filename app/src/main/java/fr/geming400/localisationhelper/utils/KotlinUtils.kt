@@ -1,4 +1,4 @@
-package fr.geming400.localisationhelper
+package fr.geming400.localisationhelper.utils
 
 import androidx.compose.foundation.text.input.TextFieldState
 

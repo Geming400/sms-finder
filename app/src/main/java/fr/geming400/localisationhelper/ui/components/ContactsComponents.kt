@@ -50,7 +50,7 @@ import contacts.core.entities.Phone
 import contacts.core.entities.RawContact
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.utils.Utils
-import fr.geming400.localisationhelper.set
+import fr.geming400.localisationhelper.utils.set
 
 @Composable
 fun ContactProfile(modifier: Modifier = Modifier, contact: Contact, onClick: () -> Unit) {
