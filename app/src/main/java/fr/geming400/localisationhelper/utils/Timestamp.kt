@@ -20,7 +20,7 @@ data class Timestamp(
     }
 
     override fun toString(): String {
-        return "Location(dateTime = ${toLocalDateTime()})"
+        return "Timestamp(dateTime = ${toLocalDateTime()})"
     }
 
     companion object {
