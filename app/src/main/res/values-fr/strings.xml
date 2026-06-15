@@ -16,4 +16,6 @@
     <string name="deletion_confirmation">Supprimer ce contact de \'SMS Finder\' va supprimer tout ses infos. Vous pouvez toujours les rajouter de nouveau !</string>
     <string name="confirm">Confirmer</string>
     <string name="cancel">Annuler</string>
+    <string name="xiaomi_notice">Téléphone Xiaomi detecté !\nPour que cette appli fonctionne correctement, vous devez l\'autoriser à s\'éxécuter comme tache de fond.\nPour faire ceci, dirigez vous dans l\'appli \"Sécurité\", puis dans l\'onglet \"Gérer les applications\", puis dans \"Démarrage automatique en arrière plan\" et cochez \"SMS Finder\"</string>
+    <string name="warning">Attention !</string>
 </resources>

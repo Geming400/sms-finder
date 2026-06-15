@@ -1,6 +1,7 @@
 package fr.geming400.localisationhelper.datastore
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
@@ -116,7 +117,8 @@ val Context.dataStore: DataStore<LocalisationHelperData> by dataStore(
 @Serializable
 data class LocalisationHelperData(
     val trackedContacts: List<TrackingData> = arrayListOf(),
-    val passwordHash: String? = null
+    val passwordHash: String? = null,
+    val sawXiaomiNotice: Boolean = Build.MANUFACTURER != "Xiaomi"
 )
 
 object LocalisationHelperDataSerializer : Serializer<LocalisationHelperData> {

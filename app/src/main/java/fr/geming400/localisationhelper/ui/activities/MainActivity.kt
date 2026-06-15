@@ -13,13 +13,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,13 +28,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
 import fr.geming400.localisationhelper.LogTags
+import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.actions.Actions
-import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
+import fr.geming400.localisationhelper.datastore.dataStore
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
+import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
     private val requestedPermissions = arrayOf(
@@ -112,6 +117,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+//        val intent = Intent(this, UserTrackingActivity::class.java)
+//        intent.putExtra("contactID", 64L)
+//        intent.putExtra("lookupKey", "404i27aaf56c8ac66864.3789r64-422A422A4440522E2A4E")
+//        startActivity(intent)
+
         enableEdgeToEdge()
         setContent {
             LocalisationHelperTheme {
@@ -125,6 +135,27 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun LocalisationHelperApp() {
+    val context = LocalContext.current
+
+    val appData = runBlocking {
+        context.dataStore.data.first()
+    }
+
+    val openXiaomiNoticeDialog = remember { mutableStateOf(!appData.sawXiaomiNotice) }
+
+    when {
+        openXiaomiNoticeDialog.value -> {
+            XiaomiNoticeDialog() {
+                openXiaomiNoticeDialog.value = false
+                runBlocking {
+                    context.dataStore.updateData {
+                        it.copy(sawXiaomiNotice = true)
+                    }
+                }
+            }
+        }
+    }
+
     ActivitySelector(AppDestinations.HOME) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             ActionInputComponent(
@@ -146,10 +177,7 @@ fun ActionInputComponent(modifier: Modifier) {
         OutlinedSecureTextField(
             state = inputState,
             label = { Text("Action name") },
-            enabled = isPasswordFieldEnabled,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password
-            )
+            enabled = isPasswordFieldEnabled
         )
 
         val action = Actions.getByNameTypeless(inputState.text.toString())
@@ -176,4 +204,32 @@ fun ActionInputComponent(modifier: Modifier) {
             Text("Reset password")
         }
     }
+}
+
+@Composable
+private fun XiaomiNoticeDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = {
+            onDismiss()
+        },
+        title = {
+            Text(stringResource(R.string.warning))
+        },
+        text = {
+            Text(stringResource(R.string.xiaomi_notice))
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onDismiss()
+                }
+            ) {
+                Text(stringResource(R.string.confirm))
+            }
+        }
+    )
 }
