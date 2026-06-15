@@ -60,8 +60,7 @@ dependencies {
     implementation libs.contacts.android.core
     implementation libs.coil.compose
     implementation libs.coil.network.okhttp
-    implementation libs.osmdroid.android
-    implementation libs.osm.androd.compose
+    implementation libs.maplibre.compose
     implementation libs.androidx.datastore
     implementation libs.kotlinx.serialization.json
 

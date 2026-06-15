@@ -69,13 +69,6 @@
             android:label="Settings activity"
             android:exported="false"
             android:theme="@style/Theme.LocalisationHelper" />
-        <activity
-            android:name=".ui.activities.OSMActivity"
-            android:label="Open Street Map activity"
-            android:exported="false"
-            android:screenOrientation="landscape"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/Theme.LocalisationHelper" />
     </application>
 
 </manifest>
