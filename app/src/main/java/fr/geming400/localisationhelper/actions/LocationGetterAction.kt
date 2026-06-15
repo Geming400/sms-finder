@@ -27,7 +27,7 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name) {
         if (geolocation.size == 2) {
             try {
                 val latitude = Math.clamp(geolocation[0].toDouble(), -90.0, 90.0)
-                val longitude = Math.clamp(geolocation[0].toDouble(), -180.0, 180.0)
+                val longitude = Math.clamp(geolocation[1].toDouble(), -180.0, 180.0)
 
                 return SimpleLocation(latitude, longitude)
             } catch (e: NumberFormatException) {
@@ -93,7 +93,7 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name) {
 
                     jsonDataStore.updateTrackedContact(asContact) {
                         it.copy(
-                            geolocation = SerializableGeolocation(geolocation.longitude, geolocation.latitude, Timestamp.now())
+                            geolocation = SerializableGeolocation(geolocation.latitude, geolocation.longitude, Timestamp.now())
                         )
                     }
                 }
