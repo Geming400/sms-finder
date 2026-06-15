@@ -172,7 +172,7 @@ fun PhoneNumberDropdown(
     var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
     var expanded by remember { mutableStateOf(false) }
 
-    val textValue: TextFieldState = if (currentChoice == null) {
+    val textValue = if (currentChoice == null) {
         rememberTextFieldState(
             Utils.formatNumber(
                 getFirstPhoneNumber(contact),

@@ -32,10 +32,7 @@ data class TrackingData(
 
 @Serializable
 data class SerializableGeolocation(
-    val longitude: Double,
     val latitude: Double,
-    /**
-     * When this geolocation data got recorded
-     */
-    val lastTimeRecorded: Timestamp? = null
+    val longitude: Double,
+    val lastTimeRecorded: Timestamp
 )
