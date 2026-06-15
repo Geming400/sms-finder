@@ -11,6 +11,8 @@ import android.util.Log
 import androidx.annotation.RequiresPermission
 import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.actions.Actions
+import fr.geming400.localisationhelper.actions.BaseAction
+import fr.geming400.localisationhelper.actions.PayloadType
 
 
 class SmsReceiver : BroadcastReceiver() {
@@ -22,21 +24,41 @@ class SmsReceiver : BroadcastReceiver() {
                 val pdus = bundle.get("pdus") as Array<*>
 
                 var body = ""
-                var sender: String? = ""
+                var sender = ""
 
                 // Constructing the final message
                 // by appending all sub-messages
                 for (pdu in pdus) {
                     val message: SmsMessage = SmsMessage.createFromPdu(pdu as ByteArray?, bundle.getString("format"))
-                    sender = message.originatingAddress
+                    sender = message.originatingAddress!!
                     body = body.plus(message.messageBody)
                 }
 
-                Log.i(LogTags.SMS_RECEIVER, "Sms received: sent by %s:".format(sender))
-                Log.i(LogTags.SMS_RECEIVER, body)
+//                Log.i(LogTags.SMS_RECEIVER, "Sms received: sent by %s:".format(sender))
+//                Log.i(LogTags.SMS_RECEIVER, body)
 
                 if (body == "a")
                     queryLocation(context, sender)
+
+                val headersAndRawContent = body.split(":", limit = 2)
+                val headers = headersAndRawContent[0].split("/", limit = 2)
+                if (headers.size == 2) {
+                    val payloadType = PayloadType.fromPayloadName(headers[0])!!
+                    val name = headers[1]
+
+                    Log.i(LogTags.SMS_RECEIVER, "Received $payloadType payload of action $name !")
+
+                    val rawContent = if (headersAndRawContent.size == 2) headersAndRawContent[1] else ""
+
+                    val pendingResult = goAsync()
+                    try {
+                        Actions.getByNameTypeless(name)?.onReceive(context, sender, pendingResult, BaseAction.Stage.fromPayloadType(payloadType), rawContent)
+                    } finally {
+                        pendingResult.finish()
+                    }
+                } else {
+                    Log.w(LogTags.SMS_RECEIVER,"Splitted received body but was of invalid size (got ${headers.size} instead). Either the body is malformed or the sms not for us")
+                }
             }
         }
     }
@@ -100,7 +122,7 @@ class SmsReceiver : BroadcastReceiver() {
                         "My last known location is unknown :("
                     } else {
                         "My last known location is %s° latitude and %s° longitude"
-                            .format(location.latitude, location.longitude)
+                            .format(location?.latitude, location?.longitude)
                     }
 
                     sendMessage(context, sender, text)

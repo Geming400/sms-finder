@@ -5,8 +5,6 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.function.Consumer;
-
 public abstract class VoidAction extends BaseAction<Void, Boolean> {
     public VoidAction(String name) {
         super(name);
@@ -21,23 +19,12 @@ public abstract class VoidAction extends BaseAction<Void, Boolean> {
 
     public abstract void executeVoid(Context context);
 
-    @Override
-    public void sendSMS(@NonNull Context context, @NonNull String sender) {
-        this.sendSmsHelper(context, sender, null);
-    }
-
+    /**
+     * Checks if the {@code rawContent} of the action is valid
+     * @param rawContent the raw content of the action
+     * @return if the {@code rawContent} is valid
+     * @throws MalformedRawActionException if there was an error while parsing/checking the raw content
+     */
     @NonNull
-    @Override
-    public final Boolean parse(String rawContent) throws MalformedRawActionException {
-        return rawContent.equals(this.getName());
-    }
-
-    public static VoidAction of(String name, Consumer<Context> input) {
-        return new VoidAction(name) {
-            @Override
-            public void executeVoid(Context context) {
-                input.accept(context);
-            }
-        };
-    }
+    public abstract Boolean checkValidity(@NonNull String rawContent) throws MalformedRawActionException;
 }
