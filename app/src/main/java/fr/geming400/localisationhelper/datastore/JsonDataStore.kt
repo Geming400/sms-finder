@@ -20,7 +20,7 @@ import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream
 
-class JsonDataStore(val context: Context) {
+class JsonDataStore(private val context: Context) {
     fun trackedContactsFlow(): Flow<List<TrackingData>> = context.dataStore.data.map { savedData ->
         savedData.trackedContacts
     }
@@ -51,6 +51,7 @@ class JsonDataStore(val context: Context) {
                     newTrackedContacts.add(it)
                 }
             }
+
             savedData.copy(
                 trackedContacts = newTrackedContacts
             )
@@ -88,6 +89,18 @@ class JsonDataStore(val context: Context) {
         contacts.forEach {
             if (it.areContactInfoEqual(contact))
                 return it
+        }
+
+        return null
+    }
+
+    fun getFirstTrackedContact(contacts: Collection<TrackingData>, sender: String?): TrackingData? {
+        if (sender == null)
+            return null
+
+        contacts.forEach {
+            if (it.linkedPhoneNumber == sender)
+                return@getFirstTrackedContact it
         }
 
         return null
