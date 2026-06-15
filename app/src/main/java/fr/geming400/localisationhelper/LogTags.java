@@ -9,7 +9,5 @@ public final class LogTags {
 
     public static final String USER_TRACKING = "userTracking";
 
-    public static final String OSM_ACTIVITY = "OSMActivity";
-
     public static final String DATA_STORE = "dataStore";
 }
