@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -28,6 +29,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import contacts.core.Contacts
@@ -44,17 +47,31 @@ import contacts.core.LookupQuery
 import contacts.core.entities.Contact
 import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.R
-import fr.geming400.localisationhelper.utils.Utils
 import fr.geming400.localisationhelper.actions.Actions
 import fr.geming400.localisationhelper.datastore.JsonDataStore
+import fr.geming400.localisationhelper.datastore.SerializableGeolocation
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
 import fr.geming400.localisationhelper.ui.components.ContactProfile
 import fr.geming400.localisationhelper.ui.components.PhoneNumberDropdown
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
+import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.runBlocking
-import org.osmdroid.util.GeoPoint
+import org.maplibre.compose.camera.CameraPosition
+import org.maplibre.compose.camera.rememberCameraState
+import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.expressions.dsl.image
+import org.maplibre.compose.expressions.value.SymbolAnchor
+import org.maplibre.compose.layers.SymbolLayer
+import org.maplibre.compose.map.MapOptions
+import org.maplibre.compose.map.MaplibreMap
+import org.maplibre.compose.map.OrnamentOptions
+import org.maplibre.compose.sources.GeoJsonData
+import org.maplibre.compose.sources.rememberGeoJsonSource
+import org.maplibre.compose.style.BaseStyle
+import org.maplibre.spatialk.geojson.Position
+import kotlin.time.Duration.Companion.seconds
 
 // TODO: Use snackbar when sending action request
 class UserTrackingActivity : ComponentActivity() {
@@ -151,7 +168,7 @@ class UserTrackingActivity : ComponentActivity() {
 }
 
 @Composable
-fun localUserTrackingActivity(): UserTrackingActivity =
+private fun localUserTrackingActivity(): UserTrackingActivity =
     LocalActivity.current as UserTrackingActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -163,10 +180,11 @@ private fun MainUserTrackingComponent(
     jsonDataStore: JsonDataStore = JsonDataStore(localUserTrackingActivity())
 ) {
     val activity = localUserTrackingActivity()
-    val context = LocalContext.current
 
+    val scrollState = rememberScrollState()
     Column(
-        modifier = Modifier.padding(innerPadding),
+        modifier = Modifier
+            .padding(innerPadding)
     ) {
         ContactProfile(
             contact = contact
@@ -223,7 +241,11 @@ private fun MainUserTrackingComponent(
                 if (trackedContactInfo.linkedPhoneNumber != null) {
                     Actions.PING.sendInstructionSMS(activity, trackedContactInfo.linkedPhoneNumber)
                 } else {
-                    Toast.makeText(activity, "linked phone number is null, can't do anything", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        activity,
+                        "linked phone number is null, can't do anything",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         ) {
@@ -233,38 +255,41 @@ private fun MainUserTrackingComponent(
         Button(
             onClick = {
                 if (trackedContactInfo.linkedPhoneNumber != null) {
-                    Actions.LOCATION.sendInstructionSMS(activity, trackedContactInfo.linkedPhoneNumber)
+                    Actions.LOCATION.sendInstructionSMS(
+                        activity,
+                        trackedContactInfo.linkedPhoneNumber
+                    )
                 } else {
-                    Toast.makeText(activity, "linked phone number is null, can't do anything", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        activity,
+                        "linked phone number is null, can't do anything",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         ) {
             Text("Request location")
         }
 
-        Text("Last time location answer: ${trackedContactInfo.geolocation?.lastTimeRecorded}")
+        Text("Last location answer: ${trackedContactInfo.geolocation}")
         Button(
             onClick = {
-                if (trackedContactInfo.geolocation != null) {
-                    val intent = Intent(context, OSMActivity::class.java)
-                    val bundle = Bundle()
-                    bundle.putDouble("latitude", trackedContactInfo.geolocation.latitude)
-                    bundle.putDouble("longitude", trackedContactInfo.geolocation.longitude)
-                    bundle.putDouble("zoom", 18.5)
-                    bundle.putParcelableArray("markers", arrayOf(
-                        GeoPoint(trackedContactInfo.geolocation.latitude, trackedContactInfo.geolocation.longitude)
-                    ))
+                if (trackedContactInfo.geolocation == null) {
 
-                    intent.putExtras(bundle)
-                    activity.startActivity(intent)
                 } else {
-                    Toast.makeText(activity, "Phone's geolocation was never recorded", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        activity,
+                        "Phone's geolocation was never recorded",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             },
             enabled = trackedContactInfo.geolocation != null
         ) {
             Text("Show map")
         }
+
+        UserLocationMap(trackedContactInfo)
     }
 }
 
@@ -276,7 +301,6 @@ private fun DeleteContactDialog(
     onDismiss: () -> Unit
 ) {
     val activity = localUserTrackingActivity()
-    rememberCoroutineScope()
     val context = LocalContext.current
     val resources = LocalResources.current
 
@@ -318,5 +342,99 @@ private fun DeleteContactDialog(
                 Text(stringResource(R.string.cancel))
             }
         }
+    )
+}
+
+@Composable
+private fun UserLocationMap(trackingData: TrackingData) {
+    if (trackingData.geolocation != null) {
+        val geolocation = trackingData.geolocation
+
+        val camera =
+            rememberCameraState(
+                firstPosition =
+                    CameraPosition(
+                        target = Position(
+                            latitude = 0.0,
+                            longitude = 0.0
+                        ),
+                        zoom = 15.5
+                    )
+            )
+
+        val oldGeolocation = remember { mutableStateOf(trackingData.geolocation.copy()) }
+        if (trackingData.geolocation != oldGeolocation.value) {
+            LaunchedEffect(Unit) {
+                camera.animateTo(
+                    finalPosition =
+                        camera.position.copy(
+                            target = Position(
+                                latitude = geolocation.latitude,
+                                longitude = geolocation.longitude
+                            )
+                        ),
+                    duration = 1.5.seconds,
+                )
+            }
+
+            oldGeolocation.value = trackingData.geolocation.copy()
+        }
+
+        LaunchedEffect(Unit) {
+            camera.animateTo(
+                finalPosition =
+                    camera.position.copy(
+                        target = Position(
+                            latitude = geolocation.latitude,
+                            longitude = geolocation.longitude
+                        )
+                    ),
+                duration = 3.seconds,
+            )
+        }
+
+        MaplibreMap(
+            baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
+            options =
+                MapOptions(
+                    ornamentOptions =
+                        OrnamentOptions(
+                            isScaleBarEnabled = false
+                        )
+                ),
+            cameraState = camera
+        ) {
+            Marker(trackingData.geolocation)
+        }
+    }
+}
+
+@Composable
+private fun Marker(geolocation: SerializableGeolocation) {
+    val markerJson = """
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [${geolocation.longitude},
+${geolocation.latitude}]
+      },
+      "properties": {}
+    }
+  ]
+}
+        """.trimIndent()
+
+    val markerSource = rememberGeoJsonSource(GeoJsonData.JsonString(markerJson))
+
+    SymbolLayer(
+        id = "marker-layer",
+        source = markerSource,
+        iconImage = image(painterResource(R.drawable.ic_location_icon)),
+        iconAnchor = const(SymbolAnchor.Bottom),
+        iconAllowOverlap = const(true)
     )
 }
