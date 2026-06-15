@@ -3,6 +3,7 @@ package fr.geming400.localisationhelper.ui.components
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.material3.Icon
@@ -36,8 +37,18 @@ fun ActivitySelector(currentDestination: AppDestinations, modifier: Modifier = M
                     label = { Text(stringResource(it.label)) },
                     selected = it == currentDestination,
                     onClick = {
-                        if (currentDestination != it)
+                        if (currentDestination != it) {
+//                            val enterTransition = if (currentDestination.isRight(it)) android.R.anim.fade_in else android.R.anim.fade_out
+//                            val exitTransition = if (currentDestination.isLeft(it)) android.R.anim.slide_in_left else android.R.anim.slide_out_right
+//
+//                            val options = ActivityOptions.makeCustomAnimation(
+//                                context,
+//                                enterTransition,
+//                                exitTransition
+//                            )
+
                             it.startActivity(context)
+                        }
                     }
                 )
             }
@@ -76,5 +87,22 @@ enum class AppDestinations(
     fun startActivity(context: Context) {
         val intent = Intent(context, clazz)
         context.startActivity(intent)
+    }
+
+    /**
+     * Starts the activity of this destination
+     * @param context the app context
+     */
+    fun startActivity(context: Context, bundle: Bundle) {
+        val intent = Intent(context, clazz)
+        context.startActivity(intent, bundle)
+    }
+
+    fun isLeft(other: AppDestinations): Boolean {
+        return this.ordinal < other.ordinal
+    }
+
+    fun isRight(other: AppDestinations): Boolean {
+        return this.ordinal > other.ordinal
     }
 }
