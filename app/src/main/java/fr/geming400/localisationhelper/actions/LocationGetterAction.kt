@@ -3,11 +3,17 @@ package fr.geming400.localisationhelper.actions
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver.PendingResult
 import android.content.Context
-import android.location.Location
 import android.location.LocationManager
 import androidx.core.location.LocationRequestCompat
+import fr.geming400.localisationhelper.datastore.JsonDataStore
+import fr.geming400.localisationhelper.datastore.SerializableGeolocation
 import fr.geming400.localisationhelper.utils.SimpleLocation
+import fr.geming400.localisationhelper.utils.Timestamp
 import fr.geming400.localisationhelper.utils.Utils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -16,15 +22,12 @@ import java.util.concurrent.CompletableFuture
 class LocationGetterAction(name: String) : Action<SimpleLocation>(name) {
     @Throws(MalformedRawActionException::class)
     override fun parse(rawContent: String): SimpleLocation {
-        val geolocation: Array<String?> =
-            rawContent.split(";")
-                .dropLastWhile { it.isEmpty() }
-                .toTypedArray()
+        val geolocation = rawContent.split(";")
 
         if (geolocation.size == 2) {
             try {
-                val latitude = Math.clamp(geolocation[0]!!.toDouble(), -90.0, 90.0)
-                val longitude = Math.clamp(geolocation[0]!!.toDouble(), -180.0, 180.0)
+                val latitude = Math.clamp(geolocation[0].toDouble(), -90.0, 90.0)
+                val longitude = Math.clamp(geolocation[0].toDouble(), -180.0, 180.0)
 
                 return SimpleLocation(latitude, longitude)
             } catch (e: NumberFormatException) {
@@ -76,10 +79,27 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name) {
     }
 
     override fun onReceive(context: Context, sender: String, pendingResult: PendingResult, stage: Stage, rawContent: String) {
-        if (stage == Stage.RECEIVE_OTHER_PHONE) {
+        if (stage == Stage.RECEIVE_HOST) {
+            val jsonDataStore = JsonDataStore(context)
 
+            CoroutineScope(Dispatchers.IO.limitedParallelism(1, "LocationGetterAction's onReceive")).launch {
+                val trackedContacts = jsonDataStore.trackedContactsFlow().first()
+
+                val trackingData = jsonDataStore.getFirstTrackedContact(trackedContacts, sender)
+                if (trackingData != null) {
+                    val asContact = trackingData.getContact(context)
+
+                    val geolocation = parse(rawContent)
+
+                    jsonDataStore.updateTrackedContact(asContact) {
+                        it.copy(
+                            geolocation = SerializableGeolocation(geolocation.longitude, geolocation.latitude, Timestamp.now())
+                        )
+                    }
+                }
+            }
         } else {
-
+            this.sendDataSMS(context, sender)
         }
     }
 }

@@ -54,6 +54,7 @@ import fr.geming400.localisationhelper.ui.components.ContactProfile
 import fr.geming400.localisationhelper.ui.components.PhoneNumberDropdown
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 import kotlinx.coroutines.runBlocking
+import org.osmdroid.util.GeoPoint
 
 // TODO: Use snackbar when sending action request
 class UserTrackingActivity : ComponentActivity() {
@@ -162,6 +163,7 @@ private fun MainUserTrackingComponent(
     jsonDataStore: JsonDataStore = JsonDataStore(localUserTrackingActivity())
 ) {
     val activity = localUserTrackingActivity()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.padding(innerPadding),
@@ -225,7 +227,43 @@ private fun MainUserTrackingComponent(
                 }
             }
         ) {
-            Text("Send ping SMS")
+            Text("Ping phone")
+        }
+
+        Button(
+            onClick = {
+                if (trackedContactInfo.linkedPhoneNumber != null) {
+                    Actions.LOCATION.sendInstructionSMS(activity, trackedContactInfo.linkedPhoneNumber)
+                } else {
+                    Toast.makeText(activity, "linked phone number is null, can't do anything", Toast.LENGTH_SHORT).show()
+                }
+            }
+        ) {
+            Text("Request location")
+        }
+
+        Text("Last time location answer: ${trackedContactInfo.geolocation?.lastTimeRecorded}")
+        Button(
+            onClick = {
+                if (trackedContactInfo.geolocation != null) {
+                    val intent = Intent(context, OSMActivity::class.java)
+                    val bundle = Bundle()
+                    bundle.putDouble("latitude", trackedContactInfo.geolocation.latitude)
+                    bundle.putDouble("longitude", trackedContactInfo.geolocation.longitude)
+                    bundle.putDouble("zoom", 18.5)
+                    bundle.putParcelableArray("markers", arrayOf(
+                        GeoPoint(trackedContactInfo.geolocation.latitude, trackedContactInfo.geolocation.longitude)
+                    ))
+
+                    intent.putExtras(bundle)
+                    activity.startActivity(intent)
+                } else {
+                    Toast.makeText(activity, "Phone's geolocation was never recorded", Toast.LENGTH_SHORT).show()
+                }
+            },
+            enabled = trackedContactInfo.geolocation != null
+        ) {
+            Text("Show map")
         }
     }
 }
