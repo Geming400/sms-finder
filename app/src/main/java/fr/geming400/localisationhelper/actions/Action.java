@@ -19,7 +19,7 @@ public abstract class Action<T> extends BaseAction<CompletableFuture<T>, T> {
 
         if (completableFuture != null)
             completableFuture.whenComplete((t, throwable) ->
-                    this.smsSenderHelper(context, sender, PayloadType.INSTRUCTION, t));
+                    this.smsSenderHelper(context, sender, PayloadType.DATA, t));
     }
 
     @Nullable
