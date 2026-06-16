@@ -117,11 +117,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        val intent = Intent(this, UserTrackingActivity::class.java)
-//        intent.putExtra("contactID", 64L)
-//        intent.putExtra("lookupKey", "404i27aaf56c8ac66864.3789r64-422A422A4440522E2A4E")
-//        startActivity(intent)
-
         enableEdgeToEdge()
         setContent {
             LocalisationHelperTheme {
