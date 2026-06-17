@@ -137,7 +137,6 @@ fun LocalisationHelperApp() {
     }
 
     val openXiaomiNoticeDialog = remember { mutableStateOf(!appData.sawXiaomiNotice) }
-
     when {
         openXiaomiNoticeDialog.value -> {
             XiaomiNoticeDialog() {

@@ -37,18 +37,8 @@ fun ActivitySelector(currentDestination: AppDestinations, modifier: Modifier = M
                     label = { Text(stringResource(it.label)) },
                     selected = it == currentDestination,
                     onClick = {
-                        if (currentDestination != it) {
-//                            val enterTransition = if (currentDestination.isRight(it)) android.R.anim.fade_in else android.R.anim.fade_out
-//                            val exitTransition = if (currentDestination.isLeft(it)) android.R.anim.slide_in_left else android.R.anim.slide_out_right
-//
-//                            val options = ActivityOptions.makeCustomAnimation(
-//                                context,
-//                                enterTransition,
-//                                exitTransition
-//                            )
-
+                        if (currentDestination != it)
                             it.startActivity(context)
-                        }
                     }
                 )
             }
