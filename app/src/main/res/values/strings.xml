@@ -20,4 +20,7 @@
     <string name="warning">Warning !</string>
     <string name="go_back">Go back</string>
     <string name="show_map">Show map</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="save_password">Save password</string>
+    <string name="reset_password">Reset password</string>
 </resources>

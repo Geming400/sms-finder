@@ -17,6 +17,8 @@ import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,11 +34,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
 import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.R
-import fr.geming400.localisationhelper.actions.Actions
 import fr.geming400.localisationhelper.datastore.dataStore
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
+import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
@@ -152,7 +154,7 @@ fun LocalisationHelperApp() {
 
     ActivitySelector(AppDestinations.HOME) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            ActionInputComponent(
+            PasswordInputDialog(
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -160,42 +162,57 @@ fun LocalisationHelperApp() {
 }
 
 @Composable
-fun ActionInputComponent(modifier: Modifier) {
+fun PasswordInputDialog(modifier: Modifier) {
     val context = LocalContext.current
 
-    val inputState = rememberTextFieldState()
-    var isPasswordFieldEnabled by remember { mutableStateOf(true) }
-
+    var isPasswordFieldEnabled by remember {
+        runBlocking {
+            val appData = context.dataStore.data.first()
+            mutableStateOf(appData.passwordHash == null)
+        }
+    }
+    val inputState = rememberTextFieldState(if (isPasswordFieldEnabled) "" else "Hi this is a cool app")
 
     Column(modifier = modifier) {
         OutlinedSecureTextField(
             state = inputState,
-            label = { Text("Action name") },
+            label = { Text(stringResource(R.string.enter_password)) },
             enabled = isPasswordFieldEnabled
         )
 
-        val action = Actions.getByNameTypeless(inputState.text.toString())
-        if (action == null) {
-            Text("no action by the name " + inputState.text)
-        } else {
-            Text("Action output: " + action.execute(context))
-        }
-
         Button(
-            onClick = { isPasswordFieldEnabled = false },
+            onClick = {
+                isPasswordFieldEnabled = false
+
+                runBlocking {
+                    context.dataStore.updateData {
+                        it.copy(passwordHash = Utils.hashPassword("SHA-256", inputState.text as String))
+                    }
+                }
+            },
             enabled = isPasswordFieldEnabled
         ) {
-            Text("Save password")
+            Text(stringResource(R.string.save_password))
         }
 
         Button(
             onClick = {
+                runBlocking {
+                    context.dataStore.updateData {
+                        it.copy(passwordHash = null)
+                    }
+                }
+
                 inputState.clearText()
                 isPasswordFieldEnabled = true
             },
-            enabled = !isPasswordFieldEnabled
+            enabled = !isPasswordFieldEnabled,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.error
+            )
         ) {
-            Text("Reset password")
+            Text(stringResource(R.string.reset_password))
         }
     }
 }

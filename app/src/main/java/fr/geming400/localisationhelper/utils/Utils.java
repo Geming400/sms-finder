@@ -13,6 +13,8 @@ import androidx.core.app.ActivityCompat;
 
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Collection;
@@ -177,5 +179,20 @@ public final class Utils {
 
     public static long getCurrentEpoch() {
         return LocalDateTime.now().toEpochSecond(OffsetDateTime.now().getOffset());
+    }
+
+    public static String hashPassword(String algorithm, String content) {
+        try {
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            byte[] digestedString = md.digest(content.getBytes());
+
+            StringBuilder builder = new StringBuilder(digestedString.length);
+            for (byte b : digestedString)
+                builder.append((char) b);
+
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(String.format("Failed to find algorithm %s while trying to hash a string", algorithm), e);
+        }
     }
 }
