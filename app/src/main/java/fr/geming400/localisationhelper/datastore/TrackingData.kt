@@ -12,6 +12,7 @@ data class TrackingData(
     // Contact info
     val lookupKey: String,
     val linkedPhoneNumber: String? = null,
+    val privateKey: String? = null,
 
     // Tracking info
     val geolocation: SerializableGeolocation? = null,
