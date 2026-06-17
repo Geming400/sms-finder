@@ -16,10 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -53,7 +54,7 @@ import fr.geming400.localisationhelper.datastore.SerializableGeolocation
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
-import fr.geming400.localisationhelper.ui.components.ContactProfile
+import fr.geming400.localisationhelper.ui.components.DeletableContactProfile
 import fr.geming400.localisationhelper.ui.components.PhoneNumberDropdown
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 import fr.geming400.localisationhelper.utils.Utils
@@ -140,19 +141,29 @@ class UserTrackingActivity : ComponentActivity() {
                 val trackedContactInfo = jsonDataStore.getTrackedContact(trackedContacts, contact)
 
                 snackbarHostState = remember { SnackbarHostState() }
-                ActivitySelector(AppDestinations.TRACKING) {
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize(),
-                        snackbarHost = {
-                            SnackbarHost(hostState = snackbarHostState)
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackbarHostState)
+                    }
+                ) { innerPadding ->
+                    val shouldShowMap = remember { mutableStateOf(false) }
+                    if (shouldShowMap.value) {
+                        UserLocationMap(Modifier.padding(innerPadding), trackedContactInfo) {
+                            shouldShowMap.value = false
                         }
-                    ) { innerPadding ->
-                        MainUserTrackingComponent(
-                            innerPadding = innerPadding,
-                            contact = contact,
-                            trackedContactInfo = trackedContactInfo,
-                            jsonDataStore = jsonDataStore
-                        )
+                    } else {
+                        ActivitySelector(AppDestinations.TRACKING) {
+                            MainUserTrackingComponent(
+                                innerPadding = innerPadding,
+                                contact = contact,
+                                trackedContactInfo = trackedContactInfo,
+                                jsonDataStore = jsonDataStore
+                            ) {
+                                shouldShowMap.value = true
+                            }
+                        }
                     }
                 }
             }
@@ -177,7 +188,8 @@ private fun MainUserTrackingComponent(
     innerPadding: PaddingValues,
     contact: Contact,
     trackedContactInfo: TrackingData,
-    jsonDataStore: JsonDataStore = JsonDataStore(localUserTrackingActivity())
+    jsonDataStore: JsonDataStore = JsonDataStore(localUserTrackingActivity()),
+    onShowMap: () -> Unit
 ) {
     val activity = localUserTrackingActivity()
 
@@ -185,11 +197,8 @@ private fun MainUserTrackingComponent(
     Column(
         modifier = Modifier
             .padding(innerPadding)
+            .verticalScroll(scrollState)
     ) {
-        ContactProfile(
-            contact = contact
-        )
-
         val openAlertDialog = remember { mutableStateOf(false) }
 
         when {
@@ -200,16 +209,10 @@ private fun MainUserTrackingComponent(
             }
         }
 
-        Button(
-            onClick = {
-                openAlertDialog.value = true
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.error
-            )
+        DeletableContactProfile(
+            contact = contact
         ) {
-            Text(stringResource(R.string.delete))
+            openAlertDialog.value = true
         }
 
         HorizontalDivider(
@@ -274,22 +277,12 @@ private fun MainUserTrackingComponent(
         Text("Last location answer: ${trackedContactInfo.geolocation}")
         Button(
             onClick = {
-                if (trackedContactInfo.geolocation == null) {
-
-                } else {
-                    Toast.makeText(
-                        activity,
-                        "Phone's geolocation was never recorded",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                onShowMap()
             },
             enabled = trackedContactInfo.geolocation != null
         ) {
-            Text("Show map")
+            Text(stringResource(R.string.show_map))
         }
-
-        UserLocationMap(trackedContactInfo)
     }
 }
 
@@ -346,40 +339,46 @@ private fun DeleteContactDialog(
 }
 
 @Composable
-private fun UserLocationMap(trackingData: TrackingData) {
-    if (trackingData.geolocation != null) {
-        val geolocation = trackingData.geolocation
-
-        val camera =
-            rememberCameraState(
-                firstPosition =
-                    CameraPosition(
-                        target = Position(
-                            latitude = 0.0,
-                            longitude = 0.0
-                        ),
-                        zoom = 15.5
-                    )
-            )
-
-        val oldGeolocation = remember { mutableStateOf(trackingData.geolocation.copy()) }
-        if (trackingData.geolocation != oldGeolocation.value) {
-            LaunchedEffect(Unit) {
-                camera.animateTo(
-                    finalPosition =
-                        camera.position.copy(
-                            target = Position(
-                                latitude = geolocation.latitude,
-                                longitude = geolocation.longitude
-                            )
-                        ),
-                    duration = 1.5.seconds,
-                )
-            }
-
-            oldGeolocation.value = trackingData.geolocation.copy()
+private fun UserLocationMap(
+    modifier: Modifier = Modifier,
+    trackingData: TrackingData,
+    onHideMap: () -> Unit
+) {
+    if (trackingData.geolocation == null) {
+        onHideMap()
+    } else {
+        UserLocationMapInner(modifier, trackingData)
+        ElevatedButton(
+            modifier = modifier
+                .padding(5.dp),
+            onClick = onHideMap
+        ) {
+            Text(stringResource(R.string.go_back))
         }
+    }
+}
 
+@Composable
+private fun UserLocationMapInner(
+    modifier: Modifier = Modifier,
+    trackingData: TrackingData
+) {
+    val geolocation = trackingData.geolocation!!
+
+    val camera =
+        rememberCameraState(
+            firstPosition =
+                CameraPosition(
+                    target = Position(
+                        latitude = 0.0,
+                        longitude = 0.0
+                    ),
+                    zoom = 15.5
+                )
+        )
+
+    val oldGeolocation = remember { mutableStateOf(geolocation.copy()) }
+    if (geolocation != oldGeolocation.value) {
         LaunchedEffect(Unit) {
             camera.animateTo(
                 finalPosition =
@@ -389,23 +388,39 @@ private fun UserLocationMap(trackingData: TrackingData) {
                             longitude = geolocation.longitude
                         )
                     ),
-                duration = 3.seconds,
+                duration = 1.5.seconds,
             )
         }
 
-        MaplibreMap(
-            baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
-            options =
-                MapOptions(
-                    ornamentOptions =
-                        OrnamentOptions(
-                            isScaleBarEnabled = false
-                        )
+        oldGeolocation.value = geolocation.copy()
+    }
+
+    LaunchedEffect(Unit) {
+        camera.animateTo(
+            finalPosition =
+                camera.position.copy(
+                    target = Position(
+                        latitude = geolocation.latitude,
+                        longitude = geolocation.longitude
+                    )
                 ),
-            cameraState = camera
-        ) {
-            Marker(trackingData.geolocation)
-        }
+            duration = 3.seconds,
+        )
+    }
+
+    MaplibreMap(
+        modifier = modifier.fillMaxSize(),
+        baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
+        options =
+            MapOptions(
+                ornamentOptions =
+                    OrnamentOptions(
+                        isScaleBarEnabled = false
+                    )
+            ),
+        cameraState = camera
+    ) {
+        Marker(trackingData.geolocation)
     }
 }
 

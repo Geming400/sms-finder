@@ -18,4 +18,6 @@
     <string name="cancel">Cancel</string>
     <string name="xiaomi_notice">Xiaomi phone detected! For this app to work properly you must allow it to execute in the background. To do this, go to the \"Security\" app, then to the \"Manage apps\" tab, then to the \"Automatic startup\" one and check \"SMS Finder\"</string>
     <string name="warning">Warning !</string>
+    <string name="go_back">Go back</string>
+    <string name="show_map">Show map</string>
 </resources>
