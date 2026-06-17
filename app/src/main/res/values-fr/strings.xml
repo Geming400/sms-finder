@@ -20,7 +20,7 @@
     <string name="warning">Attention !</string>
     <string name="go_back">Retour</string>
     <string name="show_map">Afficher la carte</string>
-    <string name="enter_password">Entrer votre mot de passe</string>
+    <string name="enter_password">Rentrer votre mot de passe</string>
     <string name="save_password">Sauvegarder votre mot de passe</string>
     <string name="reset_password">Réinitialiser votre mot de passe</string>
 </resources>
