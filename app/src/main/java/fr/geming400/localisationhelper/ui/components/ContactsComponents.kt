@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,10 +17,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,7 +82,36 @@ fun ContactProfile(modifier: Modifier = Modifier, contact: Contact) {
 }
 
 @Composable
-private fun ContactProfileInner(contact: Contact) {
+fun DeletableContactProfile(modifier: Modifier = Modifier, contact: Contact, onDelete: () -> Unit) {
+    ElevatedCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .padding(horizontal = 10.dp, vertical = 8.dp)
+    ) {
+        ContactProfileInner(contact) {
+            // This pushes the button at the right of the ElevatedCard
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(
+                modifier = Modifier
+                    .padding(end = 10.dp),
+                onClick = {
+                    onDelete()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text(stringResource(R.string.delete))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ContactProfileInner(contact: Contact, extraContent: @Composable () -> Unit = {}) {
     Row(
         Modifier
             .fillMaxSize()
@@ -112,6 +145,8 @@ private fun ContactProfileInner(contact: Contact) {
             modifier = Modifier
                 .padding(horizontal = 10.dp)
         )
+
+        extraContent()
     }
 }
 
