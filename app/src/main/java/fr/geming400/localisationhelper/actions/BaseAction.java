@@ -107,7 +107,7 @@ public abstract class BaseAction<T, P> {
      * @param context the android app's {@link Context}
      * @param sender the sender's phone number
      * @param pendingResult the {@link BroadcastReceiver.PendingResult PendingResult} used by the {@link BroadcastReceiver}.
-     *                      Though, it should not be {@linkplain BroadcastReceiver.PendingResult#finish() finished} or marked as {@linkplain BroadcastReceiver.PendingResult#goAsync() async} !
+     *                      Though, it should <b>not</b> be {@linkplain BroadcastReceiver.PendingResult#finish() finished} or marked as {@linkplain BroadcastReceiver.PendingResult#goAsync() async} !
      * @param stage the stage from which the sms got received. Cannot be {@link Stage#SEND_INSTRUCTIONS}
      * @param rawContent the rawContent of the action. This <b>doesn't contain the payload type and action name</b>.
      *                   When the stage's payload type is an {@linkplain PayloadType#INSTRUCTION instruction} one, it is always empty. (aka {@code ""})
