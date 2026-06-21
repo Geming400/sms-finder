@@ -186,7 +186,7 @@ fun PasswordInputDialog(modifier: Modifier) {
 
                 runBlocking {
                     context.dataStore.updateData {
-                        it.copy(passwordHash = Utils.hashPassword("SHA-256", inputState.text as String))
+                        it.copy(passwordHash = Utils.hashString("SHA-256", (inputState.text as String).toByteArray()))
                     }
                 }
             },

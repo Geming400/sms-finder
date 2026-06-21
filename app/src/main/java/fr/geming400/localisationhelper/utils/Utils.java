@@ -17,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
@@ -181,18 +182,34 @@ public final class Utils {
         return LocalDateTime.now().toEpochSecond(OffsetDateTime.now().getOffset());
     }
 
-    public static String hashPassword(String algorithm, String content) {
+    public static byte[] hash(String algorithm, final byte[] content) {
         try {
             MessageDigest md = MessageDigest.getInstance(algorithm);
-            byte[] digestedString = md.digest(content.getBytes());
-
-            StringBuilder builder = new StringBuilder(digestedString.length);
-            for (byte b : digestedString)
-                builder.append((char) b);
-
-            return builder.toString();
+            return md.digest(content);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(String.format("Failed to find algorithm %s while trying to hash a string", algorithm), e);
         }
+    }
+
+    public static String hashString(String algorithm, final byte[] content) {
+        byte[] hashedContent = hash(algorithm, content);
+        return Base64.getEncoder().encodeToString(content);
+    }
+
+    public static byte[] cyclicXor(final byte[] content, final byte[] key) {
+        byte[] result = new byte[content.length];
+
+        for (int i = 0; i < content.length; i++) {
+            result[i] = (byte) (content[i] ^ key[i % key.length]);
+        }
+
+        return result;
+    }
+
+    /// <b>Encodes</b> the xored content into a string via base64
+    /// @see #cyclicXor(byte[], byte[])
+    public static String cyclicXorString(final byte[] content, final byte[] key) {
+        byte[] xoredContent = cyclicXor(content, key);
+        return Base64.getEncoder().encodeToString(xoredContent);
     }
 }

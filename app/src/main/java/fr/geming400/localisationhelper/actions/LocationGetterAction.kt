@@ -7,12 +7,12 @@ import android.location.LocationManager
 import androidx.core.location.LocationRequestCompat
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.SerializableGeolocation
+import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.utils.SimpleLocation
 import fr.geming400.localisationhelper.utils.Timestamp
 import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
 
@@ -78,28 +78,26 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name) {
         return null
     }
 
-    override fun onReceive(context: Context, sender: String, pendingResult: PendingResult, stage: Stage, rawContent: String) {
+    override fun onReceive(context: Context, sender: String, pendingResult: PendingResult, stage: Stage, trackingData: TrackingData, rawContent: String) {
+        val jsonDataStore = JsonDataStore(context)
         if (stage == Stage.RECEIVE_HOST) {
-            val jsonDataStore = JsonDataStore(context)
+            val asContact = trackingData.getContact(context)
 
-            CoroutineScope(Dispatchers.IO.limitedParallelism(1, "LocationGetterAction's onReceive")).launch {
-                val trackedContacts = jsonDataStore.trackedContactsFlow().first()
+            val geolocation = parse(rawContent)
 
-                val trackingData = jsonDataStore.getFirstTrackedContact(trackedContacts, sender)
-                if (trackingData != null) {
-                    val asContact = trackingData.getContact(context)
-
-                    val geolocation = parse(rawContent)
-
-                    jsonDataStore.updateTrackedContact(asContact) {
-                        it.copy(
-                            geolocation = SerializableGeolocation(geolocation.latitude, geolocation.longitude, Timestamp.now())
+            CoroutineScope(Dispatchers.IO.limitedParallelism(1, "LocationGetterAction's onReceive (Stage.RECEIVE_HOST)")).launch {
+                jsonDataStore.updateTrackedContact(asContact) {
+                    it.copy(
+                        geolocation = SerializableGeolocation(
+                            geolocation.latitude,
+                            geolocation.longitude,
+                            Timestamp.now()
                         )
-                    }
+                    )
                 }
             }
         } else {
-            this.sendDataSMS(context, sender)
+            this.sendDataSMS(context, sender, trackingData.privateKey!!)
         }
     }
 }

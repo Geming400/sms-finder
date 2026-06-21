@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+import fr.geming400.localisationhelper.datastore.TrackingData;
 import fr.geming400.localisationhelper.utils.Utils;
 
 /**
@@ -58,12 +59,12 @@ public abstract class BaseAction<T, P> {
      * send back the serialized action's output
      * @param context the android app's {@link Context}
      * @param sender the sender's phone number
-     * @implSpec this should call {@link #smsSenderHelper(Context, String, HasPayloadType, String)} when sending a sms,
+     * @implSpec this should call {@link #smsSenderHelper(Context, String, HasPayloadType, String, String)} (Context, String)} when sending a sms,
      * with the current {@linkplain PayloadType payload type} being {@link PayloadType#INSTRUCTION PayloadType#INSTRUCTION}
      * @see PayloadType#INSTRUCTION
      */
-    public void sendInstructionSMS(@NonNull Context context, @NonNull String sender) {
-        this.smsSenderHelper(context, sender, PayloadType.INSTRUCTION, null);
+    public void sendInstructionSMS(@NonNull Context context, @NonNull String sender, @NonNull String privateKey) {
+        this.smsSenderHelper(context, sender, PayloadType.INSTRUCTION, null, privateKey);
     }
 
     /**
@@ -71,17 +72,24 @@ public abstract class BaseAction<T, P> {
      * by {@linkplain Action#parse(String) parsing} the raw sms content
      * @param context the android app's {@link Context}
      * @param sender the sender's phone number
-     * @implSpec this should call {@link #smsSenderHelper(Context, String, HasPayloadType, String)} when sending a sms,
+     * @implSpec this should call {@link #smsSenderHelper(Context, String, HasPayloadType, String, String)} when sending a sms,
      * with the current {@linkplain PayloadType payload type} being {@link PayloadType#DATA PayloadType#DATA}
      * @see PayloadType#DATA
      */
-    public abstract void sendDataSMS(@NonNull Context context, @NonNull String sender);
+    public abstract void sendDataSMS(@NonNull Context context, @NonNull String sender, @NonNull String privateKey);
 
-    // TODO: Encode content
-    protected final void smsSenderHelper(@NonNull Context context, @NonNull String sender, @NonNull HasPayloadType payloadType, @Nullable String content) {
+    protected final void smsSenderHelper(@NonNull Context context, @NonNull String sender, @NonNull HasPayloadType payloadType, @Nullable String content, @NonNull String privateKey) {
         String prefix = payloadType.getPayloadType().getPayloadName() + "/";
-        String suffix = content == null ? "" : ":" + content;
-        Utils.sendSMS(context, sender, prefix + this.getName() + suffix);
+        String suffix = content == null
+                ? ""
+                : ":" + Utils.cyclicXorString(content.getBytes(), privateKey.getBytes());
+
+        // Examples:
+        // instruction/<location>
+        // data/<location>:<24.49874;-14.6391>
+        //
+        // What's surrounded in <> is xored and then based64
+        Utils.sendSMS(context, sender, prefix + Utils.cyclicXorString(this.getName().getBytes(), privateKey.getBytes()) + suffix);
     }
 
     /**
@@ -109,10 +117,18 @@ public abstract class BaseAction<T, P> {
      * @param pendingResult the {@link BroadcastReceiver.PendingResult PendingResult} used by the {@link BroadcastReceiver}.
      *                      Though, it should <b>not</b> be {@linkplain BroadcastReceiver.PendingResult#finish() finished} or marked as {@linkplain BroadcastReceiver.PendingResult#goAsync() async} !
      * @param stage the stage from which the sms got received. Cannot be {@link Stage#SEND_INSTRUCTIONS}
-     * @param rawContent the rawContent of the action. This <b>doesn't contain the payload type and action name</b>.
+     * @param trackingData the contact's {@link TrackingData}
+     * @param rawContent the <b>unencrypted</b> raw content of the action. This <b>doesn't contain the payload type and action name</b>.
      *                   When the stage's payload type is an {@linkplain PayloadType#INSTRUCTION instruction} one, it is always empty. (aka {@code ""})
      */
-    public abstract void onReceive(@NonNull Context context, @NonNull String sender, @NonNull BroadcastReceiver.PendingResult pendingResult, @NonNull Stage stage, @NonNull String rawContent);
+    public abstract void onReceive(
+            @NonNull Context context,
+            @NonNull String sender,
+            @NonNull BroadcastReceiver.PendingResult pendingResult,
+            @NonNull Stage stage,
+            @NonNull TrackingData trackingData,
+            @NonNull String rawContent
+    );
 
     @NonNull
     @Override

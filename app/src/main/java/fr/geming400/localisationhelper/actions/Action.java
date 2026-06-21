@@ -14,12 +14,12 @@ public abstract class Action<T> extends BaseAction<CompletableFuture<T>, T> {
     }
 
     @Override
-    public void sendDataSMS(@NonNull Context context, @NonNull String sender) {
+    public void sendDataSMS(@NonNull Context context, @NonNull String sender, @NonNull String privateKey) {
         CompletableFuture<String> completableFuture = this.executeAsSerialized(context);
 
         if (completableFuture != null)
             completableFuture.whenComplete((t, throwable) ->
-                    this.smsSenderHelper(context, sender, PayloadType.DATA, t));
+                    this.smsSenderHelper(context, sender, PayloadType.DATA, t, privateKey));
     }
 
     @Nullable

@@ -3,6 +3,7 @@ package fr.geming400.localisationhelper.utils;
 import android.location.Location;
 
 import androidx.annotation.FloatRange;
+import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
@@ -27,6 +28,7 @@ public final class SimpleLocation {
         return this.longitude;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "SimpleLocation{" +

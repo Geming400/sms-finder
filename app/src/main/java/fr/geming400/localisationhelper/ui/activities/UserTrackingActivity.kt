@@ -174,7 +174,7 @@ class UserTrackingActivity : ComponentActivity() {
                                             onClick = {
                                                 runBlocking {
                                                     jsonDataStore.updateTrackedContact(contact) {
-                                                        trackedContactInfo.copy(privateKey = Utils.hashPassword("SHA-256", key.text as String))
+                                                        trackedContactInfo.copy(privateKey = Utils.hashString("SHA-256", (key.text as String).toByteArray()))
                                                     }
                                                 }
                                             },
@@ -234,8 +234,6 @@ private fun MainUserTrackingComponent(
     jsonDataStore: JsonDataStore = JsonDataStore(localUserTrackingActivity()),
     onShowMap: () -> Unit
 ) {
-    val activity = localUserTrackingActivity()
-
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -281,23 +279,6 @@ private fun MainUserTrackingComponent(
         }
 
         Text("Last time ping answer: ${trackedContactInfo.lastPingAnswer}")
-
-        Button(
-            onClick = {
-                if (trackedContactInfo.linkedPhoneNumber != null) {
-                    Actions.PING.sendInstructionSMS(activity, trackedContactInfo.linkedPhoneNumber)
-                } else {
-                    Toast.makeText(
-                        activity,
-                        "linked phone number is null, can't do anything",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        ) {
-            Text("Ping phone")
-        }
-
         ActionButton(trackedContactInfo, Actions.PING) {
             Text("Ping phone")
         }
@@ -338,7 +319,8 @@ private fun ActionButton(
         onClick = {
             action.sendInstructionSMS(
                 activity,
-                trackingData.linkedPhoneNumber!!
+                trackingData.linkedPhoneNumber!!,
+                trackingData.privateKey!!
             )
         },
         modifier = modifier,
