@@ -58,7 +58,8 @@ class SmsReceiver : BroadcastReceiver() {
                 }
 
 
-                // 2. We get the payload type and separate the headers
+
+                // 2. We get the payload type
 
                 // The payload type is always unencrypted
                 val firstPart = body.split("/")[0]
@@ -67,6 +68,9 @@ class SmsReceiver : BroadcastReceiver() {
                 val contactInfo = this.getContactInfo(context, sender)
                 val privateKey = contactInfo.privateKeys.getRightPrivateKey(payloadType)
 
+
+
+                // 3. We unencrypt the message
 
                 // This second part is in the format "actionName:payloadData"
                 // if the payload type is DATA.
