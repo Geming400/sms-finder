@@ -199,9 +199,8 @@ public final class Utils {
     public static byte[] cyclicXor(final byte[] content, final byte[] key) {
         byte[] result = new byte[content.length];
 
-        for (int i = 0; i < content.length; i++) {
+        for (int i = 0; i < content.length; i++)
             result[i] = (byte) (content[i] ^ key[i % key.length]);
-        }
 
         return result;
     }
@@ -211,5 +210,9 @@ public final class Utils {
     public static String cyclicXorString(final byte[] content, final byte[] key) {
         byte[] xoredContent = cyclicXor(content, key);
         return Base64.getEncoder().encodeToString(xoredContent);
+    }
+
+    public static boolean isPasswordValid(CharSequence password) {
+        return password.length() >= 6;
     }
 }
