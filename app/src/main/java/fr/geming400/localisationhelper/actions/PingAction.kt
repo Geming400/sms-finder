@@ -8,18 +8,17 @@ import fr.geming400.localisationhelper.utils.Timestamp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class PingAction(name: String) : VoidAction(name) {
     override fun executeVoid(context: Context?) {
 
     }
 
-    override fun checkValidity(rawContent: String): Boolean {
-        return rawContent == PONG_MSG
-    }
+    override fun checkValidity(rawContent: String): Boolean = true
 
     override fun sendDataSMS(context: Context, sender: String, privateKey: String) {
-        this.smsSenderHelper(context, sender, PayloadType.DATA, PONG_MSG, privateKey)
+        this.smsSenderHelper(context, sender, PayloadType.DATA, this.getRandomMessage(), privateKey)
     }
 
     override fun onReceive(
@@ -47,7 +46,13 @@ class PingAction(name: String) : VoidAction(name) {
         }
     }
 
-    companion object {
-        private const val PONG_MSG = "Pong !"
+    private fun getRandomMessage(): String {
+        var res = ""
+
+        val rng = Random.Default
+        for (i in 0..rng.nextInt(2, 6))
+            res += rng.nextInt()
+
+        return res
     }
 }
