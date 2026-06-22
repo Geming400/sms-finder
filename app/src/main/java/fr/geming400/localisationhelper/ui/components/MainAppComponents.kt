@@ -10,11 +10,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import fr.geming400.localisationhelper.R
+import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.ui.activities.MainActivity
 import fr.geming400.localisationhelper.ui.activities.SettingsActivity
 import fr.geming400.localisationhelper.ui.activities.TrackingActivity
@@ -46,6 +48,12 @@ fun ActivitySelector(currentDestination: AppDestinations, modifier: Modifier = M
     ) {
         content()
     }
+}
+
+@Composable
+fun rememberJsonDatastore(): JsonDataStore {
+    val context = LocalContext.current
+    return remember { JsonDataStore(context) }
 }
 
 enum class AppDestinations(

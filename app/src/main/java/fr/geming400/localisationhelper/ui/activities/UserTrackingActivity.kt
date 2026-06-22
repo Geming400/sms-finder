@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.BorderStroke
@@ -28,15 +27,14 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -66,6 +64,7 @@ import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
 import fr.geming400.localisationhelper.ui.components.DeletableContactProfile
 import fr.geming400.localisationhelper.ui.components.PhoneNumberDropdown
+import fr.geming400.localisationhelper.ui.components.rememberJsonDatastore
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.runBlocking
@@ -166,36 +165,9 @@ class UserTrackingActivity : ComponentActivity() {
                     } else {
                         ActivitySelector(AppDestinations.TRACKING) {
                             if (trackedContactInfo.privateKey == null) {
-                                val key = rememberTextFieldState()
-                                AlertDialog(
-                                    onDismissRequest = {},
-                                    confirmButton = {
-                                        Button(
-                                            onClick = {
-                                                runBlocking {
-                                                    jsonDataStore.updateTrackedContact(contact) {
-                                                        trackedContactInfo.copy(privateKey = Utils.hashString("SHA-256", (key.text as String).toByteArray()))
-                                                    }
-                                                }
-                                            },
-                                            enabled = !key.text.isEmpty()
-                                        ) {
-                                            Text(stringResource(R.string.confirm))
-                                        }
-                                    },
-                                    dismissButton = {
-                                        Button(
-                                            onClick = {
-                                                this.startActivity(Intent(this, TrackingActivity::class.java))
-                                            },
-                                        ) {
-                                            Text(stringResource(R.string.cancel))
-                                        }
-                                    },
-                                    text = {
-                                        TextField(key, label = { Text("User's private key") })
-                                    }
-                                )
+                                ChangeContactPrivateKeyDialog(contact = contact, trackedContactInfo = trackedContactInfo) {
+                                    this.startActivity(Intent(this, TrackingActivity::class.java))
+                                }
                             } else {
                                 MainUserTrackingComponent(
                                     innerPadding = innerPadding,
@@ -219,216 +191,285 @@ class UserTrackingActivity : ComponentActivity() {
             .whereLookupKeyWithIdMatches(lookupKeyWithId)
             .find()
             .first()
-}
 
-@Composable
-private fun localUserTrackingActivity(): UserTrackingActivity =
-    LocalActivity.current as UserTrackingActivity
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun MainUserTrackingComponent(
-    innerPadding: PaddingValues,
-    contact: Contact,
-    trackedContactInfo: TrackingData,
-    jsonDataStore: JsonDataStore = JsonDataStore(localUserTrackingActivity()),
-    onShowMap: () -> Unit
-) {
-    val scrollState = rememberScrollState()
-    Column(
-        modifier = Modifier
-            .padding(innerPadding)
-            .verticalScroll(scrollState)
+    @Composable
+    private fun MainUserTrackingComponent(
+        innerPadding: PaddingValues,
+        contact: Contact,
+        trackedContactInfo: TrackingData,
+        jsonDataStore: JsonDataStore = JsonDataStore(this),
+        onShowMap: () -> Unit
     ) {
-        val openAlertDialog = remember { mutableStateOf(false) }
-
-        when {
-            openAlertDialog.value -> {
-                DeleteContactDialog(jsonDataStore = jsonDataStore, contact = contact) {
-                    openAlertDialog.value = false
-                }
-            }
-        }
-
-        DeletableContactProfile(
-            contact = contact
+        val scrollState = rememberScrollState()
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .verticalScroll(scrollState)
         ) {
-            openAlertDialog.value = true
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 5.dp, vertical = 8.dp)
-        )
-
-        // If the contact has at least more than one valid
-        // phone number, then we show the phone number dropdown.
-        // If not, we don't because it's useless
-        if (Utils.getPhones(contact, true, true).size > 1) {
-            PhoneNumberDropdown(
-                contact = contact,
-                currentChoice = Utils.formatNumber(trackedContactInfo.linkedPhoneNumber),
-                onPhoneChosen = { rawContact, phone ->
-                    runBlocking {
-                        jsonDataStore.updateTrackedContact(contact) { oldData ->
-                            oldData.copy(linkedPhoneNumber = phone.normalizedNumber)
-                        }
+            val shouldShowPrivateKeyChangeDialog = remember { mutableStateOf(false) }
+            val shouldShowContactDeletionDialog = remember { mutableStateOf(false) }
+            when {
+                shouldShowPrivateKeyChangeDialog.value -> {
+                    ChangeContactPrivateKeyDialog(contact = contact, trackedContactInfo = trackedContactInfo) {
+                        shouldShowPrivateKeyChangeDialog.value = false
                     }
                 }
+
+                shouldShowContactDeletionDialog.value -> {
+                    DeleteContactDialog(jsonDataStore = jsonDataStore, contact = contact) {
+                        shouldShowContactDeletionDialog.value = false
+                    }
+                }
+            }
+
+            DeletableContactProfile(
+                contact = contact
+            ) {
+                shouldShowContactDeletionDialog.value = true
+            }
+
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 5.dp, vertical = 8.dp)
             )
-        }
 
-        Text("Last time ping answer: ${trackedContactInfo.lastPingAnswer}")
-        ActionButton(trackedContactInfo, Actions.PING) {
-            Text("Ping phone")
-        }
+            // If the contact has at least more than one valid
+            // phone number, then we show the phone number dropdown.
+            // If not, we don't because it's useless
+            if (Utils.getPhones(contact, true, true).size > 1) {
+                PhoneNumberDropdown(
+                    contact = contact,
+                    currentChoice = Utils.formatNumber(trackedContactInfo.linkedPhoneNumber),
+                    onPhoneChosen = { rawContact, phone ->
+                        runBlocking {
+                            jsonDataStore.updateTrackedContact(contact) { oldData ->
+                                oldData.copy(linkedPhoneNumber = phone.normalizedNumber)
+                            }
+                        }
+                    }
+                )
+            }
 
-        ActionButton(trackedContactInfo, Actions.LOCATION) {
-            Text("Request location")
-        }
+            Button(
+                onClick = {
+                    shouldShowPrivateKeyChangeDialog.value = true
+                }
+            ) {
+                Text("Change password")
+            }
 
-        Text("Last location answer: ${trackedContactInfo.geolocation}")
+            Text("Last time ping answer: ${trackedContactInfo.lastPingAnswer}")
+            ActionButton(trackedContactInfo, Actions.PING) {
+                Text("Ping phone")
+            }
+
+            ActionButton(trackedContactInfo, Actions.LOCATION) {
+                Text("Request location")
+            }
+
+            Text("Last location answer: ${trackedContactInfo.geolocation}")
+            Button(
+                onClick = {
+                    onShowMap()
+                },
+                enabled = trackedContactInfo.geolocation != null
+            ) {
+                Text(stringResource(R.string.show_map))
+            }
+        }
+    }
+
+    @Composable
+    private fun ActionButton(
+        trackingData: TrackingData,
+        action: BaseAction<*, *>,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+        shape: Shape = ButtonDefaults.shape,
+        colors: ButtonColors = ButtonDefaults.buttonColors(),
+        elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
+        border: BorderStroke? = null,
+        contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+        interactionSource: MutableInteractionSource? = null,
+        content: @Composable RowScope.() -> Unit
+    ) {
         Button(
             onClick = {
-                onShowMap()
+                action.sendInstructionSMS(
+                    this,
+                    trackingData.linkedPhoneNumber!!,
+                    trackingData.privateKey!!
+                )
             },
-            enabled = trackedContactInfo.geolocation != null
+            modifier = modifier,
+            enabled = enabled && trackingData.linkedPhoneNumber != null,
+            shape = shape,
+            colors = colors,
+            elevation = elevation,
+            border = border,
+            contentPadding = contentPadding,
+            interactionSource = interactionSource
         ) {
-            Text(stringResource(R.string.show_map))
+            content()
         }
     }
-}
 
-@Composable
-private fun ActionButton(
-    trackingData: TrackingData,
-    action: BaseAction<*, *>,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    shape: Shape = ButtonDefaults.shape,
-    colors: ButtonColors = ButtonDefaults.buttonColors(),
-    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
-    border: BorderStroke? = null,
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
-    interactionSource: MutableInteractionSource? = null,
-    content: @Composable RowScope.() -> Unit
-) {
-    val activity = localUserTrackingActivity()
-
-    Button(
-        onClick = {
-            action.sendInstructionSMS(
-                activity,
-                trackingData.linkedPhoneNumber!!,
-                trackingData.privateKey!!
-            )
-        },
-        modifier = modifier,
-        enabled = enabled && trackingData.linkedPhoneNumber != null,
-        shape = shape,
-        colors = colors,
-        elevation = elevation,
-        border = border,
-        contentPadding = contentPadding,
-        interactionSource = interactionSource
+    @Composable
+    private fun DeleteContactDialog(
+        modifier: Modifier = Modifier,
+        jsonDataStore: JsonDataStore,
+        contact: Contact,
+        onDismiss: () -> Unit
     ) {
-        content()
-    }
-}
+        val context = LocalContext.current
+        val resources = LocalResources.current
 
-@Composable
-private fun DeleteContactDialog(
-    modifier: Modifier = Modifier,
-    jsonDataStore: JsonDataStore,
-    contact: Contact,
-    onDismiss: () -> Unit
-) {
-    val activity = localUserTrackingActivity()
-    val context = LocalContext.current
-    val resources = LocalResources.current
+        AlertDialog(
+            modifier = modifier,
+            onDismissRequest = {
+                onDismiss()
+            },
+            title = {
+                Text(stringResource(R.string.confirmation_text))
+            },
+            text = {
+                Text(stringResource(R.string.deletion_confirmation))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        this.isContactBeingDeleted = true
 
-    AlertDialog(
-        modifier = modifier,
-        onDismissRequest = {
-            onDismiss()
-        },
-        title = {
-            Text(stringResource(R.string.confirmation_text))
-        },
-        text = {
-            Text(stringResource(R.string.deletion_confirmation))
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    activity.isContactBeingDeleted = true
+                        runBlocking {
+                            if (jsonDataStore.removeTrackedContact(contact)) {
+                                startActivity(Intent(this@UserTrackingActivity, TrackingActivity::class.java))
+                            } else {
+                                val deleteErrorMsg = resources.getString(R.string.delete_error, contact.displayNamePrimary)
+                                Toast.makeText(context, deleteErrorMsg, Toast.LENGTH_SHORT).show()
 
-                    runBlocking {
-                        if (jsonDataStore.removeTrackedContact(contact)) {
-                            activity.startActivity(Intent(activity, TrackingActivity::class.java))
-                        } else {
-                            val deleteErrorMsg = resources.getString(R.string.delete_error, contact.displayNamePrimary)
-                            Toast.makeText(context, deleteErrorMsg, Toast.LENGTH_SHORT).show()
-
-                            onDismiss()
+                                onDismiss()
+                            }
                         }
                     }
+                ) {
+                    Text(stringResource(R.string.confirm))
                 }
-            ) {
-                Text(stringResource(R.string.confirm))
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {}
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
             }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {}
-            ) {
-                Text(stringResource(R.string.cancel))
-            }
-        }
-    )
-}
+        )
+    }
 
-@Composable
-private fun UserLocationMap(
-    modifier: Modifier = Modifier,
-    trackingData: TrackingData,
-    onHideMap: () -> Unit
-) {
-    if (trackingData.geolocation == null) {
-        onHideMap()
-    } else {
-        UserLocationMapInner(modifier, trackingData)
-        ElevatedButton(
-            modifier = modifier
-                .padding(5.dp),
-            onClick = onHideMap
-        ) {
-            Text(stringResource(R.string.go_back))
+    @Composable
+    private fun UserLocationMap(
+        modifier: Modifier = Modifier,
+        trackingData: TrackingData,
+        onHideMap: () -> Unit
+    ) {
+        if (trackingData.geolocation == null) {
+            onHideMap()
+        } else {
+            UserLocationMapInner(modifier, trackingData)
+            ElevatedButton(
+                modifier = modifier
+                    .padding(5.dp),
+                onClick = onHideMap
+            ) {
+                Text(stringResource(R.string.go_back))
+            }
         }
     }
-}
 
-@Composable
-private fun UserLocationMapInner(
-    modifier: Modifier = Modifier,
-    trackingData: TrackingData
-) {
-    val geolocation = trackingData.geolocation!!
+    @Composable
+    private fun ChangeContactPrivateKeyDialog(modifier: Modifier = Modifier, contact: Contact, trackedContactInfo: TrackingData, onDismiss: () -> Unit) {
+        ChangeContactPrivateKeyDialog(modifier, contact, trackedContactInfo, onDismiss, onDismiss)
+    }
 
-    val camera =
-        rememberCameraState(
-            firstPosition =
-                CameraPosition(
-                    target = Position(
-                        latitude = 0.0,
-                        longitude = 0.0
-                    ),
-                    zoom = 15.5
+    @Composable
+    private fun ChangeContactPrivateKeyDialog(modifier: Modifier = Modifier, contact: Contact, trackedContactInfo: TrackingData, onDismiss: () -> Unit, onClose: () -> Unit = onDismiss) {
+        val jsonDataStore = rememberJsonDatastore()
+
+        val privateKeyState = rememberTextFieldState()
+        AlertDialog(
+            modifier = modifier,
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                Button(
+                    onClick = {
+                        runBlocking {
+                            jsonDataStore.updateTrackedContact(contact) {
+                                trackedContactInfo.copy(privateKey = Utils.hashString("SHA-256", (privateKeyState.text as String).toByteArray()))
+                            }
+                        }
+
+                        onClose()
+                    },
+                    enabled = Utils.isPasswordValid(privateKeyState.text)
+                ) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        onDismiss()
+                    },
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+            text = {
+                OutlinedSecureTextField(
+                    privateKeyState,
+                    label = { Text("User's private key") },
+                    isError = !Utils.isPasswordValid(privateKeyState.text)
                 )
+            }
         )
+    }
 
-    val oldGeolocation = remember { mutableStateOf(geolocation.copy()) }
-    if (geolocation != oldGeolocation.value) {
+    @Composable
+    private fun UserLocationMapInner(
+        modifier: Modifier = Modifier,
+        trackingData: TrackingData
+    ) {
+        val geolocation = trackingData.geolocation!!
+
+        val camera =
+            rememberCameraState(
+                firstPosition =
+                    CameraPosition(
+                        target = Position(
+                            latitude = 0.0,
+                            longitude = 0.0
+                        ),
+                        zoom = 15.5
+                    )
+            )
+
+        val oldGeolocation = remember { mutableStateOf(geolocation.copy()) }
+        if (geolocation != oldGeolocation.value) {
+            LaunchedEffect(Unit) {
+                camera.animateTo(
+                    finalPosition =
+                        camera.position.copy(
+                            target = Position(
+                                latitude = geolocation.latitude,
+                                longitude = geolocation.longitude
+                            )
+                        ),
+                    duration = 1.5.seconds,
+                )
+            }
+
+            oldGeolocation.value = geolocation.copy()
+        }
+
         LaunchedEffect(Unit) {
             camera.animateTo(
                 finalPosition =
@@ -438,45 +479,29 @@ private fun UserLocationMapInner(
                             longitude = geolocation.longitude
                         )
                     ),
-                duration = 1.5.seconds,
+                duration = 3.seconds,
             )
         }
 
-        oldGeolocation.value = geolocation.copy()
-    }
-
-    LaunchedEffect(Unit) {
-        camera.animateTo(
-            finalPosition =
-                camera.position.copy(
-                    target = Position(
-                        latitude = geolocation.latitude,
-                        longitude = geolocation.longitude
-                    )
+        MaplibreMap(
+            modifier = modifier.fillMaxSize(),
+            baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
+            options =
+                MapOptions(
+                    ornamentOptions =
+                        OrnamentOptions(
+                            isScaleBarEnabled = false
+                        )
                 ),
-            duration = 3.seconds,
-        )
+            cameraState = camera
+        ) {
+            Marker(trackingData.geolocation)
+        }
     }
 
-    MaplibreMap(
-        modifier = modifier.fillMaxSize(),
-        baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
-        options =
-            MapOptions(
-                ornamentOptions =
-                    OrnamentOptions(
-                        isScaleBarEnabled = false
-                    )
-            ),
-        cameraState = camera
-    ) {
-        Marker(trackingData.geolocation)
-    }
-}
-
-@Composable
-private fun Marker(geolocation: SerializableGeolocation) {
-    val markerJson = """
+    @Composable
+    private fun Marker(geolocation: SerializableGeolocation) {
+        val markerJson = """
 {
   "type": "FeatureCollection",
   "features": [
@@ -493,13 +518,14 @@ ${geolocation.latitude}]
 }
         """.trimIndent()
 
-    val markerSource = rememberGeoJsonSource(GeoJsonData.JsonString(markerJson))
+        val markerSource = rememberGeoJsonSource(GeoJsonData.JsonString(markerJson))
 
-    SymbolLayer(
-        id = "marker-layer",
-        source = markerSource,
-        iconImage = image(painterResource(R.drawable.ic_location_icon)),
-        iconAnchor = const(SymbolAnchor.Bottom),
-        iconAllowOverlap = const(true)
-    )
+        SymbolLayer(
+            id = "marker-layer",
+            source = markerSource,
+            iconImage = image(painterResource(R.drawable.ic_location_icon)),
+            iconAnchor = const(SymbolAnchor.Bottom),
+            iconAllowOverlap = const(true)
+        )
+    }
 }

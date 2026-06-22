@@ -171,13 +171,14 @@ fun PasswordInputDialog(modifier: Modifier) {
             mutableStateOf(appData.passwordHash == null)
         }
     }
-    val inputState = rememberTextFieldState(if (isPasswordFieldEnabled) "" else "Hi this is a cool app")
+    val passwordInputState = rememberTextFieldState(if (isPasswordFieldEnabled) "" else "Hi this is a cool app")
 
     Column(modifier = modifier) {
         OutlinedSecureTextField(
-            state = inputState,
+            state = passwordInputState,
             label = { Text(stringResource(R.string.enter_password)) },
-            enabled = isPasswordFieldEnabled
+            enabled = isPasswordFieldEnabled,
+            isError = !Utils.isPasswordValid(passwordInputState.text) && isPasswordFieldEnabled
         )
 
         Button(
@@ -186,11 +187,11 @@ fun PasswordInputDialog(modifier: Modifier) {
 
                 runBlocking {
                     context.dataStore.updateData {
-                        it.copy(passwordHash = Utils.hashString("SHA-256", (inputState.text as String).toByteArray()))
+                        it.copy(passwordHash = Utils.hashString("SHA-256", (passwordInputState.text as String).toByteArray()))
                     }
                 }
             },
-            enabled = isPasswordFieldEnabled
+            enabled = isPasswordFieldEnabled && Utils.isPasswordValid(passwordInputState.text)
         ) {
             Text(stringResource(R.string.save_password))
         }
@@ -203,7 +204,7 @@ fun PasswordInputDialog(modifier: Modifier) {
                     }
                 }
 
-                inputState.clearText()
+                passwordInputState.clearText()
                 isPasswordFieldEnabled = true
             },
             enabled = !isPasswordFieldEnabled,
