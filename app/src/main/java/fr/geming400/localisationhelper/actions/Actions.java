@@ -11,9 +11,10 @@ import java.util.function.Function;
 public abstract class Actions {
     private static final Map<String, BaseAction<?, ?>> ACTIONS = new HashMap<>();
 
-    public static final LocationGetterAction LOCATION = of("location", LocationGetterAction::new);
+    public static final LocationGetterAction LOCATION = register("location", LocationGetterAction::new);
 
-    public static final PingAction PING = of("ping", PingAction::new);
+    public static final PingAction PING = register("ping", PingAction::new);
+
 
     @Nullable
     public static <T, P> BaseAction<T, P> getByName(String name) {
@@ -30,13 +31,12 @@ public abstract class Actions {
         return ACTIONS.get(name);
     }
 
-
     @Unmodifiable
     public static Map<String, BaseAction<?, ?>> getAllActions() {
         return Map.copyOf(ACTIONS);
     }
 
-    private static <T, P, A extends BaseAction<T, P>> A of(String name, Function<String, A> actionFactory) {
+    private static <T, P, A extends BaseAction<T, P>> A register(String name, Function<String, A> actionFactory) {
         A action = actionFactory.apply(name);
         ACTIONS.put(name, action);
 
