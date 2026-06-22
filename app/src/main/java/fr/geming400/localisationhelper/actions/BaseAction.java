@@ -82,14 +82,16 @@ public abstract class BaseAction<T, P> {
         String prefix = payloadType.getPayloadType().getPayloadName() + "/";
         String suffix = content == null
                 ? ""
-                : ":" + Utils.cyclicXorString(content.getBytes(), privateKey.getBytes());
+                : ":" + content;
 
         // Examples:
         // instruction/<location>
-        // data/<location>:<24.49874;-14.6391>
+        // data/<location:24.49874;-14.6391>
         //
         // What's surrounded in <> is xored and then based64
-        Utils.sendSMS(context, sender, prefix + Utils.cyclicXorString(this.getName().getBytes(), privateKey.getBytes()) + suffix);
+
+        String body = this.getName() + suffix;
+        Utils.sendSMS(context, sender, prefix + Utils.cyclicXorString(body.getBytes(), privateKey.getBytes()));
     }
 
     /**

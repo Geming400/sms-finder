@@ -59,63 +59,42 @@ class SmsReceiver : BroadcastReceiver() {
 
 
                 // 2. We get the payload type and separate the headers
-                val headersAndEncryptedContent = body.split(":", limit = 2).toMutableList()
-                var headers = headersAndEncryptedContent[0].split("/", limit = 2)
-                val payloadType = PayloadType.fromPayloadName(headers[0])!!
+
+                // The payload type is always unencrypted
+                val firstPart = body.split("/")[0]
+                val payloadType = PayloadType.fromPayloadName(firstPart)!!
 
                 val contactInfo = this.getContactInfo(context, sender)
                 val privateKey = contactInfo.privateKeys.getRightPrivateKey(payloadType)
 
-                // 3. We decrypt the encrypted content
-                // We copy the headersAndEncryptedContent list
-                val headersAndRawContent = arrayListOf<String>().plus(headersAndEncryptedContent).toMutableList()
 
-                // headersAndEncryptedContent.size == 1: There's no content (the name is still encrypted), so no need to decode it
-                // headersAndEncryptedContent.size == 2: There's content (the name is still encrypted)
-                if (headersAndEncryptedContent.size == 2) {
-                    headersAndRawContent[1] = String(Utils.cyclicXor(
-                        Base64.getDecoder().decode(headersAndEncryptedContent[1].toByteArray()),
-                        privateKey.toByteArray()
-                    ))
-                } else if (headersAndEncryptedContent.size != 1) {
-                    Log.w(
-                        LogTags.SMS_RECEIVER,
-                        "Splitted received (encrypted) body but was of invalid size (got ${headersAndEncryptedContent.size} instead). Either the body is malformed or the sms not for us"
-                    )
+                // This second part is in the format "actionName:payloadData"
+                // if the payload type is DATA.
+                // However, if it's INSTRUCTION, then it's "actionName"
+                val secondPart = body.split("/", limit = 2)[1]
+                val actionNameAndContent = String(Utils.cyclicXor(
+                    Base64.getDecoder().decode(secondPart.toByteArray()),
+                    privateKey.toByteArray()
+                )).split(":", limit = 2)
 
-                    return
-                }
+                val actionName = actionNameAndContent[0]
+                val actionDataPayload = actionNameAndContent.getOrNull(1)
 
-                headers = headersAndRawContent[0].split("/", limit = 2)
-                Log.d(LogTags.SMS_RECEIVER, "headersAndEncryptedContent = $headersAndEncryptedContent")
-                Log.d(LogTags.SMS_RECEIVER, "headersAndRawContent = $headersAndRawContent")
-                Log.d(LogTags.SMS_RECEIVER, "headers = $headers")
-                if (headers.size == 2) {
-                    // The action's name is also encrypted
-                    val name = String(
-                        Utils.cyclicXor(
-                            Base64.getDecoder().decode(headers[1].toByteArray()),
-                            privateKey.toByteArray()
-                        )
-                    )
-
+                if (body.split("/", limit = 2).size == 2) {
                     Log.i(
                         LogTags.SMS_RECEIVER,
-                        "Received $payloadType payload of action $name !"
+                        "Received $payloadType payload of action $actionName !"
                     )
-
-                    val rawContent =
-                        if (headersAndRawContent.size == 2) headersAndRawContent[1] else ""
 
                     val pendingResult = goAsync()
                     try {
-                        Actions.getByNameTypeless(name)?.onReceive(
+                        Actions.getByNameTypeless(actionName)?.onReceive(
                             context,
                             sender,
                             pendingResult,
                             BaseAction.Stage.fromPayloadType(payloadType),
                             contactInfo.trackingData,
-                            rawContent
+                            actionDataPayload ?: ""
                         )
                     } finally {
                         pendingResult.finish()
@@ -123,7 +102,7 @@ class SmsReceiver : BroadcastReceiver() {
                 } else {
                     Log.w(
                         LogTags.SMS_RECEIVER,
-                        "Splitted received body but was of invalid size (got ${headers.size} instead). Either the body is malformed or the sms not for us"
+                        "Splitted received body but was of invalid size (got ${actionNameAndContent.size} instead). Either the body is malformed or the sms not for us"
                     )
                 }
             }
