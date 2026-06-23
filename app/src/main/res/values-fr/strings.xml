@@ -27,8 +27,12 @@
     <string name="enter_password">Rentrer votre mot de passe</string>
     <string name="save_password">Sauvegarder votre mot de passe</string>
     <string name="reset_password">Réinitialiser votre mot de passe</string>
-    <string name="setting.geolocation.description">Si la géolocalisation devrait être activé</string>
     <string name="setting.geolocation.name">Geolocalisation</string>
+    <string name="setting.geolocation.description">Si la géolocation est activé</string>
+    <string name="setting.battery.name">Batterie</string>
+    <string name="setting.battery.description">Si l\'obtention du pourcentage de charge est activé</string>
+    <string name="setting.category.actions">Actions</string>
+    <string name="setting.category.debug">Deboggage</string>
     <string name="introduction.steps.introduction">Introduction</string>
     <string name="introduction.steps.introduction.primary">Salut !\n\n
 
@@ -44,9 +48,14 @@
     </string>
     <string name="next">Suivant</string>
     <string name="introduction.steps.permissions">Permissions</string>
+    <string name="introduction.steps.settings.content">Il y a aussi quelques paramètres que vous pouvez activer pour parametrer d\'autres permissions en avance</string>
     <string name="denied_permission">Vous n\'avez pas autorisé %1$s</string>
-    <string name="must_authorize_permission_reason">Pour correctement utiliser cette application cette application DOIT être accordée. Vous ne pouvez pas continuer sinon.</string>
+    <string name="denied_permissions">Vous n\'avez pas autorisé les permissions requises</string>
+    <string name="must_authorize_permission_reason">Pour correctement utiliser cette application DOIT être accordée. Vous ne pouvez pas continuer sinon.</string>
+    <string name="must_authorize_permissions_reason">Pour continuer, vous devez autoriser les permissions %1$s.</string>
     <string name="grant">Accorder</string>
-    <string name="permission_icon_desc">Une image qui représente le logo de la permission %1$s</string>
     <string name="must_grant_permissions">Il y a plusieurs permissions nécéssaires à l\'utilisation de cette appli:</string>
+    <string name="reset_app">Réinitialiser l\'application</string>
+    <string name="reset_after_action">Relancer l\'appli pour que ceci prenne entièrement effet</string>
+    <string name="must_set_password">Vous devez rajouter un mot de passe pour continuer</string>
 </resources>

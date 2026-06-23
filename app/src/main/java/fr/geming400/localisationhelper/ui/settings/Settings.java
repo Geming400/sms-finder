@@ -23,11 +23,19 @@ public final class Settings {
     public static final Map<String, Setting<?>> SETTINGS = new HashMap<>();
 
     public static final Setting.BooleanSetting LOCATION = register(
-            Setting.ofBoolean("location", true),
-            Setting.Category.BASIC,
+            Setting.ofBoolean("location", false),
+            Setting.Category.ACTIONS,
             R.string.setting_geolocation_name,
             R.string.setting_geolocation_description,
+            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    );
+
+    public static final Setting.BooleanSetting BATTERY = register(
+            Setting.ofBoolean("battery", false),
+            Setting.Category.ACTIONS,
+            R.string.setting_battery_name,
+            R.string.setting_battery_description
     );
 
     private static <T, S extends Setting<T>> S register(S setting, Setting.Category category) {
@@ -57,7 +65,7 @@ public final class Settings {
         Map<Setting.Category, List<Setting<?>>> res = new LinkedHashMap<>(SETTINGS.size());
         Collection<Setting<?>> settingsSortedByCategoryWeight = SETTINGS.values()
                 .stream()
-                .sorted(Comparator.comparingInt(setting -> setting.category.getWeight()))
+                .sorted(Comparator.comparingInt(setting -> setting.category.getOrder()))
                 .collect(Collectors.toList());
 
         for (Setting<?> setting : settingsSortedByCategoryWeight) {

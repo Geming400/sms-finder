@@ -7,12 +7,13 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
+import fr.geming400.localisationhelper.ui.settings.Settings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
 
-class BatteryGetterAction(name: String): Action<Float>(name) {
+class BatteryGetterAction(name: String): Action<Float>(name, Settings.BATTERY) {
     override fun serializeResult(obj: Float): String = obj.toString()
 
     @Throws(MalformedRawActionException::class)

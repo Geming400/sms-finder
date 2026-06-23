@@ -29,6 +29,11 @@
     <string name="reset_password">Reset password</string>
     <string name="setting.geolocation.description">If geolocating this device should be allowed</string>
     <string name="setting.geolocation.name">Geolocation</string>
+    <string name="setting.battery.description">If getting the charge percentage of this device should be allowed</string>
+    <string name="setting.battery.name">Battery</string>
+    <string name="setting.category.unknown" translatable="false">UNKNOWN</string>
+    <string name="setting.category.actions">Actions</string>
+    <string name="setting.category.debug">Debug</string>
     <string name="introduction.steps.introduction">Introduction</string>
     <string name="introduction.steps.introduction.primary">Hi !\n\n
 
@@ -41,11 +46,16 @@
     <string name="introduction.steps.introduction.how_does_this_work_content">Once configured, you select a password (aka a private key), add new contacts and from there you can send actions to other phones via SMS.\n
         For it to actually work, you need to add YOUR contact on the other phone and from there, actions will get sent through if enabled.
     </string>
-    <string name="next">Next</string>
     <string name="introduction.steps.permissions">Permissions</string>
+    <string name="introduction.steps.settings.content">There are also some settings that you can enable beforehand to continue setting up permissions</string>
+    <string name="next">Next</string>
     <string name="denied_permission">You denied %1$s</string>
+    <string name="denied_permissions">You denied the required permissions</string>
     <string name="must_authorize_permission_reason">To correctly use this app this permission MUST be granted. You cannot continue if it isn\'t.</string>
+    <string name="must_authorize_permissions_reason">You must grant the %1$s permissions to continue.</string>
     <string name="grant">Grant</string>
-    <string name="permission_icon_desc">An image representing the logo of the %1$s permission</string>
     <string name="must_grant_permissions">There are multiple permissions you need to grant to this app:</string>
+    <string name="reset_app">Reset app</string>
+    <string name="reset_after_action">Relaunch the app for it to fully take effect</string>
+    <string name="must_set_password">You must set your password to continue</string>
 </resources>
