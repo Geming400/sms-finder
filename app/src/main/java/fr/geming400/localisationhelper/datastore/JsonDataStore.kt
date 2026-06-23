@@ -69,9 +69,12 @@ class JsonDataStore(private val context: Context) {
 
         context.dataStore.updateData { savedData ->
             savedData.copy(
-                trackedContacts = savedData.trackedContacts.dropWhile {
+                trackedContacts = savedData.trackedContacts.filter {
                     res = it.areContactInfoEqual(contact)
-                    return@dropWhile res
+
+                    // If the contact infos are equal then we can
+                    // remove this tracked contact
+                    return@filter !res
                 }
             )
         }
