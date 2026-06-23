@@ -53,12 +53,12 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
     }
 
     @SuppressLint("MissingPermission")
-    override fun execute(context: Context): CompletableFuture<SimpleLocation?>? {
+    override fun execute(context: Context): CompletableFuture<SimpleLocation>? {
         val locationManager =
             context.getSystemService(LocationManager::class.java)
 
         val hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        val completableFuture = CompletableFuture<SimpleLocation?>()
+        val completableFuture = CompletableFuture<SimpleLocation>()
 
         if (hasGps && Utils.hasLocationPermissions(context)) {
             locationManager.requestLocationUpdates(

@@ -5,12 +5,14 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import fr.geming400.localisationhelper.ui.settings.Setting;
 
-public abstract class Action<T> extends BaseAction<CompletableFuture<T>, T> {
+public abstract class Action<T> extends BaseAction<CompletableFuture<@NotNull T>, T> {
     public Action(String name) {
         super(name);
     }
@@ -61,5 +63,9 @@ public abstract class Action<T> extends BaseAction<CompletableFuture<T>, T> {
         });
 
         return stringCompletableFuture;
+    }
+
+    protected CompletableFuture<T> futureOf(T obj) {
+        return CompletableFuture.completedFuture(obj);
     }
 }

@@ -100,7 +100,7 @@ public abstract class BaseAction<T, P> {
      * @apiNote this should get called at the {@link Stage#RECEIVE_OTHER_PHONE RECEIVE_OTHER_PHONE} stage
      */
     @Nullable
-    public abstract T execute(Context context);
+    public abstract T execute(@NonNull Context context);
 
     /**
      * Called whenever this phone receives a {@code sms} linked to this action

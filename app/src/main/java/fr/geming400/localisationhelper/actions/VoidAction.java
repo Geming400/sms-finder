@@ -18,7 +18,7 @@ public abstract class VoidAction extends BaseAction<Void, Boolean> {
 
     @Nullable
     @Override
-    public final Void execute(Context context) {
+    public final Void execute(@NonNull Context context) {
         this.executeVoid(context);
         return null;
     }
