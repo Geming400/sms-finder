@@ -5,8 +5,6 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
-import androidx.collection.orderedScatterSetOf
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +46,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.ui.activities.MainActivity
 import fr.geming400.localisationhelper.ui.settings.Settings
@@ -55,8 +53,9 @@ import fr.geming400.localisationhelper.utils.Utils
 import fr.geming400.localisationhelper.utils.centerHorizontally
 
 @Composable
-fun MainIntroductionComponent(onEnd: () -> Unit = {}) {
-    var currentStep by remember { mutableStateOf(Step.INTRODUCTION) }
+fun MainIntroductionComponent(currentStepState: MutableState<Step>? = null, onEnd: () -> Unit = {}) {
+
+    var currentStep by currentStepState ?: rememberCurrentStep()
 
     Scaffold() { innerPadding ->
         Column(
@@ -76,7 +75,29 @@ fun MainIntroductionComponent(onEnd: () -> Unit = {}) {
                 Column(
                     modifier = Modifier.verticalScroll(scrollState)
                 ) {
-                    val isButtonEnabled = currentStep.component()
+                    var isButtonEnabled = currentStep.component()
+
+                    var shouldReloadButtonEnablingState by remember { mutableStateOf(false) }
+                    when {
+                        shouldReloadButtonEnablingState -> {
+                            isButtonEnabled = currentStep.component()
+                            shouldReloadButtonEnablingState = false
+                        }
+                    }
+
+                    val lifecycleOwner = LocalLifecycleOwner.current
+                    DisposableEffect(lifecycleOwner) {
+                        val observer = LifecycleEventObserver { _, event ->
+                            if (event == Lifecycle.Event.ON_RESUME)
+                                shouldReloadButtonEnablingState = true
+                        }
+
+                        lifecycleOwner.lifecycle.addObserver(observer)
+
+                        onDispose {
+                            lifecycleOwner.lifecycle.removeObserver(observer)
+                        }
+                    }
 
                     HorizontalDivider(Modifier.padding(vertical = 15.dp))
                     NextButton(currentStep = currentStep, isEnabled = isButtonEnabled) { step, isEnd ->
@@ -91,6 +112,10 @@ fun MainIntroductionComponent(onEnd: () -> Unit = {}) {
         }
     }
 }
+
+@Composable
+fun rememberCurrentStep(initialStep: Step = Step.INTRODUCTION): MutableState<Step> =
+    remember { mutableStateOf(initialStep) }
 
 @Composable
 private fun StepsBar(
@@ -169,7 +194,7 @@ private fun IntroductionMainComponent(): Boolean {
 
 @Composable
 private fun PermissionMainComponent(): Boolean {
-    val activity = LocalContext.current
+    val context = LocalContext.current
 
     Text(
         modifier = Modifier
@@ -178,16 +203,7 @@ private fun PermissionMainComponent(): Boolean {
         textAlign = TextAlign.Center
     )
 
-    val requiredPermissions = orderedScatterSetOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-        Manifest.permission.READ_CONTACTS,
-        Manifest.permission.SEND_SMS,
-        Manifest.permission.READ_SMS,
-        Manifest.permission.RECEIVE_SMS
-    )
-
-    requiredPermissions.forEach {
+    MainActivity.requiredPermissions.forEach {
         // The sms permissions may be multiple permissions
         // but to the end user it's only 1
         if (!it.contains("SMS"))
@@ -196,8 +212,7 @@ private fun PermissionMainComponent(): Boolean {
 
     PermissionButton(permission = Manifest.permission.SEND_SMS)
 
-    return requiredPermissions
-        .all { ActivityCompat.checkSelfPermission(activity, it) == PackageManager.PERMISSION_GRANTED }
+    return MainActivity.areAllPermissionsGranted(context)
 }
 
 @SuppressLint("RestrictedApi")
@@ -227,13 +242,12 @@ private fun PermissionButton(modifier: Modifier = Modifier, permission: String) 
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Live refresh when the user goes to the
+    // Live refresh for when the user goes to the
     // settings app
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
+            if (event == Lifecycle.Event.ON_RESUME)
                 isPermissionGranted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-            }
         }
 
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -247,7 +261,7 @@ private fun PermissionButton(modifier: Modifier = Modifier, permission: String) 
     var shouldShowGrantingDialog by remember { mutableStateOf(false) }
     when {
         shouldShowGrantingDialog -> {
-            GrantPermissionsDialog(modifier, permission) {
+            GrantPermissionDialog(modifier, permission) {
                 @Suppress("AssignedValueIsNeverRead")
                 shouldShowGrantingDialog = false
             }
@@ -287,13 +301,12 @@ private fun PermissionButton(modifier: Modifier = Modifier, permission: String) 
 }
 
 @Composable
-private fun GrantPermissionsDialog(modifier: Modifier = Modifier, permission: String, onEnd: () -> Unit) {
+fun GrantPermissionDialog(modifier: Modifier = Modifier, permission: String, onEnd: () -> Unit) {
     val activity = LocalActivity.current!! as MainActivity
     val context = LocalContext.current
 
     val permissionInfo = remember { context.packageManager.getPermissionInfo(permission, 0) }
     val permissionName = remember { permissionInfo.loadLabel(context.packageManager) }
-    val permissionIcon = remember { permissionInfo.loadIcon(context.packageManager) }
 
     val isPermissionGranted = ActivityCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED
 
@@ -302,12 +315,6 @@ private fun GrantPermissionsDialog(modifier: Modifier = Modifier, permission: St
             modifier = modifier,
             onDismissRequest = {
                 onEnd()
-            },
-            icon = {
-                Image(
-                    painter = rememberDrawablePainter(permissionIcon),
-                    contentDescription = stringResource(R.string.permission_icon_desc, permissionName)
-                )
             },
             title = {
                 Text(stringResource(R.string.denied_permission, permissionName))
@@ -335,12 +342,68 @@ private fun GrantPermissionsDialog(modifier: Modifier = Modifier, permission: St
 }
 
 @Composable
+fun GrantPermissionsDialog(modifier: Modifier = Modifier, permissions: Collection<String>, dismissButton: (@Composable () -> Unit)?, onEnd: () -> Unit) {
+    val activity = LocalActivity.current!! as MainActivity
+    val context = LocalContext.current
+
+    val permissionNames = StringBuilder()
+    val isOnePermissionDenied = permissions.any { ActivityCompat.checkSelfPermission(activity, it) == PackageManager.PERMISSION_DENIED }
+
+    permissions.forEach {
+        val permissionInfo = remember(it) { context.packageManager.getPermissionInfo(it, 0) }
+        val permissionName = remember { permissionInfo.loadLabel(context.packageManager) }
+
+        if (it == permissions.first()) {
+            permissionNames.append("$permissionName")
+        } else {
+            permissionNames.append(", $permissionName")
+        }
+    }
+
+    if (isOnePermissionDenied) {
+        AlertDialog(
+            modifier = modifier,
+            onDismissRequest = {
+                onEnd()
+            },
+            title = {
+                Text(stringResource(R.string.denied_permissions))
+            },
+            text = {
+                Text(stringResource(R.string.must_authorize_permissions_reason, permissionNames.toString()))
+            },
+            dismissButton = dismissButton,
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val shouldShowRationale = permissions.any { ActivityCompat.shouldShowRequestPermissionRationale(activity, it) }
+
+                        if (shouldShowRationale) {
+                            activity.requestPermissionsWithCallback(permissions) { success ->
+                                if (!success)
+                                    Utils.openSettingAppForActivity(activity)
+                            }
+                        } else {
+                            Utils.openSettingAppForActivity(activity)
+                        }
+
+                        onEnd()
+                    }
+                ) {
+                    Text(stringResource(R.string.grant))
+                }
+            }
+        )
+    }
+}
+
+@Composable
 private fun ActionSettingsMainComponent(): Boolean {
     Text(
         modifier = Modifier
             .centerHorizontally()
             .padding(8.dp),
-        text = "There are also some settings that you can enable beforehand to continue setting up permissions",
+        text = stringResource(R.string.introduction_steps_settings_content),
         textAlign = TextAlign.Center
     )
 

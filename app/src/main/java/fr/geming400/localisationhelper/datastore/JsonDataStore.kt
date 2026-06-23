@@ -118,7 +118,8 @@ val Context.dataStore: DataStore<LocalisationHelperData> by dataStore(
 data class LocalisationHelperData(
     val trackedContacts: List<TrackingData> = arrayListOf(),
     val passwordHash: String? = null,
-    val sawXiaomiNotice: Boolean = Build.MANUFACTURER != "Xiaomi"
+    val sawXiaomiNotice: Boolean = Build.MANUFACTURER != "Xiaomi",
+    val firstTimeOpening: Boolean = true
 )
 
 object LocalisationHelperDataSerializer : Serializer<LocalisationHelperData> {

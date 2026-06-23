@@ -22,11 +22,17 @@ open class PermissionsWithCallbackActivity : ComponentActivity() {
                 callback(permID, granted)
             }
         }
+
+        permissionsCallbacks.forEach { (id, callback) ->
+            callback(res)
+        }
     }
 
-    fun requestPermission(permission: String) {
+    fun requestPermission(permission: String) =
         permissionLauncher.launch(arrayOf(permission))
-    }
+
+    fun requestPermissions(permissions: Collection<String>) =
+        permissionLauncher.launch(permissions.toTypedArray())
 
     fun requestPermissionWithCallback(permissions: String, callback: Callback) {
         val callbackID = Uuid.random()

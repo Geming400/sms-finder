@@ -1,8 +1,13 @@
 package fr.geming400.localisationhelper.ui.activities
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.collection.OrderedScatterSet
+import androidx.collection.orderedScatterSetOf
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,18 +22,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.app.ActivityCompat
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.datastore.dataStore
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
+import fr.geming400.localisationhelper.ui.components.LoadingCircle
 import fr.geming400.localisationhelper.ui.components.MainIntroductionComponent
+import fr.geming400.localisationhelper.ui.components.Step
+import fr.geming400.localisationhelper.ui.components.rememberCurrentStep
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.flow.first
@@ -41,12 +52,44 @@ class MainActivity : PermissionsWithCallbackActivity() {
         enableEdgeToEdge()
         setContent {
             LocalisationHelperTheme {
-                MainIntroductionComponent()
-                // TODO: Condition for showing LocalisationHelperApp
-//                LocalisationHelperApp()
+                val coroutineScope = rememberCoroutineScope()
+                val appData by this.dataStore.data
+                    .collectAsState(initial = null, coroutineScope.coroutineContext)
+
+                if (appData == null) {
+                    LoadingCircle()
+                } else {
+                    if (!areAllPermissionsGranted(this) || appData!!.firstTimeOpening) {
+                        val currentStep = if (appData!!.firstTimeOpening)
+                            null
+                        else
+                            rememberCurrentStep(Step.PERMISSIONS)
+
+                        MainIntroductionComponent(currentStep) {
+                            runBlocking {
+                                dataStore.updateData {
+                                    it.copy(firstTimeOpening = false)
+                                }
+                            }
+                        }
+                    } else {
+                        LocalisationHelperApp()
+                    }
+                }
             }
         }
+    }
 
+    companion object {
+        val requiredPermissions: OrderedScatterSet<String> = orderedScatterSetOf(
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.READ_SMS,
+            Manifest.permission.RECEIVE_SMS
+        )
+
+        fun areAllPermissionsGranted(context: Context) =
+            requiredPermissions.all { ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }
     }
 }
 

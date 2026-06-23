@@ -6,15 +6,25 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.ui.activities.MainActivity
@@ -54,6 +64,36 @@ fun ActivitySelector(currentDestination: AppDestinations, modifier: Modifier = M
 fun rememberJsonDatastore(): JsonDataStore {
     val context = LocalContext.current
     return remember { JsonDataStore(context) }
+}
+
+@Composable
+fun LoadingCircle(modifier: Modifier = Modifier) {
+    // We recreate a new Scaffold
+    // because if we don't our theme won't be applied
+    // so for phones in dark mode, the bg won't be seen
+    // as dark
+    //
+    // We can't put the following Box in the ActivitySelector's content either
+    // because since it's a loading screen we don't want to
+    // have the selector menu in the bottom
+    Scaffold(
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
+        Box(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(65.dp),
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
+        }
+    }
 }
 
 enum class AppDestinations(
