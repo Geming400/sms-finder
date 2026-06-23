@@ -58,4 +58,5 @@
     <string name="reset_app">Reset app</string>
     <string name="reset_after_action">Relaunch the app for it to fully take effect</string>
     <string name="must_set_password">You must set your password to continue</string>
+    <string name="enter_user_private_key">Enter this contact\'s password</string>
 </resources>

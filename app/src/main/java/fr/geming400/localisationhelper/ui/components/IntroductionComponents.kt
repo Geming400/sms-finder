@@ -1,6 +1,5 @@
 package fr.geming400.localisationhelper.ui.components
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.activity.compose.LocalActivity

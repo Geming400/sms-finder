@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
@@ -82,9 +83,7 @@ import kotlin.time.Duration.Companion.seconds
 // TODO: Use snackbar when sending action request
 class UserTrackingActivity : ComponentActivity() {
     lateinit var contact: Contact
-
     lateinit var snackbarHostState: SnackbarHostState
-
     lateinit var trackedContacts: List<TrackingData>
 
     var isContactBeingDeleted: Boolean = false
@@ -128,17 +127,22 @@ class UserTrackingActivity : ComponentActivity() {
                         SnackbarHost(hostState = snackbarHostState)
                     }
                 ) { innerPadding ->
-                    val shouldShowMap = remember { mutableStateOf(false) }
-                    if (shouldShowMap.value) {
+                    var shouldShowMap by remember { mutableStateOf(false) }
+                    if (shouldShowMap) {
                         UserLocationMap(Modifier.padding(innerPadding), trackedContactInfo) {
-                            shouldShowMap.value = false
+                            shouldShowMap = false
                         }
                     } else {
                         ActivitySelector(AppDestinations.TRACKING) {
                             if (trackedContactInfo.privateKey == null) {
-                                ChangeContactPrivateKeyDialog(contact = contact, trackedContactInfo = trackedContactInfo) {
-                                    this.startActivity(Intent(this, TrackingActivity::class.java))
-                                }
+                                ChangeContactPrivateKeyDialog(
+                                    contact = contact,
+                                    trackedContactInfo = trackedContactInfo,
+                                    onDismiss = {
+                                        this.startActivity(Intent(this, TrackingActivity::class.java))
+                                    },
+                                    onClose = {}
+                                )
                             } else {
                                 MainUserTrackingComponent(
                                     innerPadding = innerPadding,
@@ -146,7 +150,7 @@ class UserTrackingActivity : ComponentActivity() {
                                     trackedContactInfo = trackedContactInfo,
                                     jsonDataStore = jsonDataStore
                                 ) {
-                                    shouldShowMap.value = true
+                                    shouldShowMap = true
                                 }
                             }
                         }
@@ -402,7 +406,7 @@ class UserTrackingActivity : ComponentActivity() {
             text = {
                 OutlinedSecureTextField(
                     privateKeyState,
-                    label = { Text("User's private key") },
+                    label = { Text(stringResource(R.string.enter_user_private_key)) },
                     isError = !Utils.isPasswordValid(privateKeyState.text)
                 )
             }
