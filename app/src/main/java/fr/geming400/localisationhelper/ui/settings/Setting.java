@@ -18,8 +18,10 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import fr.geming400.localisationhelper.R;
 import fr.geming400.localisationhelper.actions.Actions;
 import fr.geming400.localisationhelper.ui.activities.PermissionsWithCallbackActivity;
 import kotlin.Unit;
@@ -29,7 +31,7 @@ public abstract class Setting<T> {
     @StringRes
     protected Integer name;
     protected final T defaultValue;
-    protected Category category = Category.NONE;
+    protected Category category = Category.UNKNOWN;
     @StringRes
     protected Integer description = null;
     protected Set<String> requiredPermissions = new HashSet<>();
@@ -134,15 +136,17 @@ public abstract class Setting<T> {
 
     }
 
-    public void askForPermissions(PermissionsWithCallbackActivity activity, T valueToSet, Runnable callback) {
+    public void askForPermissions(PermissionsWithCallbackActivity activity, T valueToSet, Consumer<Boolean> callback) {
         if (this.havePermissionsBeenGranted(activity)) {
             setValue(activity, valueToSet);
-            callback.run();
+            callback.accept(true);
         } else {
             activity.requestPermissionsWithCallback(requiredPermissions, grantedPermissions -> {
                 if (grantedPermissions) {
                     setValue(activity, valueToSet);
-                    callback.run();
+                    callback.accept(true);
+                } else if (!this.havePermissionsBeenGranted(activity)) {
+                    callback.accept(false);
                 }
 
                 return Unit.INSTANCE;
@@ -179,34 +183,35 @@ public abstract class Setting<T> {
     }
 
     public enum Category {
-        NONE("None", true, 0),
-        BASIC("Basic", 1),
-        TEST("test", 2);
+        UNKNOWN(R.string.setting_category_unknown, true, 0),
+        ACTIONS(R.string.setting_category_actions, 1);
 
-        private final String name;
+        @StringRes
+        private final int name;
         private final boolean hidden;
         @IntRange(from = 0, to = Integer.MAX_VALUE)
-        private final int weight;
+        private final int order;
 
-        Category(String name, boolean hidden, @IntRange(from = 0, to = Integer.MAX_VALUE) int weight) {
+        Category(@StringRes int name, boolean hidden, @IntRange(from = 0, to = Integer.MAX_VALUE) int order) {
             this.name = name;
             this.hidden = hidden;
-            this.weight = weight;
+            this.order = order;
         }
-        Category(String name, @IntRange(from = 0, to = Integer.MAX_VALUE) int weight) {
-            this(name, false, weight);
+        Category(@StringRes int name, @IntRange(from = 0, to = Integer.MAX_VALUE) int order) {
+            this(name, false, order);
         }
 
-        public String getName() {
-            return name;
+        @StringRes
+        public int getName() {
+            return this.name;
         }
 
         public boolean isHidden() {
-            return hidden;
+            return this.hidden;
         }
 
-        public int getWeight() {
-            return weight;
+        public int getOrder() {
+            return this.order;
         }
     }
 

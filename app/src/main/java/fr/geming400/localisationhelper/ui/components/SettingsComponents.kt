@@ -5,15 +5,16 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -33,15 +34,17 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.preference.PreferenceManager
-import fr.geming400.localisationhelper.utils.Utils
+import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.ui.activities.PermissionsWithCallbackActivity
 import fr.geming400.localisationhelper.ui.settings.Setting
 import fr.geming400.localisationhelper.ui.settings.Settings
+import fr.geming400.localisationhelper.utils.Utils
+import fr.geming400.localisationhelper.utils.centerHorizontally
 
 @Composable
-fun SettingScreen(modifier: Modifier) {
+fun SettingScreen(modifier: Modifier, content: LazyListScope.() -> Unit = {}) {
     LazyColumn(
         modifier = modifier
             .scrollable(state = ScrollState(0), orientation = Orientation.Horizontal))
@@ -58,6 +61,8 @@ fun SettingScreen(modifier: Modifier) {
                 }
             }
         }
+
+        content()
     }
 }
 
@@ -94,7 +99,7 @@ private fun SettingSpacing(modifier: Modifier = Modifier, setting: Setting<*>, c
 }
 
 @Composable
-private fun SettingsCategory(modifier: Modifier = Modifier, title: String, content: @Composable () -> Unit) {
+fun SettingsCategory(modifier: Modifier = Modifier, title: String, content: @Composable () -> Unit) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -115,18 +120,16 @@ private fun SettingsCategory(modifier: Modifier = Modifier, title: String, conte
 
 @Composable
 private fun SettingDescription(modifier: Modifier = Modifier, description: String) {
-    Box(
-        contentAlignment = Alignment.Center,
+    Text(
         modifier = modifier
-            .fillMaxSize()
-            .offset(y = (-10).dp)
-    ) {
-        Text(
-            description,
-            fontSize = 4.em,
-            color = Color(180, 180, 180, 200)
-        )
-    }
+            .centerHorizontally()
+            .padding(horizontal = 6.dp)
+            .offset(y = (-10).dp),
+        text = description,
+        color = Color(180, 180, 180, 200),
+        maxLines = 1,
+        autoSize = TextAutoSize.StepBased(maxFontSize = 22.sp)
+    )
 }
 
 @Composable
@@ -143,11 +146,35 @@ private fun BooleanSetting(modifier: Modifier = Modifier, setting: Setting<Boole
             style = MaterialTheme.typography.bodyLarge
         )
 
+        var shouldShowGrantingDialog by remember { mutableStateOf(false) }
+        when {
+            shouldShowGrantingDialog -> {
+                GrantPermissionsDialog(
+                    modifier = modifier,
+                    permissions = setting.requiredPermissions,
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                shouldShowGrantingDialog = false
+                            }
+                        ) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                }) {
+                    shouldShowGrantingDialog = false
+                }
+            }
+        }
+
         Switch(
             checked = isVisuallyChecked,
             onCheckedChange = {
-                setting.askForPermissions(activity, it) {
-                    isVisuallyChecked = it
+                setting.askForPermissions(activity, it) { success ->
+                    if (success) {
+                        isVisuallyChecked = it
+                    } else {
+                        shouldShowGrantingDialog = true
+                    }
                 }
             }
         )
