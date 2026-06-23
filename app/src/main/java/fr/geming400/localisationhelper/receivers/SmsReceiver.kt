@@ -35,83 +35,87 @@ class SmsReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
-            val bundle = intent.extras
-            if (bundle != null) {
-                // 1. Parsing the incoming message
-                val pdus = bundle.get("pdus") as Array<*>
+            try {
+                val bundle = intent.extras
+                if (bundle != null) {
+                    // 1. Parsing the incoming message
+                    val pdus = bundle.get("pdus") as Array<*>
 
-                var body = ""
-                var sender = ""
+                    var body = ""
+                    var sender = ""
 
-                // Constructing the final message
-                // by appending all sub-messages
-                for (pdu in pdus) {
-                    val message =
-                        SmsMessage.createFromPdu(pdu as ByteArray?, bundle.getString("format"))
-                    sender = message.originatingAddress!!
-                    body = body.plus(message.messageBody)
-                }
-
-                if (body.contains("--ignore")) {
-                    Log.i(LogTags.SMS_RECEIVER, "Sms received with flag '--ignore', ignoring")
-                    return
-                }
-
-
-
-                // 2. We get the payload type
-
-                // The payload type is always unencrypted
-                val firstPart = body.split("/")[0]
-                val payloadType = PayloadType.fromPayloadName(firstPart)!!
-
-                val contactInfo = this.getContactInfo(context, sender)
-                val privateKey = contactInfo.privateKeys.getRightPrivateKey(payloadType)
-
-
-
-                // 3. We unencrypt the message
-
-                // This second part is in the format "actionName:payloadData"
-                // if the payload type is DATA.
-                // However, if it's INSTRUCTION, then it's "actionName"
-                val secondPart = body.split("/", limit = 2)[1]
-                val actionNameAndContent = String(Utils.cyclicXor(
-                    Base64.getDecoder().decode(secondPart.toByteArray()),
-                    privateKey.toByteArray()
-                )).split(":", limit = 2)
-
-                val actionName = actionNameAndContent[0]
-                val actionDataPayload = actionNameAndContent.getOrNull(1)
-
-                if (body.split("/", limit = 2).size == 2) {
-                    Log.i(
-                        LogTags.SMS_RECEIVER,
-                        "Received $payloadType payload of action $actionName !"
-                    )
-
-                    val pendingResult = goAsync()
-                    try {
-                        val action = Actions.getByNameTypeless(actionName)!!
-                        if (action.canSendAnyPayload(context)) {
-                            Actions.getByNameTypeless(actionName)?.onReceive(
-                                context,
-                                sender,
-                                pendingResult,
-                                BaseAction.Stage.fromPayloadType(payloadType),
-                                contactInfo.trackingData,
-                                actionDataPayload ?: ""
-                            )
-                        }
-                    } finally {
-                        pendingResult.finish()
+                    // Constructing the final message
+                    // by appending all sub-messages
+                    for (pdu in pdus) {
+                        val message =
+                            SmsMessage.createFromPdu(pdu as ByteArray?, bundle.getString("format"))
+                        sender = message.originatingAddress!!
+                        body = body.plus(message.messageBody)
                     }
-                } else {
-                    Log.w(
-                        LogTags.SMS_RECEIVER,
-                        "Splitted received body but was of invalid size (got ${actionNameAndContent.size} instead). Either the body is malformed or the sms not for us"
-                    )
+
+                    if (body.contains("--ignore")) {
+                        Log.i(LogTags.SMS_RECEIVER, "Sms received with flag '--ignore', ignoring")
+                        return
+                    }
+
+
+                    // 2. We get the payload type
+
+                    // The payload type is always unencrypted
+                    val firstPart = body.split("/")[0]
+                    val payloadType = PayloadType.fromPayloadName(firstPart)!!
+
+                    val contactInfo = this.getContactInfo(context, sender)
+                    val privateKey = contactInfo.privateKeys.getRightPrivateKey(payloadType)
+
+
+                    // 3. We unencrypt the message
+
+                    // This second part is in the format "actionName:payloadData"
+                    // if the payload type is DATA.
+                    // However, if it's INSTRUCTION, then it's "actionName"
+                    val secondPart = body.split("/", limit = 2)[1]
+                    val actionNameAndContent = String(
+                        Utils.cyclicXor(
+                            Base64.getDecoder().decode(secondPart.toByteArray()),
+                            privateKey.toByteArray()
+                        )
+                    ).split(":", limit = 2)
+
+                    val actionName = actionNameAndContent[0]
+                    val actionDataPayload = actionNameAndContent.getOrNull(1)
+
+                    if (body.split("/", limit = 2).size == 2) {
+                        Log.i(
+                            LogTags.SMS_RECEIVER,
+                            "Received $payloadType payload of action $actionName !"
+                        )
+
+                        val pendingResult = goAsync()
+                        try {
+                            val action = Actions.getByNameTypeless(actionName)!!
+                            if (action.canSendAnyPayload(context)) {
+                                Actions.getByNameTypeless(actionName)?.onReceive(
+                                    context,
+                                    sender,
+                                    pendingResult,
+                                    BaseAction.Stage.fromPayloadType(payloadType),
+                                    contactInfo.trackingData,
+                                    actionDataPayload ?: ""
+                                )
+                            }
+                        } finally {
+                            pendingResult.finish()
+                        }
+                    } else {
+                        Log.w(
+                            LogTags.SMS_RECEIVER,
+                            "Splitted received body but was of invalid size (got ${actionNameAndContent.size} instead). Either the body is malformed or the sms not for us"
+                        )
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e(LogTags.SMS_RECEIVER, "Caught error in SmsReceiver.", e)
             }
         }
     }
