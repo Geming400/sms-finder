@@ -8,12 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-// TODO: battery getter action
 public abstract class Actions {
     private static final Map<String, BaseAction<?, ?>> ACTIONS = new HashMap<>();
 
     public static final LocationGetterAction LOCATION = register("location", LocationGetterAction::new);
-
+    public static final BatteryGetterAction BATTERY = register("battery", BatteryGetterAction::new);
     public static final PingAction PING = register("ping", PingAction::new);
 
 
