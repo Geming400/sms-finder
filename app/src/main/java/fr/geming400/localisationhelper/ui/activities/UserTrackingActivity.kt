@@ -63,6 +63,7 @@ import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
 import fr.geming400.localisationhelper.ui.components.DeletableContactProfile
+import fr.geming400.localisationhelper.ui.components.LoadingCircle
 import fr.geming400.localisationhelper.ui.components.PhoneNumberDropdown
 import fr.geming400.localisationhelper.ui.components.rememberJsonDatastore
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
@@ -117,32 +118,7 @@ class UserTrackingActivity : ComponentActivity() {
 
                 // Since we're tracking a contact, we're waiting until 'trackedContacts' is non-empty
                 if (trackedContacts.isEmpty() || isContactBeingDeleted) {
-                    // We recreate a new Scaffold
-                    // because if we don't our theme won't be applied
-                    // so for phones in dark mode, the bg won't be seen
-                    // as dark
-                    //
-                    // We can't put the following Box in the ActivitySelector's content either
-                    // because since it's a loading screen we don't want to
-                    // have the selector menu in the bottom
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize()
-                    ) { innerPadding ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(65.dp),
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                                )
-                            }
-                        }
-                    }
+                    LoadingCircle()
 
                     return@LocalisationHelperTheme
                 }
@@ -265,6 +241,11 @@ class UserTrackingActivity : ComponentActivity() {
 
             ActionButton(trackedContactInfo, Actions.LOCATION) {
                 Text("Request location")
+            }
+
+            Text("Battery charge: ${trackedContactInfo.lastRecordedBatteryCharge}%")
+            ActionButton(trackedContactInfo, Actions.BATTERY) {
+                Text("Get battery info")
             }
 
             Text("Last location answer: ${trackedContactInfo.geolocation}")
