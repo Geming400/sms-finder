@@ -25,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -33,9 +34,12 @@ import contacts.core.LookupQuery
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.utils.Utils
 import fr.geming400.localisationhelper.datastore.JsonDataStore
+import fr.geming400.localisationhelper.datastore.LocalisationHelperData
+import fr.geming400.localisationhelper.datastore.dataStore
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
 import fr.geming400.localisationhelper.ui.components.ContactsList
+import fr.geming400.localisationhelper.ui.components.LoadingCircle
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 import kotlinx.coroutines.runBlocking
 
@@ -83,44 +87,68 @@ class TrackingActivity : ComponentActivity() {
             val trackedContacts by jsonDataStore.trackedContactsFlow()
                 .collectAsState(initial = emptyList(), coroutineScope.coroutineContext)
 
-            LocalisationHelperTheme {
-                ActivitySelector(AppDestinations.TRACKING) {
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize(),
-                        floatingActionButton = { ContactAdderButton() }
-                    ) { innerPadding ->
-                        ContactsList(
-                            modifier = Modifier.padding(innerPadding),
-                            contactsFilter = trackedContacts.map { it.lookupKeyWithId },
-                            onContactClick = { contact ->
-                                val intent = Intent(this, UserTrackingActivity::class.java)
-                                val bundle = Bundle()
-                                bundle.putString("lookupKey", contact.lookupKey)
-                                bundle.putLong("contactID", contact.id)
-                                intent.putExtras(bundle)
+            val appData by this.dataStore.data
+                .collectAsState(initial = null, coroutineScope.coroutineContext)
 
-                                this.startActivity(intent)
+            LocalisationHelperTheme {
+                if (appData == null) {
+                    LoadingCircle()
+                } else {
+                    ActivitySelector(AppDestinations.TRACKING) {
+                        Scaffold(
+                            modifier = Modifier.fillMaxSize(),
+                            floatingActionButton = {
+                                if (appData!!.passwordHash != null)
+                                    ContactAdderButton()
                             }
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(innerPadding)
-                                    .padding(horizontal = 8.dp)
-                                    .fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column() {
-                                    Text(
-                                        stringResource(R.string.add_contacts),
-                                        fontSize = 4.em,
-                                        textAlign = TextAlign.Center
-                                    )
+                        ) { innerPadding ->
+                            if (appData!!.passwordHash != null) {
+                                ContactsList(
+                                    modifier = Modifier.padding(innerPadding),
+                                    contactsFilter = trackedContacts.map { it.lookupKeyWithId },
+                                    onContactClick = { contact ->
+                                        val intent = Intent(this, UserTrackingActivity::class.java)
+                                        val bundle = Bundle()
+                                        bundle.putString("lookupKey", contact.lookupKey)
+                                        bundle.putLong("contactID", contact.id)
+                                        intent.putExtras(bundle)
+
+                                        this.startActivity(intent)
+                                    }
+                                ) {
+                                    MustAddContactsText(Modifier.padding(innerPadding), appData!!)
                                 }
+                            } else {
+                                MustAddContactsText(Modifier.padding(innerPadding), appData!!)
                             }
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun MustAddContactsText(modifier: Modifier = Modifier, appData: LocalisationHelperData) {
+    Box(
+        modifier = modifier
+            .padding(horizontal = 8.dp)
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        val text =
+            if (appData.passwordHash == null) R.string.must_set_password else R.string.add_contacts
+        val fontWeight =
+            if (appData.passwordHash == null) FontWeight.Bold else null
+
+        Column() {
+            Text(
+                stringResource(text),
+                fontSize = 4.em,
+                fontWeight = fontWeight,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
