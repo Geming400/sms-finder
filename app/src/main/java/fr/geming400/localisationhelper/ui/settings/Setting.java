@@ -3,8 +3,10 @@ package fr.geming400.localisationhelper.ui.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 
 import androidx.annotation.IntRange;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.PreferenceManager;
 
@@ -18,15 +20,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import fr.geming400.localisationhelper.ui.activities.CustomActivity;
+import fr.geming400.localisationhelper.actions.Actions;
+import fr.geming400.localisationhelper.ui.activities.PermissionsWithCallbackActivity;
+import kotlin.Unit;
 
-// TODO: Add translation stuff
 public abstract class Setting<T> {
     protected final String id;
-    protected String name;
+    @StringRes
+    protected Integer name;
     protected final T defaultValue;
     protected Category category = Category.NONE;
-    protected String description = null;
+    @StringRes
+    protected Integer description = null;
     protected Set<String> requiredPermissions = new HashSet<>();
 
     public Setting(String id, T defaultValue) {
@@ -43,15 +48,15 @@ public abstract class Setting<T> {
     abstract public void setValue(Context context, T val);
 
     protected void setValueHelper(Context context, Runnable action) {
-        if (hasPermissionsBeenGranted(context))
+        if (this.havePermissionsBeenGranted(context))
             action.run();
     }
 
     protected T getValueHelper(Context context, Supplier<T> action) {
-        if (hasPermissionsBeenGranted(context))
+        if (this.havePermissionsBeenGranted(context))
             return action.get();
         else
-            return defaultValue;
+            return this.defaultValue;
     }
 
     public String getId() {
@@ -70,33 +75,43 @@ public abstract class Setting<T> {
         this.category = Objects.requireNonNull(category);
     }
 
-    public void setName(@Nullable String name) {
+    public void setName(@Nullable @StringRes Integer name) {
         this.name = name;
     }
 
-    public String getName() {
-        return name == null ? id : name;
+    public String getName(Resources resources) {
+        return this.name == null ? this.id : resources.getString(this.name);
     }
 
-    public void setDescription(@Nullable String description) {
+    public void setDescription(@Nullable @StringRes Integer description) {
         this.description = description;
     }
 
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
+    public Optional<Integer> getDescription() {
+        return Optional.ofNullable(this.description);
+    }
+
+    public boolean areActionsDependant() {
+        if (this instanceof BooleanSetting) {
+            return Actions.getAllActions().values()
+                    .stream()
+                    .anyMatch(action -> action.getDependentSettings().contains(this));
+        } else {
+            return false;
+        }
     }
 
     public Setting<T> addRequiredPermission(String permission) {
         if (permission == null || permission.isEmpty())
             return this;
 
-        requiredPermissions.add(permission);
+        this.requiredPermissions.add(permission);
         return this;
     }
 
     @Unmodifiable
     public Set<String> getRequiredPermissions() {
-        return Set.copyOf(requiredPermissions);
+        return Set.copyOf(this.requiredPermissions);
     }
 
     private void showPermissionsDialog(Context context, T valueToSet, Runnable callback) {
@@ -104,7 +119,7 @@ public abstract class Setting<T> {
                 .setTitle("Permissions required")
                 .setMessage("Some permissions are required for")
                 .setPositiveButton("Grant", (dialogInterface, which) -> {
-                    setValue(context, valueToSet);
+                    this.setValue(context, valueToSet);
                     callback.run();
                 })
                 .setNegativeButton("Cancel", (dialogInterface, which) -> {})
@@ -112,20 +127,27 @@ public abstract class Setting<T> {
                 .show();
     }
 
-    public boolean hasPermissionsBeenGranted(Context context) {
+    public boolean havePermissionsBeenGranted(Context context) {
         return requiredPermissions
                 .stream()
                 .allMatch(perm -> context.checkSelfPermission(perm) == PackageManager.PERMISSION_GRANTED);
 
     }
 
-    public void askForPermissions(CustomActivity activity, T valueToSet, Runnable callback) {
-        activity.requestPermissionsWithCallback(requiredPermissions.toArray(new String[0]), 0, (grantedPermissions) -> {
-            if (!grantedPermissions.containsValue(false)) {
-                setValue(activity, valueToSet);
-                callback.run();
-            }
-        });
+    public void askForPermissions(PermissionsWithCallbackActivity activity, T valueToSet, Runnable callback) {
+        if (this.havePermissionsBeenGranted(activity)) {
+            setValue(activity, valueToSet);
+            callback.run();
+        } else {
+            activity.requestPermissionsWithCallback(requiredPermissions, grantedPermissions -> {
+                if (grantedPermissions) {
+                    setValue(activity, valueToSet);
+                    callback.run();
+                }
+
+                return Unit.INSTANCE;
+            });
+        }
     }
 
 

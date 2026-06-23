@@ -2,6 +2,11 @@ package fr.geming400.localisationhelper.ui.settings;
 
 import android.Manifest;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+
+import org.jetbrains.annotations.Unmodifiable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,28 +17,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import fr.geming400.localisationhelper.R;
+
 public final class Settings {
     public static final Map<String, Setting<?>> SETTINGS = new HashMap<>();
-    
-    public static final Setting.BooleanSetting LOCATION = register(Setting.ofBoolean("location", false), Setting.Category.BASIC, "If geolocation should be enabled", Manifest.permission.READ_CONTACTS);
-    public static final Setting.StringSetting STR = register(Setting.ofString("str", "Hii :3"), Setting.Category.BASIC);
-    public static final Setting.FloatSetting FLOAT = register(Setting.ofFloat("FLOAT", .5f), Setting.Category.BASIC);
 
-    public static final Setting.IntSetting INT2 = register(Setting.ofInt("int2", 5), Setting.Category.TEST);
+    public static final Setting.BooleanSetting LOCATION = register(
+            Setting.ofBoolean("location", true),
+            Setting.Category.BASIC,
+            R.string.setting_geolocation_name,
+            R.string.setting_geolocation_description,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    );
 
     private static <T, S extends Setting<T>> S register(S setting, Setting.Category category) {
-        return register(setting, category, null);
+        return register(setting, category, null, null);
     }
 
-    private static <T, S extends Setting<T>> S register(S setting, Setting.Category category, String description, String... requiredPermissions) {
+    private static <T, S extends Setting<T>> S register(
+            S setting,
+            Setting.Category category,
+            @Nullable @StringRes Integer name,
+            @Nullable @StringRes Integer description,
+            String... requiredPermissions
+    ) {
         setting.setCategory(category);
+        setting.setName(name);
         setting.setDescription(description);
-        Arrays.asList(requiredPermissions).forEach(setting::addRequiredPermission);
+
+        Arrays.asList(requiredPermissions)
+                .forEach(setting::addRequiredPermission);
 
         SETTINGS.put(setting.getId(), setting);
         return setting;
     }
 
+    @Unmodifiable
     public static Map<Setting.Category, List<Setting<?>>> getSettingsByCategory() {
         Map<Setting.Category, List<Setting<?>>> res = new LinkedHashMap<>(SETTINGS.size());
         Collection<Setting<?>> settingsSortedByCategoryWeight = SETTINGS.values()
@@ -53,6 +72,11 @@ public final class Settings {
         }
 
         return res;
+    }
+
+    @Unmodifiable
+    public static Collection<Setting<?>> getSettings() {
+        return List.copyOf(SETTINGS.values());
     }
     
     private Settings() {}

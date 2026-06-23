@@ -29,12 +29,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.preference.PreferenceManager
 import fr.geming400.localisationhelper.utils.Utils
-import fr.geming400.localisationhelper.ui.activities.CustomActivity
+import fr.geming400.localisationhelper.ui.activities.PermissionsWithCallbackActivity
 import fr.geming400.localisationhelper.ui.settings.Setting
 import fr.geming400.localisationhelper.ui.settings.Settings
 
@@ -76,7 +78,7 @@ fun SettingItem(modifier: Modifier = Modifier, setting: Setting<*>) {
 }
 
 @Composable
-fun SettingSpacing(modifier: Modifier = Modifier, setting: Setting<*>, content: @Composable () -> Unit) {
+private fun SettingSpacing(modifier: Modifier = Modifier, setting: Setting<*>, content: @Composable () -> Unit) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -88,11 +90,11 @@ fun SettingSpacing(modifier: Modifier = Modifier, setting: Setting<*>, content: 
     }
 
     if (setting.description.isPresent)
-        SettingDescription(modifier = modifier, description = setting.description.get())
+        SettingDescription(modifier = modifier, description = stringResource(setting.description.get()))
 }
 
 @Composable
-fun SettingsCategory(modifier: Modifier = Modifier, title: String, content: @Composable () -> Unit) {
+private fun SettingsCategory(modifier: Modifier = Modifier, title: String, content: @Composable () -> Unit) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -112,7 +114,7 @@ fun SettingsCategory(modifier: Modifier = Modifier, title: String, content: @Com
 }
 
 @Composable
-fun SettingDescription(modifier: Modifier = Modifier, description: String) {
+private fun SettingDescription(modifier: Modifier = Modifier, description: String) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -128,16 +130,16 @@ fun SettingDescription(modifier: Modifier = Modifier, description: String) {
 }
 
 @Composable
-fun BooleanSetting(modifier: Modifier = Modifier, setting: Setting<Boolean>) {
+private fun BooleanSetting(modifier: Modifier = Modifier, setting: Setting<Boolean>) {
     val context = LocalContext.current
-    val activity = LocalActivity.current as CustomActivity
+    val activity = LocalActivity.current as PermissionsWithCallbackActivity
     val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     var isVisuallyChecked by remember { mutableStateOf(sharedPreferences.getBoolean(setting.id, setting.defaultValue)) }
 
     SettingSpacing(modifier, setting) {
         Text(
-            text = setting.name,
+            text = setting.getName(LocalResources.current),
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -153,7 +155,7 @@ fun BooleanSetting(modifier: Modifier = Modifier, setting: Setting<Boolean>) {
 }
 
 @Composable
-fun IntSetting(modifier: Modifier = Modifier, setting: Setting<Int>) {
+private fun IntSetting(modifier: Modifier = Modifier, setting: Setting<Int>) {
     val context = LocalContext.current
     val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -161,7 +163,7 @@ fun IntSetting(modifier: Modifier = Modifier, setting: Setting<Int>) {
 
     SettingSpacing(modifier, setting) {
         Text(
-            text = setting.name,
+            text = setting.getName(LocalResources.current),
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -183,7 +185,7 @@ fun IntSetting(modifier: Modifier = Modifier, setting: Setting<Int>) {
 }
 
 @Composable
-fun FloatSetting(modifier: Modifier = Modifier, setting: Setting<Float>) {
+private fun FloatSetting(modifier: Modifier = Modifier, setting: Setting<Float>) {
     val context = LocalContext.current
     val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -193,7 +195,7 @@ fun FloatSetting(modifier: Modifier = Modifier, setting: Setting<Float>) {
 
     SettingSpacing(modifier, setting) {
         Text(
-            text = setting.name,
+            text = setting.getName(LocalResources.current),
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -215,7 +217,7 @@ fun FloatSetting(modifier: Modifier = Modifier, setting: Setting<Float>) {
 }
 
 @Composable
-fun StringSetting(modifier: Modifier = Modifier, setting: Setting<String>) {
+private fun StringSetting(modifier: Modifier = Modifier, setting: Setting<String>) {
     val context = LocalContext.current
     val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -223,7 +225,7 @@ fun StringSetting(modifier: Modifier = Modifier, setting: Setting<String>) {
 
     SettingSpacing(modifier, setting) {
         Text(
-            text = setting.name
+            text = setting.getName(LocalResources.current)
         )
 
         TextField(

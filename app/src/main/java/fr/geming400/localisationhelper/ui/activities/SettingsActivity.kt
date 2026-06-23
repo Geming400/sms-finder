@@ -12,7 +12,7 @@ import fr.geming400.localisationhelper.ui.components.AppDestinations
 import fr.geming400.localisationhelper.ui.components.SettingScreen
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 
-class SettingsActivity : CustomActivity() {
+class SettingsActivity : PermissionsWithCallbackActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
