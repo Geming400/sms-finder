@@ -8,6 +8,7 @@ import androidx.core.location.LocationRequestCompat
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.SerializableGeolocation
 import fr.geming400.localisationhelper.datastore.TrackingData
+import fr.geming400.localisationhelper.ui.settings.Settings
 import fr.geming400.localisationhelper.utils.SimpleLocation
 import fr.geming400.localisationhelper.utils.Timestamp
 import fr.geming400.localisationhelper.utils.Utils
@@ -19,7 +20,7 @@ import java.util.concurrent.CompletableFuture
 /**
  * Serialization format: `latitude;longitude`
  */
-class LocationGetterAction(name: String) : Action<SimpleLocation>(name) {
+class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings.LOCATION) {
     @Throws(MalformedRawActionException::class)
     override fun parse(rawContent: String): SimpleLocation {
         val geolocation = rawContent.split(";")

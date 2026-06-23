@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+// TODO: battery getter action
 public abstract class Actions {
     private static final Map<String, BaseAction<?, ?>> ACTIONS = new HashMap<>();
 

@@ -6,12 +6,13 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.jetbrains.annotations.Unmodifiable;
+
 import java.util.Arrays;
+import java.util.Set;
 
 import fr.geming400.localisationhelper.datastore.TrackingData;
+import fr.geming400.localisationhelper.ui.settings.Setting;
 import fr.geming400.localisationhelper.utils.Utils;
 
 /**
@@ -22,36 +23,25 @@ import fr.geming400.localisationhelper.utils.Utils;
  */
 public abstract class BaseAction<T, P> {
     private final String name;
+    private final Set<Setting.BooleanSetting> dependentSettings;
 
     public BaseAction(String name) {
-        final String regexPattern = "[a-zA-Z0-9-_]*";
-        if (!name.matches(regexPattern))
-            throw new RuntimeException("Action's name '" + name + "' doesn't respect regex " + regexPattern);
+        this.name = validateName(name);
+        this.dependentSettings = Set.of();
+    }
 
-        this.name = name;
+    public BaseAction(String name, Setting.BooleanSetting... dependentSettings) {
+        this.name = validateName(name);
+        this.dependentSettings = Set.copyOf(Arrays.asList(dependentSettings));
     }
 
     public String getName() {
         return this.name;
     }
 
-    /**
-     * Gets the name of this with the password hashed using {@code SHA-256}
-     * @param password the password
-     * @return the action's name in the format {@code "hashed pass/name"}
-     * @implNote if the {@code SHA-256} algorithm doesn't exist, only the {@linkplain #getName() name} will be returned
-     */
-    public String getName(String password) {
-        try {
-            return this.digestPasswordAsSha256(password) + "/" + this.getName();
-        } catch (NoSuchAlgorithmException e) {
-            return this.getName();
-        }
-    }
-
-    protected String digestPasswordAsSha256(String password) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        return Arrays.toString(md.digest(password.getBytes(StandardCharsets.US_ASCII)));
+    @Unmodifiable
+    public Set<Setting.BooleanSetting> getDependentSettings() {
+        return Set.copyOf(this.dependentSettings);
     }
 
     /**
@@ -132,6 +122,12 @@ public abstract class BaseAction<T, P> {
             @NonNull String rawContent
     );
 
+    public boolean canSendAnyPayload(Context context) {
+        return this.dependentSettings
+                .stream()
+                .allMatch(setting -> setting.getValue(context));
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -139,6 +135,14 @@ public abstract class BaseAction<T, P> {
                 "name='" + this.name + '\'' +
                 "isVoid='" + this.isVoid() + '\'' +
                 '}';
+    }
+
+    public static String validateName(String name) {
+        final String regexPattern = "[a-zA-Z0-9-_]*";
+        if (!name.matches(regexPattern))
+            throw new RuntimeException("Action's name '" + name + "' doesn't respect regex " + regexPattern);
+
+        return name;
     }
 
     public enum Stage implements HasPayloadType {
