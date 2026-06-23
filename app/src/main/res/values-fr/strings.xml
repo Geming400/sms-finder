@@ -9,7 +9,7 @@
     <string name="no_viable_phone_number_error">Choisissez un numéro de tel. valide</string>
     <string name="back_button_exit">Utiliser le boutton de retour pour sortir de la carte</string>
     <string name="has_no_valid_numbers_error">Ce contact n\'a aucun numéro de tel. valide !</string>
-    <string name="add_contacts">Rajouter des contacts avec le boutton \'+\'</string>
+    <string name="add_contacts">Rajoutez des contacts avec le boutton \'+\'</string>
     <string name="delete">Supprimer</string>
     <string name="delete_error">Une erreur c\'est produite en essayant de supprimer %1$s</string>
     <string name="confirmation_text">Êtes-vous sûr ?</string>
@@ -17,8 +17,8 @@
     <string name="confirm">Confirmer</string>
     <string name="cancel">Annuler</string>
     <string name="xiaomi_notice">
-        Téléphone Xiaomi detecté !\n
-        Pour que cette appli fonctionne correctement, vous devez l\'autoriser à s\'éxécuter comme tache de fond.\n
+        Téléphone Xiaomi detecté !\n\n
+        Pour que cette appli fonctionne correctement, vous devez l\'autoriser à s\'éxécuter comme tache de fond.\n\n
         Pour faire ceci, dirigez vous dans l\'appli \"Sécurité\", puis dans l\'onglet \"Gérer les applications\", puis dans \"Démarrage automatique en arrière-plan\" et cochez \"SMS Finder\"
     </string>
     <string name="warning">Attention !</string>
@@ -32,7 +32,7 @@
     <string name="setting.battery.name">Batterie</string>
     <string name="setting.battery.description">Si l\'obtention du pourcentage de charge est activé</string>
     <string name="setting.category.actions">Actions</string>
-    <string name="setting.category.debug">Deboggage</string>
+    <string name="setting.category.debug">Déboggage</string>
     <string name="introduction.steps.introduction">Introduction</string>
     <string name="introduction.steps.introduction.primary">Salut !\n\n
 

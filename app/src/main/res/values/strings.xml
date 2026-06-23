@@ -17,8 +17,8 @@
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="xiaomi_notice">
-        Xiaomi phone detected!\n
-        For this app to work properly you must allow it to execute in the background.\n
+        Xiaomi phone detected!\n\n
+        For this app to work properly you must allow it to execute in the background.\n\n
         To do this, go to the \"Security\" app, then to the \"Manage apps\" tab, then to the \"Automatic startup\" one and check \"SMS Finder\"
     </string>
     <string name="warning">Warning !</string>
