@@ -24,7 +24,7 @@ import fr.geming400.localisationhelper.ui.components.AppDestinations
 import fr.geming400.localisationhelper.ui.components.SettingScreen
 import fr.geming400.localisationhelper.ui.components.SettingsCategory
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
-import fr.geming400.localisationhelper.utils.centerVertically
+import fr.geming400.localisationhelper.utils.centerHorizontally
 import kotlinx.coroutines.runBlocking
 
 class SettingsActivity : PermissionsWithCallbackActivity() {
@@ -56,7 +56,7 @@ private fun ResetButton(modifier: Modifier = Modifier) {
 
     Button(
         modifier = modifier
-            .centerVertically()
+            .centerHorizontally()
             .padding(8.dp),
         onClick = {
             runBlocking {

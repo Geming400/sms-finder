@@ -54,7 +54,6 @@ import fr.geming400.localisationhelper.utils.centerHorizontally
 
 @Composable
 fun MainIntroductionComponent(currentStepState: MutableState<Step>? = null, onEnd: () -> Unit = {}) {
-
     var currentStep by currentStepState ?: rememberCurrentStep()
 
     Scaffold() { innerPadding ->
@@ -204,13 +203,8 @@ private fun PermissionMainComponent(): Boolean {
     )
 
     MainActivity.requiredPermissions.forEach {
-        // The sms permissions may be multiple permissions
-        // but to the end user it's only 1
-        if (!it.contains("SMS"))
-            PermissionButton(permission = it)
+        PermissionButton(permission = it)
     }
-
-    PermissionButton(permission = Manifest.permission.SEND_SMS)
 
     return MainActivity.areAllPermissionsGranted(context)
 }
