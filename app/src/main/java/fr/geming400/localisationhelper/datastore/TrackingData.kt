@@ -16,7 +16,8 @@ data class TrackingData(
 
     // Tracking info
     val geolocation: SerializableGeolocation? = null,
-    val lastPingAnswer: Timestamp? = null
+    val lastPingAnswer: Timestamp? = null,
+    val lastRecordedBatteryCharge: Float? = null
 ) {
     val lookupKeyWithId: LookupQuery.LookupKeyWithId
         get() = LookupQuery.LookupKeyWithId(lookupKey, 0)
