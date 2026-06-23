@@ -92,14 +92,17 @@ class SmsReceiver : BroadcastReceiver() {
 
                     val pendingResult = goAsync()
                     try {
-                        Actions.getByNameTypeless(actionName)?.onReceive(
-                            context,
-                            sender,
-                            pendingResult,
-                            BaseAction.Stage.fromPayloadType(payloadType),
-                            contactInfo.trackingData,
-                            actionDataPayload ?: ""
-                        )
+                        val action = Actions.getByNameTypeless(actionName)!!
+                        if (action.canSendAnyPayload(context)) {
+                            Actions.getByNameTypeless(actionName)?.onReceive(
+                                context,
+                                sender,
+                                pendingResult,
+                                BaseAction.Stage.fromPayloadType(payloadType),
+                                contactInfo.trackingData,
+                                actionDataPayload ?: ""
+                            )
+                        }
                     } finally {
                         pendingResult.finish()
                     }

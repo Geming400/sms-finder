@@ -1,8 +1,12 @@
 package fr.geming400.localisationhelper.utils;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.provider.Settings;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -214,5 +218,12 @@ public final class Utils {
 
     public static boolean isPasswordValid(CharSequence password) {
         return password.length() >= 6;
+    }
+
+    public static void openSettingAppForActivity(Activity activity) {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
+        intent.setData(uri);
+        activity.startActivity(intent);
     }
 }

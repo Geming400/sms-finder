@@ -13,14 +13,40 @@
     <string name="delete">Supprimer</string>
     <string name="delete_error">Une erreur c\'est produite en essayant de supprimer %1$s</string>
     <string name="confirmation_text">Êtes-vous sûr ?</string>
-    <string name="deletion_confirmation">Supprimer ce contact de \'SMS Finder\' va supprimer tout ses infos. Vous pouvez toujours les rajouter de nouveau !</string>
+    <string name="deletion_confirmation">Supprimer ce contact de \'SMS Finder\' va supprimer toutes ses infos. Vous pouvez toujours les rajouter de nouveau !</string>
     <string name="confirm">Confirmer</string>
     <string name="cancel">Annuler</string>
-    <string name="xiaomi_notice">Téléphone Xiaomi detecté !\nPour que cette appli fonctionne correctement, vous devez l\'autoriser à s\'éxécuter comme tache de fond.\nPour faire ceci, dirigez vous dans l\'appli \"Sécurité\", puis dans l\'onglet \"Gérer les applications\", puis dans \"Démarrage automatique en arrière plan\" et cochez \"SMS Finder\"</string>
+    <string name="xiaomi_notice">
+        Téléphone Xiaomi detecté !\n
+        Pour que cette appli fonctionne correctement, vous devez l\'autoriser à s\'éxécuter comme tache de fond.\n
+        Pour faire ceci, dirigez vous dans l\'appli \"Sécurité\", puis dans l\'onglet \"Gérer les applications\", puis dans \"Démarrage automatique en arrière-plan\" et cochez \"SMS Finder\"
+    </string>
     <string name="warning">Attention !</string>
     <string name="go_back">Retour</string>
     <string name="show_map">Afficher la carte</string>
     <string name="enter_password">Rentrer votre mot de passe</string>
     <string name="save_password">Sauvegarder votre mot de passe</string>
     <string name="reset_password">Réinitialiser votre mot de passe</string>
+    <string name="setting.geolocation.description">Si la géolocalisation devrait être activé</string>
+    <string name="setting.geolocation.name">Geolocalisation</string>
+    <string name="introduction.steps.introduction">Introduction</string>
+    <string name="introduction.steps.introduction.primary">Salut !\n\n
+
+        C\'est une appli assez simple que j\'ai faite pour moi-même, car j\'ai réussi à perdre mon téléphone plusieurs fois, et je n\'ai pas toujours les données mobiles activées.
+        Si vous êtes comme moi, ou vous n\'utilisez pas les services Google, alors ceci est pour vous !\n\n
+
+        Cette appli doit être installée sur 2 téléphones ou sinon elle est inutile.
+    </string>
+    <string name="introduction.steps.introduction.how_does_this_work">Comment cela fonctionne ?</string>
+    <string name="introduction.steps.introduction.how_does_this_work_content">
+        Une fois configuré, vous devrez selectionner un mot de passe (clé privée), rajouter des contacts et depuis là, vous pourrez ensuite envoyer des actions à d\'autres via des SMS.\n
+        Mais pour que ceci fonctionne, vous devez rajouter VOTRE contact sur l\'autre téléphone pour ensuite envoyer des actions, si elles ont été activées.
+    </string>
+    <string name="next">Suivant</string>
+    <string name="introduction.steps.permissions">Permissions</string>
+    <string name="denied_permission">Vous n\'avez pas autorisé %1$s</string>
+    <string name="must_authorize_permission_reason">Pour correctement utiliser cette application cette application DOIT être accordée. Vous ne pouvez pas continuer sinon.</string>
+    <string name="grant">Accorder</string>
+    <string name="permission_icon_desc">Une image qui représente le logo de la permission %1$s</string>
+    <string name="must_grant_permissions">Il y a plusieurs permissions nécéssaires à l\'utilisation de cette appli:</string>
 </resources>

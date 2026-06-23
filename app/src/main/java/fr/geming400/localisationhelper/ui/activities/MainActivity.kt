@@ -1,15 +1,8 @@
 package fr.geming400.localisationhelper.ui.activities
 
-import android.Manifest
-import android.app.AlertDialog
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -31,107 +24,34 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.app.ActivityCompat
-import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.datastore.dataStore
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
+import fr.geming400.localisationhelper.ui.components.MainIntroductionComponent
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
-class MainActivity : ComponentActivity() {
-    private val requestedPermissions = arrayOf(
-        Manifest.permission.READ_SMS,
-        Manifest.permission.SEND_SMS,
-        Manifest.permission.RECEIVE_SMS,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    )
-
-    private val permissionsLauncher: ActivityResultLauncher<Array<String>> =
-        registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { result ->
-            // If the user didn't allow for fine location, we will force them to accept it
-            if (!result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false)) {
-                requestLocationPermissions()
-            } else {
-                for (perm in requestedPermissions) {
-                    // If at least one permission isn't granted we show the dialog
-                    // telling the user to enable the required permissions
-                    if (!result.getOrDefault(perm, false)) {
-                        createPermissionsDialog().show()
-                        break
-                    }
-                }
-            }
-        }
-
-    private val locationPermissionLauncher: ActivityResultLauncher<String> = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { _ -> }
-
-
-    fun showPermissionsDialog() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            createLocationPermissionDialog().show()
-        }
-
-        // If at least one permission isn't granted
-        if (
-            requestedPermissions.map { ActivityCompat.shouldShowRequestPermissionRationale(this, it) }.contains(true)
-        ) {
-            Log.i(LogTags.SMS_PERMISSIONS, "Showing user popup to grant %s permission".format(requestedPermissions.contentToString()))
-            createPermissionsDialog().show()
-        } else {
-            Log.i(LogTags.SMS_PERMISSIONS, "User already granted %s permissions".format(requestedPermissions.contentToString()))
-        }
-    }
-
-    private fun requestBasePermissions() {
-        permissionsLauncher.launch(requestedPermissions)
-    }
-
-    private fun requestLocationPermissions() {
-        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-    }
-
-
-    private fun createPermissionsDialog(): AlertDialog = AlertDialog.Builder(this)
-        .setTitle("Permissions required")
-        .setMessage("This app needs SMS related permissions/location to function properly")
-        .setPositiveButton(
-            "Ok"
-        ) { _, _ -> requestBasePermissions() }
-        .setCancelable(false)
-        .create()
-
-    private fun createLocationPermissionDialog() : AlertDialog = AlertDialog.Builder(this)
-        .setTitle("Location permissions")
-        .setMessage("Fine location is preferred overed coarse location for more accurate results")
-        .setPositiveButton(
-            "Ok"
-        ) { _, _ -> requestLocationPermissions() }
-        .create()
-
+class MainActivity : PermissionsWithCallbackActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
         setContent {
             LocalisationHelperTheme {
-                LocalisationHelperApp()
+                MainIntroductionComponent()
+                // TODO: Condition for showing LocalisationHelperApp
+//                LocalisationHelperApp()
             }
         }
 
-        showPermissionsDialog()
     }
 }
 
 @Composable
-fun LocalisationHelperApp() {
+private fun LocalisationHelperApp() {
     val context = LocalContext.current
 
     val appData = runBlocking {
@@ -154,7 +74,7 @@ fun LocalisationHelperApp() {
 
     ActivitySelector(AppDestinations.HOME) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            PasswordInputDialog(
+            PasswordInputField(
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -162,7 +82,7 @@ fun LocalisationHelperApp() {
 }
 
 @Composable
-fun PasswordInputDialog(modifier: Modifier) {
+private fun PasswordInputField(modifier: Modifier) {
     val context = LocalContext.current
 
     var isPasswordFieldEnabled by remember {
