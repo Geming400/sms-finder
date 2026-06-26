@@ -1,4 +1,4 @@
-package fr.geming400.localisationhelper.actions;
+package fr.geming400.localisationhelper.action.actions;
 
 import androidx.annotation.Nullable;
 
@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import fr.geming400.localisationhelper.action.BaseAction;
 
 public abstract class Actions {
     private static final Map<String, BaseAction<?, ?>> ACTIONS = new HashMap<>();

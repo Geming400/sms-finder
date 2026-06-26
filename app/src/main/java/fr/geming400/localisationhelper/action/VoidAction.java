@@ -1,4 +1,4 @@
-package fr.geming400.localisationhelper.actions;
+package fr.geming400.localisationhelper.action;
 
 import android.content.Context;
 

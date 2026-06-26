@@ -1,10 +1,12 @@
-package fr.geming400.localisationhelper.actions
+package fr.geming400.localisationhelper.action.actions
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import fr.geming400.localisationhelper.action.Action
+import fr.geming400.localisationhelper.action.MalformedRawActionException
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.settings.Settings

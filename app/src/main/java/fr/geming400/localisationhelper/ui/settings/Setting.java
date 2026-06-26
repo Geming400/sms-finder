@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import fr.geming400.localisationhelper.R;
-import fr.geming400.localisationhelper.actions.Actions;
+import fr.geming400.localisationhelper.action.actions.Actions;
 import fr.geming400.localisationhelper.ui.activities.PermissionsWithCallbackActivity;
 import kotlin.Unit;
 

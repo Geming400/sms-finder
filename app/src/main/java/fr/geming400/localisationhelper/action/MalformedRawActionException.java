@@ -1,4 +1,4 @@
-package fr.geming400.localisationhelper.actions;
+package fr.geming400.localisationhelper.action;
 
 public final class MalformedRawActionException extends RuntimeException {
     public MalformedRawActionException(String message, BaseAction<?, ?> action, String rawContent) {

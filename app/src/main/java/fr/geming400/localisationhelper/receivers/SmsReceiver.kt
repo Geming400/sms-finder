@@ -7,9 +7,9 @@ import android.provider.Telephony
 import android.telephony.SmsMessage
 import android.util.Log
 import fr.geming400.localisationhelper.LogTags
-import fr.geming400.localisationhelper.actions.Actions
-import fr.geming400.localisationhelper.actions.BaseAction
-import fr.geming400.localisationhelper.actions.PayloadType
+import fr.geming400.localisationhelper.action.actions.Actions
+import fr.geming400.localisationhelper.action.BaseAction
+import fr.geming400.localisationhelper.action.PayloadType
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.datastore.dataStore

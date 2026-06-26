@@ -1,10 +1,12 @@
-package fr.geming400.localisationhelper.actions
+package fr.geming400.localisationhelper.action.actions
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver.PendingResult
 import android.content.Context
 import android.location.LocationManager
 import androidx.core.location.LocationRequestCompat
+import fr.geming400.localisationhelper.action.Action
+import fr.geming400.localisationhelper.action.MalformedRawActionException
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.settings.Settings

@@ -1,7 +1,9 @@
-package fr.geming400.localisationhelper.actions
+package fr.geming400.localisationhelper.action.actions
 
 import android.content.BroadcastReceiver
 import android.content.Context
+import fr.geming400.localisationhelper.action.PayloadType
+import fr.geming400.localisationhelper.action.VoidAction
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.utils.Timestamp
