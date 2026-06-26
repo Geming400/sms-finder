@@ -15,7 +15,6 @@ data class TrackingData(
     val lookupKey: String,
     val linkedPhoneNumber: String? = null,
     val privateKey: String? = null,
-    val isKeyValid: Boolean? = null,
 
     // Tracking info
     val geolocation: BoxedTimestamp<SimpleLocation>? = null,
