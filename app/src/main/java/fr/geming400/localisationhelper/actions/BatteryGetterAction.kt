@@ -8,6 +8,7 @@ import android.os.BatteryManager
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.settings.Settings
+import fr.geming400.localisationhelper.utils.BoxedTimestamp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,7 +60,7 @@ class BatteryGetterAction(name: String): Action<Float>(name, Settings.BATTERY) {
             CoroutineScope(Dispatchers.IO.limitedParallelism(1, "BatteryGetterAction's onReceive (Stage.RECEIVE_HOST)")).launch {
                 jsonDataStore.updateTrackedContact(asContact) {
                     it.copy(
-                        lastRecordedBatteryCharge = batteryCharge
+                        lastRecordedBatteryCharge = BoxedTimestamp.now(batteryCharge)
                     )
                 }
             }

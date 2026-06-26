@@ -4,6 +4,8 @@ import android.content.Context
 import contacts.core.Contacts
 import contacts.core.LookupQuery
 import contacts.core.entities.Contact
+import fr.geming400.localisationhelper.utils.BoxedTimestamp
+import fr.geming400.localisationhelper.utils.SimpleLocation
 import fr.geming400.localisationhelper.utils.Timestamp
 import kotlinx.serialization.Serializable
 
@@ -13,11 +15,12 @@ data class TrackingData(
     val lookupKey: String,
     val linkedPhoneNumber: String? = null,
     val privateKey: String? = null,
+    val isKeyValid: Boolean? = null,
 
     // Tracking info
-    val geolocation: SerializableGeolocation? = null,
+    val geolocation: BoxedTimestamp<SimpleLocation>? = null,
     val lastPingAnswer: Timestamp? = null,
-    val lastRecordedBatteryCharge: Float? = null
+    val lastRecordedBatteryCharge: BoxedTimestamp<Float>? = null
 ) {
     val lookupKeyWithId: LookupQuery.LookupKeyWithId
         get() = LookupQuery.LookupKeyWithId(lookupKey, 0)
@@ -31,10 +34,3 @@ data class TrackingData(
     fun areContactInfoEqual(contact: Contact) =
         contact.lookupKey == lookupKey
 }
-
-@Serializable
-data class SerializableGeolocation(
-    val latitude: Double,
-    val longitude: Double,
-    val lastTimeRecorded: Timestamp
-)

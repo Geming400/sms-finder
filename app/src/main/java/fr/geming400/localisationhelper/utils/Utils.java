@@ -187,6 +187,10 @@ public final class Utils {
         return LocalDateTime.now().toEpochSecond(OffsetDateTime.now().getOffset());
     }
 
+    public static long getCurrentEpochMs() {
+        return LocalDateTime.now().toInstant(OffsetDateTime.now().getOffset()).toEpochMilli();
+    }
+
     public static byte[] hash(String algorithm, final byte[] content) {
         try {
             MessageDigest md = MessageDigest.getInstance(algorithm);

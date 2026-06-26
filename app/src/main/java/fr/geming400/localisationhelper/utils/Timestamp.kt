@@ -1,5 +1,6 @@
 package fr.geming400.localisationhelper.utils
 
+import android.text.format.DateUtils
 import androidx.annotation.IntRange
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
@@ -18,6 +19,15 @@ data class Timestamp(
     fun toLocalDateTime(): LocalDateTime {
         return LocalDateTime.ofEpochSecond(timestamp, 0, getZoneOffset())
     }
+
+    fun getRelativeTime(): String =
+        DateUtils.getRelativeTimeSpanString(
+            this.toLocalDateTime().toInstant(this.getZoneOffset()).toEpochMilli(),
+            Utils.getCurrentEpochMs(),
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        ).toString()
+
 
     override fun toString(): String {
         return "Timestamp(dateTime = ${toLocalDateTime()})"

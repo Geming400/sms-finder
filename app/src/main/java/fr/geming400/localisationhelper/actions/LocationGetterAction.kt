@@ -6,11 +6,10 @@ import android.content.Context
 import android.location.LocationManager
 import androidx.core.location.LocationRequestCompat
 import fr.geming400.localisationhelper.datastore.JsonDataStore
-import fr.geming400.localisationhelper.datastore.SerializableGeolocation
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.settings.Settings
+import fr.geming400.localisationhelper.utils.BoxedTimestamp
 import fr.geming400.localisationhelper.utils.SimpleLocation
-import fr.geming400.localisationhelper.utils.Timestamp
 import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,9 +47,8 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
         }
     }
 
-    override fun serializeResult(location: SimpleLocation): String {
-        return String.format("%s;%s", location.latitude, location.longitude)
-    }
+    override fun serializeResult(location: SimpleLocation): String =
+        String.format("%s;%s", location.latitude, location.longitude)
 
     @SuppressLint("MissingPermission")
     override fun execute(context: Context): CompletableFuture<SimpleLocation>? {
@@ -96,11 +94,10 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
             CoroutineScope(Dispatchers.IO.limitedParallelism(1, "LocationGetterAction's onReceive (Stage.RECEIVE_HOST)")).launch {
                 jsonDataStore.updateTrackedContact(asContact) {
                     it.copy(
-                        geolocation = SerializableGeolocation(
+                        geolocation = BoxedTimestamp.now(SimpleLocation(
                             geolocation.latitude,
                             geolocation.longitude,
-                            Timestamp.now()
-                        )
+                        ))
                     )
                 }
             }
