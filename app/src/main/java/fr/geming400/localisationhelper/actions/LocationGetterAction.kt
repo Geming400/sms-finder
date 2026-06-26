@@ -79,7 +79,14 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
         return null
     }
 
-    override fun onReceive(context: Context, sender: String, pendingResult: PendingResult, stage: Stage, trackingData: TrackingData, rawContent: String) {
+    override fun onReceive(
+        context: Context,
+        sender: String,
+        pendingResult: PendingResult,
+        stage: Stage,
+        trackingData: TrackingData,
+        rawContent: String
+    ) {
         val jsonDataStore = JsonDataStore(context)
         if (stage == Stage.RECEIVE_HOST) {
             val asContact = trackingData.getContact(context)

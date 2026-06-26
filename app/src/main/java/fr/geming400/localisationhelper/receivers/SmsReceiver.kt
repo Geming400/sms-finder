@@ -13,7 +13,7 @@ import fr.geming400.localisationhelper.actions.PayloadType
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.datastore.dataStore
-import fr.geming400.localisationhelper.utils.Utils
+import fr.geming400.localisationhelper.utils.SmsCryptography
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.Base64
@@ -34,6 +34,8 @@ class SmsReceiver : BroadcastReceiver() {
         }
 
     override fun onReceive(context: Context, intent: Intent) {
+        val base64Decoded = Base64.getDecoder()
+
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
             try {
                 val bundle = intent.extras
@@ -59,11 +61,12 @@ class SmsReceiver : BroadcastReceiver() {
                     }
 
 
+                    val parts = body.split(BaseAction.DELIMITER, limit = 3)
+
                     // 2. We get the payload type
 
                     // The payload type is always unencrypted
-                    val firstPart = body.split("/")[0]
-                    val payloadType = PayloadType.fromPayloadName(firstPart)!!
+                    val payloadType = PayloadType.fromPayloadName(parts[0])!!
 
                     val contactInfo = this.getContactInfo(context, sender)
                     val privateKey = contactInfo.privateKeys.getRightPrivateKey(payloadType)
@@ -71,21 +74,23 @@ class SmsReceiver : BroadcastReceiver() {
 
                     // 3. We unencrypt the message
 
+                    val iv = base64Decoded.decode(parts[1])
+
                     // This second part is in the format "actionName:payloadData"
                     // if the payload type is DATA.
                     // However, if it's INSTRUCTION, then it's "actionName"
-                    val secondPart = body.split("/", limit = 2)[1]
-                    val actionNameAndContent = String(
-                        Utils.cyclicXor(
-                            Base64.getDecoder().decode(secondPart.toByteArray()),
-                            privateKey.toByteArray()
-                        )
+                    val encryptedContent = parts[2]
+                    val actionNameAndContent = SmsCryptography.decryptContent(
+                        Base64.getDecoder().decode(encryptedContent.toByteArray()),
+                        iv,
+                        privateKey,
+                        SmsCryptography.getSaltFromString(sender)
                     ).split(":", limit = 2)
 
                     val actionName = actionNameAndContent[0]
                     val actionDataPayload = actionNameAndContent.getOrNull(1)
 
-                    if (body.split("/", limit = 2).size == 2) {
+                    if (actionNameAndContent.size == 2 || actionNameAndContent.size == 1) {
                         Log.i(
                             LogTags.SMS_RECEIVER,
                             "Received $payloadType payload of action $actionName !"

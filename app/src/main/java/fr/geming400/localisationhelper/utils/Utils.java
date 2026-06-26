@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.IntFunction;
 
 import contacts.core.entities.Contact;
 import contacts.core.entities.Phone;
@@ -197,23 +198,7 @@ public final class Utils {
 
     public static String hashString(String algorithm, final byte[] content) {
         byte[] hashedContent = hash(algorithm, content);
-        return Base64.getEncoder().encodeToString(content);
-    }
-
-    public static byte[] cyclicXor(final byte[] content, final byte[] key) {
-        byte[] result = new byte[content.length];
-
-        for (int i = 0; i < content.length; i++)
-            result[i] = (byte) (content[i] ^ key[i % key.length]);
-
-        return result;
-    }
-
-    /// <b>Encodes</b> the xored content into a string via base64
-    /// @see #cyclicXor(byte[], byte[])
-    public static String cyclicXorString(final byte[] content, final byte[] key) {
-        byte[] xoredContent = cyclicXor(content, key);
-        return Base64.getEncoder().encodeToString(xoredContent);
+        return Base64.getEncoder().encodeToString(hashedContent);
     }
 
     public static boolean isPasswordValid(CharSequence password) {
@@ -225,5 +210,13 @@ public final class Utils {
         Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
         intent.setData(uri);
         activity.startActivity(intent);
+    }
+
+    public static <T> T[] concatenateArrays(IntFunction<T[]> arrayFactory, T[] a, T[] b) {
+        T[] result = arrayFactory.apply(a.length + b.length);
+        System.arraycopy(a, 0, result, 0,  a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+
+        return result;
     }
 }

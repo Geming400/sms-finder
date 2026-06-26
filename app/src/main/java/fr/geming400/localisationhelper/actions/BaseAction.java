@@ -2,6 +2,7 @@ package fr.geming400.localisationhelper.actions;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,10 +10,13 @@ import androidx.annotation.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Set;
 
+import fr.geming400.localisationhelper.LogTags;
 import fr.geming400.localisationhelper.datastore.TrackingData;
 import fr.geming400.localisationhelper.ui.settings.Setting;
+import fr.geming400.localisationhelper.utils.SmsCryptography;
 import fr.geming400.localisationhelper.utils.Utils;
 
 /**
@@ -22,6 +26,8 @@ import fr.geming400.localisationhelper.utils.Utils;
  * because we're sending an {@linkplain PayloadType#INSTRUCTION instruction sms}, the format will be instead {@code "payloadType/name"}
  */
 public abstract class BaseAction<T, P> {
+    public static final String DELIMITER = ";";
+
     private final String name;
     private final Set<Setting.BooleanSetting> dependentSettings;
 
@@ -49,6 +55,7 @@ public abstract class BaseAction<T, P> {
      * send back the serialized action's output
      * @param context the android app's {@link Context}
      * @param sender the sender's phone number
+     * @param privateKey the private key used to encode the content
      * @implSpec this should call {@link #smsSenderHelper(Context, String, HasPayloadType, String, String)} (Context, String)} when sending a sms,
      * with the current {@linkplain PayloadType payload type} being {@link PayloadType#INSTRUCTION PayloadType#INSTRUCTION}
      * @see PayloadType#INSTRUCTION
@@ -62,26 +69,43 @@ public abstract class BaseAction<T, P> {
      * by {@linkplain Action#parse(String) parsing} the raw sms content
      * @param context the android app's {@link Context}
      * @param sender the sender's phone number
+     * @param privateKey the private key used to encode the content
      * @implSpec this should call {@link #smsSenderHelper(Context, String, HasPayloadType, String, String)} when sending a sms,
      * with the current {@linkplain PayloadType payload type} being {@link PayloadType#DATA PayloadType#DATA}
      * @see PayloadType#DATA
      */
     public abstract void sendDataSMS(@NonNull Context context, @NonNull String sender, @NonNull String privateKey);
 
-    protected final void smsSenderHelper(@NonNull Context context, @NonNull String sender, @NonNull HasPayloadType payloadType, @Nullable String content, @NonNull String privateKey) {
-        String prefix = payloadType.getPayloadType().getPayloadName() + "/";
+    protected final void smsSenderHelper(
+            @NonNull Context context,
+            @NonNull String sender,
+            @NonNull HasPayloadType payloadType,
+            @Nullable String content,
+            @NonNull String privateKey
+    ) {
+        Base64.Encoder encoder = Base64.getEncoder();
+
+        String prefix = payloadType.getPayloadType().getPayloadName() + DELIMITER;
         String suffix = content == null
                 ? ""
                 : ":" + content;
 
         // Examples:
         // instruction/<location>
-        // data/<location:24.49874;-14.6391>
+        // data;[iv];<location:24.49874:-14.6391>
         //
-        // What's surrounded in <> is xored and then based64
+        // What's surrounded in <> is encrypted and then base64-ed
+        // What's surrounded in [] is simply base64-ed
 
         String body = this.getName() + suffix;
-        Utils.sendSMS(context, sender, prefix + Utils.cyclicXorString(body.getBytes(), privateKey.getBytes()));
+        SmsCryptography.EncryptedContent encryptedContent = SmsCryptography.encryptContent(body.getBytes(), privateKey, SmsCryptography.getSaltFromString(sender));
+
+        Log.d(LogTags.SMS_RECEIVER, "IV is: " + Arrays.toString(encryptedContent.iv));
+        Utils.sendSMS(
+                context,
+                sender,
+                prefix + encoder.encodeToString(encryptedContent.iv) + DELIMITER + encoder.encodeToString(encryptedContent.encryptedData)
+        );
     }
 
     /**
