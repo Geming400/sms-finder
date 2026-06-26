@@ -29,6 +29,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -113,7 +114,7 @@ fun MainIntroductionComponent(currentStepState: MutableState<Step>? = null, onEn
 
 @Composable
 fun rememberCurrentStep(initialStep: Step = Step.INTRODUCTION): MutableState<Step> =
-    remember { mutableStateOf(initialStep) }
+    rememberSaveable { mutableStateOf(initialStep) }
 
 @Composable
 private fun StepsBar(
@@ -298,8 +299,8 @@ fun GrantPermissionDialog(modifier: Modifier = Modifier, permission: String, onE
     val activity = LocalActivity.current!! as MainActivity
     val context = LocalContext.current
 
-    val permissionInfo = remember { context.packageManager.getPermissionInfo(permission, 0) }
-    val permissionName = remember { permissionInfo.loadLabel(context.packageManager) }
+    val permissionInfo = remember(permission) { context.packageManager.getPermissionInfo(permission, 0) }
+    val permissionName = remember(permission) { permissionInfo.loadLabel(context.packageManager) }
 
     val isPermissionGranted = ActivityCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED
 
@@ -344,7 +345,7 @@ fun GrantPermissionsDialog(modifier: Modifier = Modifier, permissions: Collectio
 
     permissions.forEach {
         val permissionInfo = remember(it) { context.packageManager.getPermissionInfo(it, 0) }
-        val permissionName = remember { permissionInfo.loadLabel(context.packageManager) }
+        val permissionName = remember(it) { permissionInfo.loadLabel(context.packageManager) }
 
         if (it == permissions.first()) {
             permissionNames.append("$permissionName")

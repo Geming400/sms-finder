@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -101,11 +102,12 @@ private fun LocalisationHelperApp() {
         context.dataStore.data.first()
     }
 
-    val openXiaomiNoticeDialog = remember { mutableStateOf(!appData.sawXiaomiNotice) }
+    var openXiaomiNoticeDialog by rememberSaveable { mutableStateOf(!appData.sawXiaomiNotice) }
     when {
-        openXiaomiNoticeDialog.value -> {
+        openXiaomiNoticeDialog -> {
             XiaomiNoticeDialog() {
-                openXiaomiNoticeDialog.value = false
+                @Suppress("AssignedValueIsNeverRead")
+                openXiaomiNoticeDialog = false
                 runBlocking {
                     context.dataStore.updateData {
                         it.copy(sawXiaomiNotice = true)
