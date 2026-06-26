@@ -62,4 +62,7 @@
     <string name="reset_after_action">Relancer l\'appli pour que ceci prenne entièrement effet</string>
     <string name="must_set_password">Vous devez rajouter un mot de passe pour continuer</string>
     <string name="enter_user_private_key">Rentrer le mot de passe du contact</string>
+    <string name="map_open_more_actions_button">Montre plus d\'action et d\'infos pour la carte</string>
+    <string name="map_close_more_actions_button">Ferme les actions et infos ouvertes</string>
+    <string name="copy_to_clipboard">Copier</string>
 </resources>

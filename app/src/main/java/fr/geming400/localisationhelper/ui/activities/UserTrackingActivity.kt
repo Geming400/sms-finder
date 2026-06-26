@@ -1,10 +1,13 @@
 package fr.geming400.localisationhelper.ui.activities
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +15,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,8 +28,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
+import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -39,6 +47,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
@@ -46,16 +55,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import contacts.core.Contacts
 import contacts.core.LookupQuery
 import contacts.core.entities.Contact
 import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.R
-import fr.geming400.localisationhelper.actions.Actions
-import fr.geming400.localisationhelper.actions.BaseAction
+import fr.geming400.localisationhelper.action.actions.Actions
+import fr.geming400.localisationhelper.action.BaseAction
 import fr.geming400.localisationhelper.datastore.JsonDataStore
-import fr.geming400.localisationhelper.datastore.SerializableGeolocation
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
@@ -64,6 +75,7 @@ import fr.geming400.localisationhelper.ui.components.LoadingCircle
 import fr.geming400.localisationhelper.ui.components.PhoneNumberDropdown
 import fr.geming400.localisationhelper.ui.components.rememberJsonDatastore
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
+import fr.geming400.localisationhelper.utils.SimpleLocation
 import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.runBlocking
 import org.maplibre.compose.camera.CameraPosition
@@ -105,7 +117,8 @@ class UserTrackingActivity : ComponentActivity() {
         setContent {
             LocalisationHelperTheme {
                 val coroutineScope = rememberCoroutineScope()
-                val jsonDataStore = remember(this) { JsonDataStore(this) }
+                val jsonDataStore = remember { JsonDataStore(this) }
+                snackbarHostState = remember { SnackbarHostState() }
 
                 val trackedContacts by jsonDataStore.trackedContactsFlow()
                     .collectAsState(initial = emptyList(), coroutineScope.coroutineContext)
@@ -120,7 +133,10 @@ class UserTrackingActivity : ComponentActivity() {
 
                 val trackedContactInfo = jsonDataStore.getTrackedContact(trackedContacts, contact)
 
-                snackbarHostState = remember { SnackbarHostState() }
+                var shouldShowMap by rememberSaveable { mutableStateOf(false) }
+                BackHandler(shouldShowMap) {
+                    shouldShowMap = false
+                }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -128,7 +144,6 @@ class UserTrackingActivity : ComponentActivity() {
                         SnackbarHost(hostState = snackbarHostState)
                     }
                 ) { innerPadding ->
-                    var shouldShowMap by remember { mutableStateOf(false) }
                     if (shouldShowMap) {
                         UserLocationMap(Modifier.padding(innerPadding), trackedContactInfo) {
                             shouldShowMap = false
@@ -187,18 +202,18 @@ private fun MainUserTrackingComponent(
             .padding(innerPadding)
             .verticalScroll(scrollState)
     ) {
-        val shouldShowPrivateKeyChangeDialog = remember { mutableStateOf(false) }
-        val shouldShowContactDeletionDialog = remember { mutableStateOf(false) }
+        var shouldShowPrivateKeyChangeDialog by remember { mutableStateOf(false) }
+        var shouldShowContactDeletionDialog by remember { mutableStateOf(false) }
         when {
-            shouldShowPrivateKeyChangeDialog.value -> {
+            shouldShowPrivateKeyChangeDialog -> {
                 ChangeContactPrivateKeyDialog(contact = contact, trackedContactInfo = trackedContactInfo) {
-                    shouldShowPrivateKeyChangeDialog.value = false
+                    shouldShowPrivateKeyChangeDialog = false
                 }
             }
 
-            shouldShowContactDeletionDialog.value -> {
+            shouldShowContactDeletionDialog -> {
                 DeleteContactDialog(jsonDataStore = jsonDataStore, contact = contact) {
-                    shouldShowContactDeletionDialog.value = false
+                    shouldShowContactDeletionDialog = false
                 }
             }
         }
@@ -206,7 +221,7 @@ private fun MainUserTrackingComponent(
         DeletableContactProfile(
             contact = contact
         ) {
-            shouldShowContactDeletionDialog.value = true
+            shouldShowContactDeletionDialog = true
         }
 
         HorizontalDivider(
@@ -233,7 +248,7 @@ private fun MainUserTrackingComponent(
 
         Button(
             onClick = {
-                shouldShowPrivateKeyChangeDialog.value = true
+                shouldShowPrivateKeyChangeDialog = true
             }
         ) {
             Text("Change password")
@@ -248,7 +263,6 @@ private fun MainUserTrackingComponent(
             Text("Request location")
         }
 
-        Text("Battery charge: ${trackedContactInfo.lastRecordedBatteryCharge}%")
         ActionButton(trackedContactInfo, Actions.BATTERY) {
             Text("Get battery info")
         }
@@ -364,12 +378,87 @@ private fun UserLocationMap(
         onHideMap()
     } else {
         UserLocationMapInner(modifier, trackingData)
-        ElevatedButton(
-            modifier = modifier
-                .padding(5.dp),
-            onClick = onHideMap
-        ) {
-            Text(stringResource(R.string.go_back))
+
+
+        var shouldShowActions by rememberSaveable { mutableStateOf(false) }
+        BackHandler(shouldShowActions) {
+            shouldShowActions = false
+        }
+
+        Column(modifier.padding(5.dp)) {
+            Row {
+                FilledIconButton(
+                    onClick = {
+                        shouldShowActions = !shouldShowActions
+                    }
+                ) {
+                    if (shouldShowActions) {
+                        Icon(
+                            painterResource(R.drawable.ic_close),
+                            stringResource(R.string.map_close_more_actions_button)
+                        )
+                    } else {
+                        Icon(
+                            painterResource(R.drawable.ic_add),
+                            stringResource(R.string.map_open_more_actions_button)
+                        )
+                    }
+                }
+
+                ElevatedButton(
+                    onClick = onHideMap
+                ) {
+                    Text(stringResource(R.string.go_back))
+                }
+            }
+
+            if (shouldShowActions) {
+                Card(Modifier.padding(5.dp)) {
+                    Column(Modifier.padding(6.dp)) {
+                        ActionButton(
+                            trackingData = trackingData,
+                            action = Actions.LOCATION,
+                            shape = ButtonDefaults.elevatedShape,
+                            colors = ButtonDefaults.elevatedButtonColors(),
+                            elevation = ButtonDefaults.elevatedButtonElevation()
+                        ) {
+                            Text("Request location")
+                        }
+
+                        ElevatedCard(
+                            modifier = Modifier
+                                .padding(6.dp)
+                        ) {
+                            Column(Modifier.padding(10.dp)) {
+                                Text(
+                                    text = "Latitude: ${trackingData.geolocation.value.latitude}"
+                                )
+
+                                Text(
+                                    text = "Longitude: ${trackingData.geolocation.value.longitude}"
+                                )
+
+                                val context = LocalContext.current
+                                Button(
+                                    onClick = {
+                                        val clipboard = context.getSystemService(ClipboardManager::class.java)
+
+                                        val clipboardData = trackingData.geolocation.value.toFormattedString()
+                                        clipboard.setPrimaryClip(
+                                            ClipData.newPlainText(
+                                                clipboardData,
+                                                clipboardData
+                                            )
+                                        )
+                                    }
+                                ) {
+                                    Text(stringResource(R.string.copy_to_clipboard))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -448,8 +537,8 @@ private fun UserLocationMapInner(
                 finalPosition =
                     camera.position.copy(
                         target = Position(
-                            latitude = geolocation.latitude,
-                            longitude = geolocation.longitude
+                            latitude = geolocation.value.latitude,
+                            longitude = geolocation.value.longitude
                         )
                     ),
                 duration = 1.5.seconds,
@@ -464,8 +553,8 @@ private fun UserLocationMapInner(
             finalPosition =
                 camera.position.copy(
                     target = Position(
-                        latitude = geolocation.latitude,
-                        longitude = geolocation.longitude
+                        latitude = geolocation.value.latitude,
+                        longitude = geolocation.value.longitude
                     )
                 ),
             duration = 3.seconds,
@@ -484,12 +573,12 @@ private fun UserLocationMapInner(
             ),
         cameraState = camera
     ) {
-        Marker(trackingData.geolocation)
+        Marker(trackingData.geolocation.value)
     }
 }
 
 @Composable
-private fun Marker(geolocation: SerializableGeolocation) {
+private fun Marker(geolocation: SimpleLocation) {
     val markerJson = """
 {
   "type": "FeatureCollection",
@@ -512,7 +601,7 @@ ${geolocation.latitude}]
     SymbolLayer(
         id = "marker-layer",
         source = markerSource,
-        iconImage = image(painterResource(R.drawable.ic_location_icon)),
+        iconImage = image(painterResource(org.maplibre.android.R.drawable.maplibre_marker_icon_default)),
         iconAnchor = const(SymbolAnchor.Bottom),
         iconAllowOverlap = const(true)
     )

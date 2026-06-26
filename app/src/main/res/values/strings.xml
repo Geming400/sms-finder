@@ -63,4 +63,7 @@
     <string name="reset_after_action">Relaunch the app for it to fully take effect</string>
     <string name="must_set_password">You must set your password to continue</string>
     <string name="enter_user_private_key">Enter this contact\'s password</string>
+    <string name="map_open_more_actions_button">Opens more actions and info for the map</string>
+    <string name="map_close_more_actions_button">Close the opened actions and info</string>
+    <string name="copy_to_clipboard">Copy</string>
 </resources>
