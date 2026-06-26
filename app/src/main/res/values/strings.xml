@@ -40,11 +40,15 @@
         This was a simple app made for myself because I managed to lose my phone multiple times, and I don\'t always have the cellular network thingy on.
         If you are like this or straight up don\'t want to use any Google services, this is for you !\n\n
 
-        This app needs to be installed on another phone, or it will become useless.
+        This app needs to be installed on 2 or more phones, or it will become useless.
     </string>
     <string name="introduction.steps.introduction.how_does_this_work">How does this work ?</string>
-    <string name="introduction.steps.introduction.how_does_this_work_content">Once configured, you select a password (aka a private key), add new contacts and from there you can send actions to other phones via SMS.\n
-        For it to actually work, you need to add YOUR contact on the other phone and from there, actions will get sent through if enabled.
+    <string name="introduction.steps.introduction.how_does_this_work_content">First of all you select a password (aka a private key),
+        add new contacts and from there you can send actions to them (they need to have this app installed)\n
+        For it to actually work, you need to add YOUR contact on the other phone and from there, actions will get sent through if enabled.\n\n
+
+        Once configured, if you send actions it will get sent through as an SMS instead of relying on any external server.\n
+        The data that\'s sent is encrypted.
     </string>
     <string name="introduction.steps.permissions">Permissions</string>
     <string name="introduction.steps.settings.content">There are also some settings that you can enable beforehand to continue setting up permissions</string>

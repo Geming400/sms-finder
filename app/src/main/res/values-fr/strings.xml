@@ -39,12 +39,15 @@
         C\'est une appli assez simple que j\'ai faite pour moi-même, car j\'ai réussi à perdre mon téléphone plusieurs fois, et je n\'ai pas toujours les données mobiles activées.
         Si vous êtes comme moi, ou vous n\'utilisez pas les services Google, alors ceci est pour vous !\n\n
 
-        Cette appli doit être installée sur 2 téléphones ou sinon elle est inutile.
+        Cette appli doit être installée sur 2 téléphones ou plus ou sinon elle est inutile.
     </string>
     <string name="introduction.steps.introduction.how_does_this_work">Comment cela fonctionne ?</string>
     <string name="introduction.steps.introduction.how_does_this_work_content">
-        Une fois configuré, vous devrez selectionner un mot de passe (clé privée), rajouter des contacts et depuis là, vous pourrez ensuite envoyer des actions à d\'autres via des SMS.\n
-        Mais pour que ceci fonctionne, vous devez rajouter VOTRE contact sur l\'autre téléphone pour ensuite envoyer des actions, si elles ont été activées.
+        Vous devez d\'abord selectionner un mot de passe (clé privée) puis rajouter des contacts et depuis là, vous pourrez ensuite leurs envoyer des actions.\n
+        Mais pour que ceci fonctionne, vous devez rajouter VOTRE contact sur un des autres téléphones pour ensuite envoyer des actions, si elles ont été activées.\n\n
+
+        Une fois configurée, si vous envoyez des actions, le protocole SMS sera utilisé au lieu d\'utiliser un serveur externe.\n
+        Les données envoyées sont encryptées.
     </string>
     <string name="next">Suivant</string>
     <string name="introduction.steps.permissions">Permissions</string>
