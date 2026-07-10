@@ -304,6 +304,8 @@ private fun MainUserTrackingComponent(
             if (trackedContactInfo.geolocation != null)
                 Text(stringResource(R.string.last_recorded_location, trackedContactInfo.geolocation.value.latitude, trackedContactInfo.geolocation.value.longitude))
 
+            Spacer(Modifier.height(4.dp))
+
             Button(
                 onClick = {
                     onShowMap()
@@ -530,15 +532,12 @@ private fun UserLocationMap(
                             Text(stringResource(R.string.request_location))
                         }
 
-                        ElevatedCard(
-                            modifier = Modifier
-                                .padding(6.dp)
-                        ) {
+                        ElevatedCard(Modifier.padding(6.dp)) {
                             Column(Modifier.padding(10.dp)) {
                                 Text(stringResource(R.string.latitude, trackingData.geolocation.value.latitude))
                                 Text(stringResource(R.string.longitude, trackingData.geolocation.value.longitude))
 
-                                ActionButtonDivider()
+                                Spacer(Modifier.height(3.dp))
 
                                 val context = LocalContext.current
                                 Button(
@@ -566,9 +565,8 @@ private fun UserLocationMap(
 }
 
 @Composable
-private fun ChangeContactPrivateKeyDialog(modifier: Modifier = Modifier, contact: Contact, trackedContactInfo: TrackingData, onDismiss: () -> Unit) {
+private fun ChangeContactPrivateKeyDialog(modifier: Modifier = Modifier, contact: Contact, trackedContactInfo: TrackingData, onDismiss: () -> Unit) =
     ChangeContactPrivateKeyDialog(modifier, contact, trackedContactInfo, onDismiss, onDismiss)
-}
 
 @Composable
 private fun ChangeContactPrivateKeyDialog(modifier: Modifier = Modifier, contact: Contact, trackedContactInfo: TrackingData, onDismiss: () -> Unit, onClose: () -> Unit = onDismiss) {

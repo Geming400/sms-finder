@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">SMS Finder</string>
     <string name="destinations_home">Home</string>
     <string name="destinations_tracking">Tracking</string>
-    <string name="destinations_settings">Settings</string>
+    <string name="destinations_settings" translatable="false">Settings</string>
     <string name="linked_phone_number">Linked phone number</string>
     <string name="unknown_contact">Unknown contact</string>
     <string name="content_description_click_to_expand">Click to expand</string>
@@ -25,8 +25,8 @@
     <string name="go_back">Go back</string>
     <string name="show_map">Show map</string>
     <string name="enter_password">Enter your password</string>
-    <string name="save_password">Save password</string>
-    <string name="reset_password">Reset password</string>
+    <string name="save_password">Save</string>
+    <string name="reset_password">Reset</string>
     <string name="setting.geolocation.description">If geolocating this device should be allowed</string>
     <string name="setting.geolocation.name">Geolocation</string>
     <string name="setting.battery.description">If getting the charge percentage of this device should be allowed</string>
