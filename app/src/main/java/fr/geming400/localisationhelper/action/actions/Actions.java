@@ -15,6 +15,7 @@ public abstract class Actions {
 
     public static final LocationGetterAction LOCATION = register("location", LocationGetterAction::new);
     public static final BatteryGetterAction BATTERY = register("battery", BatteryGetterAction::new);
+    public static final ExtraInfoGetterAction EXTRA_INFO = register("extra_info", ExtraInfoGetterAction::new);
     public static final PingAction PING = register("ping", PingAction::new);
 
 
