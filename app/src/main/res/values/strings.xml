@@ -67,8 +67,8 @@
     <string name="map_close_more_actions_button">Close the opened actions and info</string>
     <string name="copy_to_clipboard">Copy</string>
     <string name="phone_stats">Phone stats</string>
-    <string name="last_ping_answer">Last answer: %s</string>
-    <string name="battery_charge">Battery charge: %f%%</string>
+    <string name="last_ping_answer">Last global answer: %s</string>
+    <string name="battery_charge">Battery charge: %.2f%%</string>
     <string name="battery_charge_unknown">Battery charge: unknown</string>
     <string name="is_dnd_enabled">Is do-not-disturb enabled: %s</string>
     <string name="is_mobile_data_enabled">Is mobile data enabled: %s</string>
@@ -80,7 +80,7 @@
     <string name="change_password">Change password</string>
     <string name="request_location">Request location</string>
     <string name="phone_location">Phone\'s location</string>
-    <string name="last_location_answer">Last location request answer: %s</string>
+    <string name="last_location_answer">Last answer: %s</string>
     <string name="never">Never</string>
     <string name="last_recorded_location">Last recorded location: %s° lat, %s° long</string>
     <string name="latitude">Latitude: %f°</string>
