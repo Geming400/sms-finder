@@ -14,11 +14,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -29,6 +32,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.Card
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledIconButton
@@ -50,6 +54,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
@@ -57,6 +62,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import contacts.core.Contacts
@@ -64,8 +70,8 @@ import contacts.core.LookupQuery
 import contacts.core.entities.Contact
 import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.R
-import fr.geming400.localisationhelper.action.actions.Actions
 import fr.geming400.localisationhelper.action.BaseAction
+import fr.geming400.localisationhelper.action.actions.Actions
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
@@ -77,6 +83,8 @@ import fr.geming400.localisationhelper.ui.components.rememberJsonDatastore
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 import fr.geming400.localisationhelper.utils.SimpleLocation
 import fr.geming400.localisationhelper.utils.Utils
+import fr.geming400.localisationhelper.utils.getYesOrNo
+import fr.geming400.localisationhelper.utils.nullableStringResource
 import kotlinx.coroutines.runBlocking
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
@@ -251,32 +259,98 @@ private fun MainUserTrackingComponent(
                 shouldShowPrivateKeyChangeDialog = true
             }
         ) {
-            Text("Change password")
+            Text(stringResource(R.string.change_password))
         }
 
-        Text("Last time ping answer: ${trackedContactInfo.lastPingAnswer}")
-        ActionButton(trackedContactInfo, Actions.PING) {
-            Text("Ping phone")
+        CategoryCard(stringResource(R.string.phone_stats)) {
+            Text(
+                nullableStringResource(R.string.last_ping_answer, trackedContactInfo.lastPingAnswer?.getRelativeTime())
+            )
+
+            Text(
+                if (trackedContactInfo.lastRecordedBatteryCharge == null)
+                    nullableStringResource(R.string.battery_charge_unknown)
+                else
+                    stringResource(R.string.battery_charge, trackedContactInfo.lastRecordedBatteryCharge.value)
+            )
+
+            Text(
+                nullableStringResource(R.string.is_dnd_enabled, getYesOrNo(trackedContactInfo.extraInfo?.value?.isDndEnabled))
+            )
+
+            Text(
+                nullableStringResource(R.string.is_mobile_data_enabled, getYesOrNo(trackedContactInfo.extraInfo?.value?.isMobileDataEnabled))
+            )
+
+// Useless unless you are using it on your own decide
+// for some reason (don't ask why I added this)
+//            Text(
+//                nullableStringResource(R.string.is_airplane_mode_enabled, getYesOrNo(trackedContactInfo.extraInfo?.value?.isAirplaneModeEnabled))
+//            )
+
+            ActionButtonDivider()
+
+            ActionButton(trackedContactInfo, setOf(Actions.PING, Actions.BATTERY, Actions.EXTRA_INFO)) {
+                Text(stringResource(R.string.update_stats))
+            }
         }
 
-        ActionButton(trackedContactInfo, Actions.LOCATION) {
-            Text("Request location")
-        }
+        CategoryCard(stringResource(R.string.phone_location)) {
+            if (trackedContactInfo.geolocation == null)
+                Text(stringResource(R.string.last_location_answer, stringResource(R.string.never)))
+            else
+                Text(stringResource(R.string.last_location_answer, trackedContactInfo.geolocation.getRelativeTime()))
 
-        ActionButton(trackedContactInfo, Actions.BATTERY) {
-            Text("Get battery info")
-        }
+            if (trackedContactInfo.geolocation != null)
+                Text(stringResource(R.string.last_recorded_location, trackedContactInfo.geolocation.value.latitude, trackedContactInfo.geolocation.value.longitude))
 
-        Text("Last location answer: ${trackedContactInfo.geolocation}")
-        Button(
-            onClick = {
-                onShowMap()
-            },
-            enabled = trackedContactInfo.geolocation != null
-        ) {
-            Text(stringResource(R.string.show_map))
+            Button(
+                onClick = {
+                    onShowMap()
+                },
+                enabled = trackedContactInfo.geolocation != null
+            ) {
+                Text(stringResource(R.string.show_map))
+            }
+
+            ActionButtonDivider()
+
+            ActionButton(trackedContactInfo, Actions.LOCATION) {
+                Text(stringResource(R.string.request_location))
+            }
         }
     }
+}
+
+@Composable
+private fun CategoryCard(name: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) =
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp)
+    ) {
+        Column(modifier.padding(8.dp)) {
+            Text(
+                text = "$name:",
+                textDecoration = TextDecoration.Underline,
+                fontWeight = FontWeight.Bold,
+                fontSize = 4.em
+            )
+
+            content()
+        }
+    }
+
+@Composable
+private fun ActionButtonDivider(
+    modifier: Modifier = Modifier,
+    dividerThickness: Dp = DividerDefaults.Thickness,
+    dividerColor: Color = DividerDefaults.color,
+    height: Dp = 3.dp
+) {
+    Spacer(modifier.height(height))
+    HorizontalDivider(modifier, dividerThickness, dividerColor)
+    Spacer(modifier.height(height))
 }
 
 @Composable
@@ -292,16 +366,47 @@ private fun ActionButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit
+) =
+    ActionButton(
+        modifier = modifier,
+        trackingData = trackingData,
+        actions = listOf(action),
+        enabled = enabled && trackingData.linkedPhoneNumber != null,
+        shape = shape,
+        colors = colors,
+        elevation = elevation,
+        border = border,
+        contentPadding = contentPadding,
+        interactionSource = interactionSource,
+    ) {
+        content()
+    }
+
+@Composable
+private fun ActionButton(
+    trackingData: TrackingData,
+    actions: Collection<BaseAction<*, *>>,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = ButtonDefaults.shape,
+    colors: ButtonColors = ButtonDefaults.buttonColors(),
+    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource? = null,
+    content: @Composable RowScope.() -> Unit
 ) {
     val activity = getUserTrackingActivity()
 
     Button(
         onClick = {
-            action.sendInstructionSMS(
-                activity,
-                trackingData.linkedPhoneNumber!!,
-                trackingData.privateKey!!
-            )
+            actions.forEach {
+                it.sendInstructionSMS(
+                    activity,
+                    trackingData.linkedPhoneNumber!!,
+                    trackingData.privateKey!!
+                )
+            }
         },
         modifier = modifier,
         enabled = enabled && trackingData.linkedPhoneNumber != null,
@@ -422,7 +527,7 @@ private fun UserLocationMap(
                             colors = ButtonDefaults.elevatedButtonColors(),
                             elevation = ButtonDefaults.elevatedButtonElevation()
                         ) {
-                            Text("Request location")
+                            Text(stringResource(R.string.request_location))
                         }
 
                         ElevatedCard(
@@ -430,13 +535,10 @@ private fun UserLocationMap(
                                 .padding(6.dp)
                         ) {
                             Column(Modifier.padding(10.dp)) {
-                                Text(
-                                    text = "Latitude: ${trackingData.geolocation.value.latitude}"
-                                )
+                                Text(stringResource(R.string.latitude, trackingData.geolocation.value.latitude))
+                                Text(stringResource(R.string.longitude, trackingData.geolocation.value.longitude))
 
-                                Text(
-                                    text = "Longitude: ${trackingData.geolocation.value.longitude}"
-                                )
+                                ActionButtonDivider()
 
                                 val context = LocalContext.current
                                 Button(

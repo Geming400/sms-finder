@@ -11,7 +11,7 @@
     <string name="has_no_valid_numbers_error">Ce contact n\'a aucun numéro de tel. valide !</string>
     <string name="add_contacts">Rajoutez des contacts avec le boutton \'+\'</string>
     <string name="delete">Supprimer</string>
-    <string name="delete_error">Une erreur c\'est produite en essayant de supprimer %1$s</string>
+    <string name="delete_error">Une erreur c\'est produite en essayant de supprimer %s</string>
     <string name="confirmation_text">Êtes-vous sûr ?</string>
     <string name="deletion_confirmation">Supprimer ce contact de \'SMS Finder\' va supprimer toutes ses infos. Vous pouvez toujours les rajouter de nouveau !</string>
     <string name="confirm">Confirmer</string>
@@ -52,10 +52,10 @@
     <string name="next">Suivant</string>
     <string name="introduction.steps.permissions">Permissions</string>
     <string name="introduction.steps.settings.content">Il y a aussi quelques paramètres que vous pouvez activer pour parametrer d\'autres permissions en avance</string>
-    <string name="denied_permission">Vous n\'avez pas autorisé %1$s</string>
+    <string name="denied_permission">Vous n\'avez pas autorisé %s</string>
     <string name="denied_permissions">Vous n\'avez pas autorisé les permissions requises</string>
     <string name="must_authorize_permission_reason">Pour correctement utiliser cette application DOIT être accordée. Vous ne pouvez pas continuer sinon.</string>
-    <string name="must_authorize_permissions_reason">Pour continuer, vous devez autoriser les permissions %1$s.</string>
+    <string name="must_authorize_permissions_reason">Pour continuer, vous devez autoriser les permissions %s.</string>
     <string name="grant">Accorder</string>
     <string name="must_grant_permissions">Il y a plusieurs permissions nécéssaires à l\'utilisation de cette appli:</string>
     <string name="reset_app">Réinitialiser l\'application</string>
@@ -65,4 +65,23 @@
     <string name="map_open_more_actions_button">Montre plus d\'action et d\'infos pour la carte</string>
     <string name="map_close_more_actions_button">Ferme les actions et infos ouvertes</string>
     <string name="copy_to_clipboard">Copier</string>
+    <string name="phone_stats">Stats du téléphone</string>
+    <string name="last_ping_answer">Dernière réponse : %s</string>
+    <string name="battery_charge">Charge: %.2f%%</string>
+    <string name="battery_charge_unknown">Charge: inconnue</string>
+    <string name="is_dnd_enabled">Est-ce que le mode ne pas déranger est activé : %s</string>
+    <string name="is_airplane_mode_enabled">Est-ce que le mode avion est activé : %s</string>
+    <string name="update_stats">Mettre à jour</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="is_mobile_data_enabled">Est-ce que les données mobiles sont activées : %s</string>
+    <string name="unknown">Inconnu</string>
+    <string name="change_password">Changer le mot de passe</string>
+    <string name="request_location">Demander la geolocation</string>
+    <string name="phone_location">Gélocation du téléphone</string>
+    <string name="last_location_answer">Dernière réponse de géolocalisation: %s</string>
+    <string name="never">Jamais</string>
+    <string name="last_recorded_location">Dernière gélocation enregistée : %s° lat, %s° long</string>
+    <string name="latitude">Latitude: %f°</string>
+    <string name="longitude">Longitude: %f°</string>
 </resources>

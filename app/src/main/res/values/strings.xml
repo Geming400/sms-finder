@@ -11,7 +11,7 @@
     <string name="has_no_valid_numbers_error">This contact has no valid phone numbers !</string>
     <string name="add_contacts">Add contacts by clicking on the \'+\' button</string>
     <string name="delete">Delete</string>
-    <string name="delete_error">An error occurred while trying to delete %1$s</string>
+    <string name="delete_error">An error occurred while trying to delete %s</string>
     <string name="confirmation_text">Are you sure ?</string>
     <string name="deletion_confirmation">Deleting this contact from \'SMS Finder\' will delete all of its info. You can always add them back !</string>
     <string name="confirm">Confirm</string>
@@ -53,10 +53,10 @@
     <string name="introduction.steps.permissions">Permissions</string>
     <string name="introduction.steps.settings.content">There are also some settings that you can enable beforehand to continue setting up permissions</string>
     <string name="next">Next</string>
-    <string name="denied_permission">You denied %1$s</string>
+    <string name="denied_permission">You denied %s</string>
     <string name="denied_permissions">You denied the required permissions</string>
     <string name="must_authorize_permission_reason">To correctly use this app this permission MUST be granted. You cannot continue if it isn\'t.</string>
-    <string name="must_authorize_permissions_reason">You must grant the %1$s permissions to continue.</string>
+    <string name="must_authorize_permissions_reason">You must grant the %s permissions to continue.</string>
     <string name="grant">Grant</string>
     <string name="must_grant_permissions">There are multiple permissions you need to grant to this app:</string>
     <string name="reset_app">Reset app</string>
@@ -66,4 +66,23 @@
     <string name="map_open_more_actions_button">Opens more actions and info for the map</string>
     <string name="map_close_more_actions_button">Close the opened actions and info</string>
     <string name="copy_to_clipboard">Copy</string>
+    <string name="phone_stats">Phone stats</string>
+    <string name="last_ping_answer">Last answer: %s</string>
+    <string name="battery_charge">Battery charge: %f%%</string>
+    <string name="battery_charge_unknown">Battery charge: unknown</string>
+    <string name="is_dnd_enabled">Is do-not-disturb enabled: %s</string>
+    <string name="is_mobile_data_enabled">Is mobile data enabled: %s</string>
+    <string name="is_airplane_mode_enabled">Is airplane mode enabled: %s</string>
+    <string name="update_stats">Update stats</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="unknown">Unknown</string>
+    <string name="change_password">Change password</string>
+    <string name="request_location">Request location</string>
+    <string name="phone_location">Phone\'s location</string>
+    <string name="last_location_answer">Last location request answer: %s</string>
+    <string name="never">Never</string>
+    <string name="last_recorded_location">Last recorded location: %s° lat, %s° long</string>
+    <string name="latitude">Latitude: %f°</string>
+    <string name="longitude">Longitude: %f°</string>
 </resources>
