@@ -11,6 +11,7 @@ import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.settings.Settings
 import fr.geming400.localisationhelper.utils.BoxedTimestamp
+import fr.geming400.localisationhelper.utils.Timestamp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,11 +39,13 @@ class BatteryGetterAction(name: String): Action<Float>(name, Settings.BATTERY) {
             context.registerReceiver(null, ifilter)
         }
 
-        return this.futureOf(batteryStatus?.let { intent ->
-            val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-            val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-            level * 100 / scale.toFloat()
-        })
+        return this.futureOf {
+            batteryStatus?.let { intent ->
+                val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+                val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+                level * 100 / scale.toFloat()
+            }
+        }
     }
 
     override fun onReceive(
@@ -62,7 +65,8 @@ class BatteryGetterAction(name: String): Action<Float>(name, Settings.BATTERY) {
             CoroutineScope(Dispatchers.IO.limitedParallelism(1, "BatteryGetterAction's onReceive (Stage.RECEIVE_HOST)")).launch {
                 jsonDataStore.updateTrackedContact(asContact) {
                     it.copy(
-                        lastRecordedBatteryCharge = BoxedTimestamp.now(batteryCharge)
+                        lastRecordedBatteryCharge = BoxedTimestamp.now(batteryCharge),
+                        lastPingAnswer = Timestamp.now()
                     )
                 }
             }

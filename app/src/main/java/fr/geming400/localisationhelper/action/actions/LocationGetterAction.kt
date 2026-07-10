@@ -12,6 +12,7 @@ import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.settings.Settings
 import fr.geming400.localisationhelper.utils.BoxedTimestamp
 import fr.geming400.localisationhelper.utils.SimpleLocation
+import fr.geming400.localisationhelper.utils.Timestamp
 import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -99,7 +100,8 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
                         geolocation = BoxedTimestamp.now(SimpleLocation(
                             geolocation.latitude,
                             geolocation.longitude,
-                        ))
+                        )),
+                        lastPingAnswer = Timestamp.now()
                     )
                 }
             }
