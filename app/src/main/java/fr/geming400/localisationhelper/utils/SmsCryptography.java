@@ -13,8 +13,8 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public final class SmsCryptography {
-    private static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
-    private static final byte[] STATIC_SALT = new byte[] {
+    public static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
+    public static final byte[] STATIC_SALT = new byte[] {
             12,
             -78,
             14,

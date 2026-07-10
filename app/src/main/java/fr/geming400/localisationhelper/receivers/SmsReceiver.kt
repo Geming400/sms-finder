@@ -84,7 +84,7 @@ class SmsReceiver : BroadcastReceiver() {
                         Base64.getDecoder().decode(encryptedContent.toByteArray()),
                         iv,
                         privateKey,
-                        SmsCryptography.getSaltFromString(sender)
+                        SmsCryptography.STATIC_SALT
                     ).split(":", limit = 2)
 
                     val actionName = actionNameAndContent[0]
@@ -96,7 +96,7 @@ class SmsReceiver : BroadcastReceiver() {
                             "Received $payloadType payload of action $actionName !"
                         )
 
-                        val pendingResult = goAsync()
+                        val pendingResult = this.goAsync()
                         try {
                             val action = Actions.getByNameTypeless(actionName)!!
                             if (action.canSendAnyPayload(context)) {

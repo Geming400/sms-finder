@@ -2,7 +2,6 @@ package fr.geming400.localisationhelper.action;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,7 +12,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Set;
 
-import fr.geming400.localisationhelper.LogTags;
 import fr.geming400.localisationhelper.datastore.TrackingData;
 import fr.geming400.localisationhelper.ui.settings.Setting;
 import fr.geming400.localisationhelper.utils.SmsCryptography;
@@ -98,9 +96,7 @@ public abstract class BaseAction<T, P> {
         // What's surrounded in [] is simply base64-ed
 
         String body = this.getName() + suffix;
-        SmsCryptography.EncryptedContent encryptedContent = SmsCryptography.encryptContent(body.getBytes(), privateKey, SmsCryptography.getSaltFromString(sender));
-
-        Log.d(LogTags.SMS_RECEIVER, "IV is: " + Arrays.toString(encryptedContent.iv));
+        SmsCryptography.EncryptedContent encryptedContent = SmsCryptography.encryptContent(body.getBytes(), privateKey, SmsCryptography.STATIC_SALT);
         Utils.sendSMS(
                 context,
                 sender,
