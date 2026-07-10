@@ -19,7 +19,8 @@ data class TrackingData(
     // Tracking info
     val geolocation: BoxedTimestamp<SimpleLocation>? = null,
     val lastPingAnswer: Timestamp? = null,
-    val lastRecordedBatteryCharge: BoxedTimestamp<Float>? = null
+    val lastRecordedBatteryCharge: BoxedTimestamp<Float>? = null,
+    val extraInfo: BoxedTimestamp<ExtraInfo>? = null
 ) {
     val lookupKeyWithId: LookupQuery.LookupKeyWithId
         get() = LookupQuery.LookupKeyWithId(lookupKey, 0)
