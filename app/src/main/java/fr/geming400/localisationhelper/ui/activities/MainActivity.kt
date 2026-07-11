@@ -9,13 +9,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.collection.OrderedScatterSet
 import androidx.collection.orderedScatterSetOf
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.Scaffold
@@ -30,19 +35,30 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.core.app.ActivityCompat
+import contacts.core.Contacts
+import contacts.core.LookupQuery
 import fr.geming400.localisationhelper.R
+import fr.geming400.localisationhelper.datastore.LocalisationHelperData
 import fr.geming400.localisationhelper.datastore.dataStore
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
+import fr.geming400.localisationhelper.ui.components.CategoryCard
+import fr.geming400.localisationhelper.ui.components.ContactProfile
 import fr.geming400.localisationhelper.ui.components.LoadingCircle
 import fr.geming400.localisationhelper.ui.components.MainIntroductionComponent
 import fr.geming400.localisationhelper.ui.components.Step
 import fr.geming400.localisationhelper.ui.components.rememberCurrentStep
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 import fr.geming400.localisationhelper.utils.Utils
+import fr.geming400.localisationhelper.utils.centerHorizontally
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
@@ -74,7 +90,7 @@ class MainActivity : PermissionsWithCallbackActivity() {
                             }
                         }
                     } else {
-                        LocalisationHelperApp()
+                        LocalisationHelperApp(appData!!)
                     }
                 }
             }
@@ -95,12 +111,8 @@ class MainActivity : PermissionsWithCallbackActivity() {
 }
 
 @Composable
-private fun LocalisationHelperApp() {
+private fun LocalisationHelperApp(appData: LocalisationHelperData) {
     val context = LocalContext.current
-
-    val appData = runBlocking {
-        context.dataStore.data.first()
-    }
 
     var openXiaomiNoticeDialog by rememberSaveable { mutableStateOf(!appData.sawXiaomiNotice) }
     when {
@@ -119,15 +131,59 @@ private fun LocalisationHelperApp() {
 
     ActivitySelector(AppDestinations.HOME) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            PasswordInputField(
-                modifier = Modifier.padding(innerPadding)
-            )
+            val scrollState = rememberScrollState()
+            Column(
+                Modifier
+                    .padding(innerPadding)
+                    .verticalScroll(scrollState)
+            ) {
+                Card(Modifier.padding(12.dp)) {
+                    Text(
+                        modifier = Modifier
+                            .centerHorizontally()
+                            .padding(5.dp),
+                        text = stringResource(R.string.leak_pii_disclaimer),
+                        textAlign = TextAlign.Center,
+                        fontSize = 4.em,
+                        color = Color.Red
+                    )
+                }
+
+                CategoryCard(stringResource(R.string.password)) {
+                    PasswordInputField()
+                }
+
+                CategoryCard(stringResource(R.string.recent_contacts)) {
+                    if (appData.lastAccessedContacts.isEmpty()) {
+                        Text(
+                            modifier = Modifier
+                                .centerHorizontally()
+                                .alpha(0.65f)
+                                .padding(4.dp),
+                            text = stringResource(R.string.no_recent_contacts),
+                            textAlign = TextAlign.Center
+                        )
+                    } else {
+                        appData.lastAccessedContacts.forEach {
+                            val contact = Contacts(context)
+                                .lookupQuery()
+                                .whereLookupKeyWithIdMatches(LookupQuery.LookupKeyWithId(it, 0))
+                                .find()
+                                .first()
+
+                            ContactProfile(contact = contact) {
+                                UserTrackingActivity.start(context, contact)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun PasswordInputField(modifier: Modifier) {
+private fun PasswordInputField(modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     var isPasswordFieldEnabled by remember {
@@ -145,6 +201,8 @@ private fun PasswordInputField(modifier: Modifier) {
             enabled = isPasswordFieldEnabled,
             isError = !Utils.isPasswordValid(passwordInputState.text) && isPasswordFieldEnabled
         )
+
+        Spacer(Modifier.height(10.dp))
 
         Button(
             onClick = {

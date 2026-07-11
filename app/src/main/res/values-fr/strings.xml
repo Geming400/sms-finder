@@ -86,4 +86,13 @@
     <string name="last_recorded_location">Dernière géolocalisation enregistée : %s° lat, %s° long</string>
     <string name="latitude">Latitude: %f°</string>
     <string name="longitude">Longitude: %f°</string>
+    <string name="password">Mot de passe</string>
+    <string name="recent_contacts">Contacts récents</string>
+    <string name="no_recent_contacts">Vous n\'avez aucun contacts que vous avez récemment accédé.</string>
+    <string name="leak_pii_disclaimer">
+        ATTENTION:\n\n
+
+        Car cette application peut être utilisée avec de mauvaises intentions (ex : regarder la géolocalisation de quelqu\'un), je ne suis pas
+        résponsable pour quelconque données divulguées.
+    </string>
 </resources>

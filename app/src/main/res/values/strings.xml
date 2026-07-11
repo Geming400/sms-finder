@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">SMS Finder</string>
     <string name="destinations_home">Home</string>
     <string name="destinations_tracking">Tracking</string>
-    <string name="destinations_settings" translatable="false">Settings</string>
+    <string name="destinations_settings">Settings</string>
     <string name="linked_phone_number">Linked phone number</string>
     <string name="unknown_contact">Unknown contact</string>
     <string name="content_description_click_to_expand">Click to expand</string>
@@ -87,4 +87,12 @@
     <string name="last_recorded_location">Last recorded location: %s° lat, %s° long</string>
     <string name="latitude">Latitude: %f°</string>
     <string name="longitude">Longitude: %f°</string>
+    <string name="password">Password</string>
+    <string name="recent_contacts">Recent contacts</string>
+    <string name="no_recent_contacts">You have no contacts that you have recently accessed.</string>
+    <string name="leak_pii_disclaimer">
+        DISCLAIMER:\n\n
+
+        Since this app can be actively used with bad intentions (eg: looking at someone\'s location), I am not responsible for any leaked information.
+    </string>
 </resources>
