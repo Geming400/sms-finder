@@ -53,7 +53,7 @@ public final class SmsCryptography {
             cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
             return new String(cipher.doFinal(content), StandardCharsets.UTF_8);
         } catch (GeneralSecurityException e) {
-            throw new RuntimeException("Caught error while trying to encrypt something", e);
+            throw new RuntimeException("Caught error while trying to decrypt something", e);
         }
     }
 
@@ -68,9 +68,9 @@ public final class SmsCryptography {
         }
     }
 
-    public static byte[] getSaltFromString(String phoneNumber) {
+    public static byte[] getSaltFromString(String text) {
         String reversedNumber = new StringBuilder()
-                .append(phoneNumber)
+                .append(text)
                 .reverse()
                 .toString();
         byte[] numBytes = reversedNumber.getBytes();
