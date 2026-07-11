@@ -95,4 +95,5 @@
 
         Since this app can be actively used with bad intentions (eg: looking at someone\'s location), I am not responsible for any leaked information.
     </string>
+    <string name="setting.category.update_checker">Update checker</string>
 </resources>

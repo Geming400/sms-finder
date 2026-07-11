@@ -6,7 +6,9 @@ coilNetworkOkhttp = "3.4.0"
 contactsAndroid = "0.5.0"
 coreKtx = "1.18.0"
 datastorePreferences = "1.2.1"
+githubApi = "1.330"
 gson = "2.13.2"
+javaSemver = "0.10.2"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
@@ -28,7 +30,9 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 contacts-android-core = { module = "com.github.vestrel00.contacts-android:core", version.ref = "contactsAndroid" }
+github-api = { module = "org.kohsuke:github-api", version.ref = "githubApi" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+java-semver = { module = "com.github.zafarkhaja:java-semver", version.ref = "javaSemver" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

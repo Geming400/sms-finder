@@ -50,6 +50,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.ui.activities.MainActivity
+import fr.geming400.localisationhelper.ui.activities.PermissionsWithCallbackActivity
 import fr.geming400.localisationhelper.ui.settings.Settings
 import fr.geming400.localisationhelper.ui.theme.Colors
 import fr.geming400.localisationhelper.ui.theme.Red80
@@ -300,7 +301,7 @@ private fun PermissionButton(modifier: Modifier = Modifier, permission: String) 
 
 @Composable
 fun GrantPermissionDialog(modifier: Modifier = Modifier, permission: String, onEnd: () -> Unit) {
-    val activity = LocalActivity.current!! as MainActivity
+    val activity = LocalActivity.current!! as PermissionsWithCallbackActivity
     val context = LocalContext.current
 
     val permissionInfo = remember(permission) { context.packageManager.getPermissionInfo(permission, 0) }

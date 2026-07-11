@@ -8,4 +8,6 @@ public final class LogTags {
     public static final String USER_TRACKING = "userTracking";
 
     public static final String DATA_STORE = "dataStore";
+
+    public static final String AUTO_UPDATER = "autoUpdater";
 }

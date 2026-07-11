@@ -2,6 +2,7 @@ package fr.geming400.localisationhelper.ui.activities
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.geming400.localisationhelper.AutoUpdater
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.datastore.LocalisationHelperData
 import fr.geming400.localisationhelper.datastore.dataStore
@@ -38,8 +40,12 @@ class SettingsActivity : PermissionsWithCallbackActivity() {
                     ActivitySelector(AppDestinations.SETTINGS) {
                         SettingScreen(modifier = Modifier.padding(innerPadding)) {
                             item {
+                                SettingsCategory(title = stringResource(R.string.setting_category_update_checker)) {
+                                    UpdateChecker()
+                                }
+
                                 SettingsCategory(title = stringResource(R.string.setting_category_debug)) {
-                                    ResetButton()
+                                    ResetAppButton()
                                 }
                             }
                         }
@@ -51,7 +57,7 @@ class SettingsActivity : PermissionsWithCallbackActivity() {
 }
 
 @Composable
-private fun ResetButton(modifier: Modifier = Modifier) {
+private fun ResetAppButton(modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     Button(
@@ -73,5 +79,39 @@ private fun ResetButton(modifier: Modifier = Modifier) {
         )
     ) {
         Text(stringResource(R.string.reset_app))
+    }
+}
+
+@Composable
+private fun UpdateChecker() {
+    // TODO: Update this accordingly
+    Text("A new update was found !")
+
+    // TODO: Separate "Check for updates" button and "Download" button
+    // TODO: Add "Last checked: " thing with Timpestamp::getRelativeTime
+
+    val activity = LocalActivity.current as SettingsActivity
+
+    Button(
+        modifier = Modifier.centerHorizontally(),
+        onClick = {
+            val thread = Thread() {
+                runBlocking {
+                    AutoUpdater.updateApp(activity)
+                }
+            }
+
+            thread.name = "Updater Checker thread"
+            thread.start()
+        }
+    ) {
+        Text("Check for updates")
+    }
+
+    Button(
+        modifier = Modifier.centerHorizontally(),
+        onClick =  {}
+    ) {
+        Text("Download")
     }
 }

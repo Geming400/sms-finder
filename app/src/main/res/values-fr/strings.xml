@@ -95,4 +95,5 @@
         Car cette application peut être utilisée avec de mauvaises intentions (ex : regarder la géolocalisation de quelqu\'un), je ne suis pas
         résponsable pour quelconque données divulguées.
     </string>
+    <string name="setting.category.update_checker">Vérificateur de mises à jour</string>
 </resources>
