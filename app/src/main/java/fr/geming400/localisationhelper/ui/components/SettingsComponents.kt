@@ -136,9 +136,8 @@ private fun SettingDescription(modifier: Modifier = Modifier, description: Strin
 private fun BooleanSetting(modifier: Modifier = Modifier, setting: Setting<Boolean>) {
     val context = LocalContext.current
     val activity = LocalActivity.current as PermissionsWithCallbackActivity
-    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    var isVisuallyChecked by remember { mutableStateOf(sharedPreferences.getBoolean(setting.id, setting.defaultValue)) }
+    var isVisuallyChecked by remember { mutableStateOf(setting.getValue(context)) }
 
     SettingSpacing(modifier, setting) {
         Text(
@@ -184,9 +183,8 @@ private fun BooleanSetting(modifier: Modifier = Modifier, setting: Setting<Boole
 @Composable
 private fun IntSetting(modifier: Modifier = Modifier, setting: Setting<Int>) {
     val context = LocalContext.current
-    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    val textState = rememberTextFieldState(sharedPreferences.getInt(setting.id, setting.defaultValue).toString())
+    val textState = rememberTextFieldState(setting.getValue(context).toString())
 
     SettingSpacing(modifier, setting) {
         Text(
@@ -214,9 +212,8 @@ private fun IntSetting(modifier: Modifier = Modifier, setting: Setting<Int>) {
 @Composable
 private fun FloatSetting(modifier: Modifier = Modifier, setting: Setting<Float>) {
     val context = LocalContext.current
-    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    val textState = rememberTextFieldState(sharedPreferences.getFloat(setting.id, setting.defaultValue).toString())
+    val textState = rememberTextFieldState(setting.getValue(context).toString())
 
     val isFloat = textState.text.toString().toFloatOrNull() != null
 
@@ -246,9 +243,8 @@ private fun FloatSetting(modifier: Modifier = Modifier, setting: Setting<Float>)
 @Composable
 private fun StringSetting(modifier: Modifier = Modifier, setting: Setting<String>) {
     val context = LocalContext.current
-    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    val textState = rememberTextFieldState(sharedPreferences.getString(setting.id, setting.defaultValue)!!)
+    val textState = rememberTextFieldState(setting.getValue(context))
 
     SettingSpacing(modifier, setting) {
         Text(
