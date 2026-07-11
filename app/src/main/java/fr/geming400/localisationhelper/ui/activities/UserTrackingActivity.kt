@@ -99,7 +99,8 @@ import org.maplibre.compose.style.BaseStyle
 import org.maplibre.spatialk.geojson.Position
 import kotlin.time.Duration.Companion.seconds
 
-// TODO: Use snackbar when sending action request
+// TODO: Use snackbar when sending action request (?)
+// TODO: Add contact dependant settings
 class UserTrackingActivity : ComponentActivity() {
     lateinit var contact: Contact
     lateinit var snackbarHostState: SnackbarHostState
