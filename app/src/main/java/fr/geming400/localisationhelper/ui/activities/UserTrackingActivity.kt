@@ -14,7 +14,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -60,11 +59,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import contacts.core.Contacts
 import contacts.core.LookupQuery
 import contacts.core.entities.Contact
@@ -76,6 +72,7 @@ import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
+import fr.geming400.localisationhelper.ui.components.CategoryCard
 import fr.geming400.localisationhelper.ui.components.DeletableContactProfile
 import fr.geming400.localisationhelper.ui.components.LoadingCircle
 import fr.geming400.localisationhelper.ui.components.PhoneNumberDropdown
@@ -83,6 +80,7 @@ import fr.geming400.localisationhelper.ui.components.rememberJsonDatastore
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 import fr.geming400.localisationhelper.utils.SimpleLocation
 import fr.geming400.localisationhelper.utils.Utils
+import fr.geming400.localisationhelper.utils.centerHorizontally
 import fr.geming400.localisationhelper.utils.getYesOrNo
 import fr.geming400.localisationhelper.utils.nullableStringResource
 import kotlinx.coroutines.runBlocking
@@ -255,6 +253,9 @@ private fun MainUserTrackingComponent(
         }
 
         Button(
+            modifier = Modifier
+                .centerHorizontally()
+                .padding(6.dp),
             onClick = {
                 shouldShowPrivateKeyChangeDialog = true
             }
@@ -323,25 +324,6 @@ private fun MainUserTrackingComponent(
         }
     }
 }
-
-@Composable
-private fun CategoryCard(name: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) =
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(12.dp)
-    ) {
-        Column(modifier.padding(8.dp)) {
-            Text(
-                text = "$name:",
-                textDecoration = TextDecoration.Underline,
-                fontWeight = FontWeight.Bold,
-                fontSize = 4.em
-            )
-
-            content()
-        }
-    }
 
 @Composable
 private fun ActionButtonDivider(

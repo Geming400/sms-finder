@@ -35,7 +35,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.preference.PreferenceManager
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.ui.activities.PermissionsWithCallbackActivity
 import fr.geming400.localisationhelper.ui.settings.Setting

@@ -8,9 +8,12 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +27,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.ui.activities.MainActivity
@@ -95,6 +101,26 @@ fun LoadingCircle(modifier: Modifier = Modifier) {
         }
     }
 }
+
+@Composable
+fun CategoryCard(name: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) =
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp)
+    ) {
+        Column(modifier.padding(8.dp)) {
+            Text(
+                text = "$name:",
+                textDecoration = TextDecoration.Underline,
+                fontWeight = FontWeight.Bold,
+                fontSize = 4.em,
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
+            )
+
+            content()
+        }
+    }
 
 enum class AppDestinations(
     @field:StringRes
