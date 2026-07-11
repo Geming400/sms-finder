@@ -1,6 +1,5 @@
 package fr.geming400.localisationhelper.ui.activities
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -32,7 +31,6 @@ import androidx.compose.ui.unit.em
 import contacts.core.Contacts
 import contacts.core.LookupQuery
 import fr.geming400.localisationhelper.R
-import fr.geming400.localisationhelper.utils.Utils
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.LocalisationHelperData
 import fr.geming400.localisationhelper.datastore.dataStore
@@ -41,6 +39,7 @@ import fr.geming400.localisationhelper.ui.components.AppDestinations
 import fr.geming400.localisationhelper.ui.components.ContactsList
 import fr.geming400.localisationhelper.ui.components.LoadingCircle
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
+import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.runBlocking
 
 class TrackingActivity : ComponentActivity() {

@@ -2,6 +2,7 @@ package fr.geming400.localisationhelper.ui.activities
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -70,6 +71,7 @@ import fr.geming400.localisationhelper.action.BaseAction
 import fr.geming400.localisationhelper.action.actions.Actions
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
+import fr.geming400.localisationhelper.datastore.dataStore
 import fr.geming400.localisationhelper.ui.components.ActivitySelector
 import fr.geming400.localisationhelper.ui.components.AppDestinations
 import fr.geming400.localisationhelper.ui.components.CategoryCard
@@ -83,6 +85,7 @@ import fr.geming400.localisationhelper.utils.Utils
 import fr.geming400.localisationhelper.utils.centerHorizontally
 import fr.geming400.localisationhelper.utils.getYesOrNo
 import fr.geming400.localisationhelper.utils.nullableStringResource
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
@@ -139,6 +142,10 @@ class UserTrackingActivity : ComponentActivity() {
                 }
 
                 val trackedContactInfo = jsonDataStore.getTrackedContact(trackedContacts, contact)
+
+                runBlocking {
+                    jsonDataStore.addRecentlyAccessedContact(contact, dataStore.data.first().lastAccessedContacts)
+                }
 
                 var shouldShowMap by rememberSaveable { mutableStateOf(false) }
                 BackHandler(shouldShowMap) {
@@ -277,9 +284,11 @@ private fun MainUserTrackingComponent(
         }
 
         CategoryCard(stringResource(R.string.phone_stats)) {
-            Text(
-                nullableStringResource(R.string.last_ping_answer, trackedContactInfo.lastPingAnswer?.getRelativeTime())
-            )
+            if (trackedContactInfo.lastPingAnswer == null) {
+                Text(stringResource(R.string.last_ping_answer, stringResource(R.string.never)))
+            } else {
+                Text(stringResource(R.string.last_ping_answer, trackedContactInfo.lastPingAnswer.getRelativeTime()))
+            }
 
             Text(
                 if (trackedContactInfo.lastRecordedBatteryCharge == null)

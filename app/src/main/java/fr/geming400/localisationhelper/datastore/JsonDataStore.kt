@@ -18,6 +18,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import okhttp3.internal.toImmutableList
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -98,16 +99,45 @@ class JsonDataStore(private val context: Context) {
         return null
     }
 
-    fun getFirstTrackedContact(contacts: Collection<TrackingData>, sender: String?): TrackingData? {
-        if (sender == null)
+    fun getFirstTrackedContact(contacts: Collection<TrackingData>, phoneNumber: String?): TrackingData? {
+        if (phoneNumber == null)
             return null
 
         contacts.forEach {
-            if (it.linkedPhoneNumber == sender)
+            if (it.linkedPhoneNumber == phoneNumber)
                 return@getFirstTrackedContact it
         }
 
         return null
+    }
+
+    suspend fun addRecentlyAccessedContact(contact: Contact, recentlyAccessedContacts: List<String>) {
+        if (recentlyAccessedContacts.contains(contact.lookupKey)) {
+            val list = recentlyAccessedContacts.toMutableList()
+            list.remove(contact.lookupKey!!)
+            list.add(0, contact.lookupKey!!)
+
+            context.dataStore.updateData {
+                it.copy(
+                    lastAccessedContacts = list
+                )
+            }
+        } else {
+            val list = recentlyAccessedContacts.toMutableList()
+            list.add(0, contact.lookupKey!!)
+
+            val finalList =
+                list.subList(
+                    0,
+                    list.size.coerceAtMost(LocalisationHelperData.MAX_RECENTLY_ACCESSED_CONTACTS.toInt())
+                ).toImmutableList()
+
+            context.dataStore.updateData {
+                it.copy(
+                    lastAccessedContacts = finalList
+                )
+            }
+        }
     }
 }
 
@@ -122,8 +152,13 @@ data class LocalisationHelperData(
     val trackedContacts: List<TrackingData> = arrayListOf(),
     val passwordHash: String? = null,
     val sawXiaomiNotice: Boolean = Build.MANUFACTURER != "Xiaomi",
+    val lastAccessedContacts: List<String> = arrayListOf(),
     val firstTimeOpening: Boolean = true
-)
+) {
+    companion object {
+        const val MAX_RECENTLY_ACCESSED_CONTACTS: Short = 3
+    }
+}
 
 object LocalisationHelperDataSerializer : Serializer<LocalisationHelperData> {
     override val defaultValue: LocalisationHelperData = LocalisationHelperData()
