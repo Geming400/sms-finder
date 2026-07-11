@@ -38,6 +38,13 @@ public final class Settings {
             R.string.setting_battery_description
     );
 
+    public static final Setting.BooleanSetting EXTRA_INFO = register(
+            Setting.ofBoolean("extra_info", false),
+            Setting.Category.ACTIONS,
+            R.string.setting_extra_info_name,
+            R.string.setting_extra_info_description
+    );
+
     private static <T, S extends Setting<T>> S register(S setting, Setting.Category category) {
         return register(setting, category, null, null);
     }

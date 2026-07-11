@@ -9,6 +9,7 @@ import fr.geming400.localisationhelper.action.Action
 import fr.geming400.localisationhelper.datastore.ExtraInfo
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
+import fr.geming400.localisationhelper.ui.settings.Settings
 import fr.geming400.localisationhelper.utils.BoxedTimestamp
 import fr.geming400.localisationhelper.utils.Timestamp
 import fr.geming400.localisationhelper.utils.toBoolFromInt
@@ -21,7 +22,7 @@ import java.util.concurrent.CompletableFuture
 typealias SystemSettings = android.provider.Settings.System
 typealias GlobalSettings = android.provider.Settings.Global
 
-class ExtraInfoGetterAction(name: String) : Action<ExtraInfo>(name) {
+class ExtraInfoGetterAction(name: String) : Action<ExtraInfo>(name, Settings.EXTRA_INFO) {
     override fun serializeResult(obj: ExtraInfo): String =
         "${obj.isAirplaneModeEnabled.toInt()};${obj.isMobileDataEnabled.toInt()};${obj.isDndEnabled.toInt()}"
 

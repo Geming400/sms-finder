@@ -30,7 +30,9 @@
     <string name="setting.geolocation.name">Geolocalisation</string>
     <string name="setting.geolocation.description">Si la géolocation est activé</string>
     <string name="setting.battery.name">Batterie</string>
-    <string name="setting.battery.description">Si l\'obtention du pourcentage de charge est activé</string>
+    <string name="setting.battery.description">Si l\'obtention du pourcentage de charge est autorisé</string>
+    <string name="setting.extra_info.name">Info Supplémentaire</string>
+    <string name="setting.extra_info.description">Si l\'obtention d\'info supplémentaire est autorisé</string>
     <string name="setting.category.actions">Actions</string>
     <string name="setting.category.debug">Déboggage</string>
     <string name="introduction.steps.introduction">Introduction</string>

@@ -27,10 +27,12 @@
     <string name="enter_password">Enter your password</string>
     <string name="save_password">Save</string>
     <string name="reset_password">Reset</string>
-    <string name="setting.geolocation.description">If geolocating this device should be allowed</string>
     <string name="setting.geolocation.name">Geolocation</string>
-    <string name="setting.battery.description">If getting the charge percentage of this device should be allowed</string>
+    <string name="setting.geolocation.description">If geolocating this device should be allowed</string>
     <string name="setting.battery.name">Battery</string>
+    <string name="setting.battery.description">If getting the charge percentage of this device should be allowed</string>
+    <string name="setting.extra_info.name">Extra Info</string>
+    <string name="setting.extra_info.description">If getting extra info about this device should be allowed</string>
     <string name="setting.category.unknown" translatable="false">UNKNOWN</string>
     <string name="setting.category.actions">Actions</string>
     <string name="setting.category.debug">Debug</string>
