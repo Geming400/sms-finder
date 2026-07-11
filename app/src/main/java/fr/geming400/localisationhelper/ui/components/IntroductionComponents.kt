@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -49,6 +51,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.ui.activities.MainActivity
 import fr.geming400.localisationhelper.ui.settings.Settings
+import fr.geming400.localisationhelper.ui.theme.Colors
+import fr.geming400.localisationhelper.ui.theme.Red80
 import fr.geming400.localisationhelper.utils.Utils
 import fr.geming400.localisationhelper.utils.centerHorizontally
 
@@ -130,9 +134,9 @@ private fun StepsBar(
                 modifier = Modifier
                     .weight(1f)
                     .height(height)
-                    .wrapContentHeight(align = Alignment.CenterVertically),
+                    .wrapContentHeight(align = Alignment.CenterVertically)
+                    .alpha(if (step == currentStep) 1f else 0.3f),
                 textAlign = TextAlign.Center,
-                color = if (step == currentStep) Color.Unspecified else MaterialTheme.colorScheme.onSecondary
             )
 
             if (step != Step.entries.last())
@@ -264,11 +268,11 @@ private fun PermissionButton(modifier: Modifier = Modifier, permission: String) 
 
     val buttonColors = if (isPermissionGranted)
         ButtonDefaults.buttonColors(
-            disabledContainerColor = Color(0xFF204B21)
+            disabledContainerColor = Colors.green()
         )
     else
         ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer,
+            containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.errorContainer else Red80,
             contentColor = Color.White
         )
 
