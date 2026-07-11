@@ -189,6 +189,18 @@ class UserTrackingActivity : ComponentActivity() {
             .whereLookupKeyWithIdMatches(lookupKeyWithId)
             .find()
             .first()
+
+    companion object {
+        fun start(context: Context, contact: Contact) {
+            val intent = Intent(context, UserTrackingActivity::class.java)
+            val bundle = Bundle()
+            bundle.putString("lookupKey", contact.lookupKey)
+            bundle.putLong("contactID", contact.id)
+            intent.putExtras(bundle)
+
+            context.startActivity(intent)
+        }
+    }
 }
 
 @Composable

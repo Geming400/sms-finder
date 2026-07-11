@@ -107,13 +107,7 @@ class TrackingActivity : ComponentActivity() {
                                     modifier = Modifier.padding(innerPadding),
                                     contactsFilter = trackedContacts.map { it.lookupKeyWithId },
                                     onContactClick = { contact ->
-                                        val intent = Intent(this, UserTrackingActivity::class.java)
-                                        val bundle = Bundle()
-                                        bundle.putString("lookupKey", contact.lookupKey)
-                                        bundle.putLong("contactID", contact.id)
-                                        intent.putExtras(bundle)
-
-                                        this.startActivity(intent)
+                                        UserTrackingActivity.start(this, contact)
                                     }
                                 ) {
                                     MustAddContactsText(Modifier.padding(innerPadding), appData!!)
