@@ -177,7 +177,7 @@ public final class Utils {
     }
 
     public static void sendSMS(@NonNull Context context, @NonNull String sender, String body) {
-        Log.d(LogTags.SMS_SENDER, "Sending sms to" + sender + "with body: " + body);
+        Log.d(LogTags.SMS_SENDER, "Sending sms to " + sender + "with body: " + body);
 
         var smsManager = context.getSystemService(SmsManager.class);
         smsManager.sendMultipartTextMessage(sender, null, smsManager.divideMessage(body), null, null);
