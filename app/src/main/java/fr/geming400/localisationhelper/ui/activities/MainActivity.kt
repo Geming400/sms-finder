@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.collection.OrderedScatterSet
@@ -45,6 +46,8 @@ import androidx.compose.ui.unit.em
 import androidx.core.app.ActivityCompat
 import contacts.core.Contacts
 import contacts.core.LookupQuery
+import fr.geming400.localisationhelper.AutoUpdater
+import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.datastore.LocalisationHelperData
 import fr.geming400.localisationhelper.datastore.dataStore
@@ -90,11 +93,30 @@ class MainActivity : PermissionsWithCallbackActivity() {
                             }
                         }
                     } else {
+                        var hasCheckedForUpdates by rememberSaveable { mutableStateOf(false) }
+                        if (!hasCheckedForUpdates) {
+                            hasCheckedForUpdates = true
+                            this.checkForUpdates()
+                        }
+
                         LocalisationHelperApp(appData!!)
                     }
                 }
             }
         }
+    }
+
+    fun checkForUpdates() {
+        Log.i(LogTags.AUTO_UPDATER, "Checking for updates in MainActivity on startup")
+
+        val thread = Thread() {
+            runBlocking {
+                AutoUpdater.checkForUpdates(this@MainActivity)
+            }
+        }
+
+        thread.name = "Updater Checker thread (checker)"
+        thread.start()
     }
 
     companion object {
@@ -118,7 +140,6 @@ private fun LocalisationHelperApp(appData: LocalisationHelperData) {
     when {
         openXiaomiNoticeDialog -> {
             XiaomiNoticeDialog() {
-                @Suppress("AssignedValueIsNeverRead")
                 openXiaomiNoticeDialog = false
                 runBlocking {
                     context.dataStore.updateData {

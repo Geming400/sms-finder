@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -13,15 +14,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import fr.geming400.localisationhelper.AutoUpdater
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.ui.activities.MainActivity
@@ -47,10 +54,34 @@ fun ActivitySelector(currentDestination: AppDestinations, modifier: Modifier = M
             AppDestinations.entries.forEach {
                 item(
                     icon = {
-                        Icon(
-                            painterResource(it.icon),
-                            contentDescription = stringResource(it.label)
-                        )
+                        val coroutineScope = rememberCoroutineScope()
+                        val hasFoundUpdate by AutoUpdater.updateFlow
+                            .collectAsState(AutoUpdater.hasFoundUpdate(), coroutineScope.coroutineContext)
+
+                        // Hardcoded case for setting dest
+                        if (it == AppDestinations.SETTINGS && hasFoundUpdate) {
+                            Box {
+                                Icon(
+                                    painterResource(it.icon),
+                                    contentDescription = stringResource(it.label)
+                                )
+
+                                Icon(
+                                    modifier = Modifier
+                                        .background(
+                                            NavigationBarDefaults.containerColor,
+                                            CircleShape
+                                        ),
+                                    painter = painterResource(R.drawable.ic_download),
+                                    contentDescription = stringResource(it.label)
+                                )
+                            }
+                        } else {
+                            Icon(
+                                painterResource(it.icon),
+                                contentDescription = stringResource(it.label)
+                            )
+                        }
                     },
                     label = { Text(stringResource(it.label)) },
                     selected = it == currentDestination,
@@ -158,7 +189,7 @@ enum class AppDestinations(
      * @param context the app context
      */
     fun startActivity(context: Context, bundle: Bundle) {
-        val intent = Intent(context, clazz)
+        val intent = Intent(context, this.clazz)
         context.startActivity(intent, bundle)
     }
 

@@ -96,4 +96,17 @@
         résponsable pour quelconque données divulguées.
     </string>
     <string name="setting.category.update_checker">Vérificateur de mises à jour</string>
+    <string name="no_update_found">Aucune mise à jours ont été trouvées.</string>
+    <string name="found_update_time">Dernière vérification %s.</string>
+    <string name="new_update_found">Une nouvelle mise à jour a été trouvée !</string>
+    <string name="update_exception">Il y a eu une erreur pendant la mise à jour de l\'appli</string>
+    <string name="updater_installing">Installation de la maj...</string>
+    <string name="update_downloading">Téléchargement de la maj...</string>
+    <string name="updater_error">Il y a eu une erreur pendant le téléchargement de la (possible) maj !</string>
+    <string name="updater_state_prefix">Etat: %s</string>
+    <string name="show_on_maps">Afficher sur une autre carte</string>
+    <string name="check_for_updates">Vérifier les mises à jour</string>
+    <string name="download_update">Télécharger</string>
+    <string name="setting.category.links">Liens</string>
+    <string name="github_icon">Icone Github</string>
 </resources>

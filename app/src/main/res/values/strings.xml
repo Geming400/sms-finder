@@ -96,4 +96,17 @@
         Since this app can be actively used with bad intentions (eg: looking at someone\'s location), I am not responsible for any leaked information.
     </string>
     <string name="setting.category.update_checker">Update checker</string>
+    <string name="new_update_found">A new update has been found !</string>
+    <string name="no_update_found">No updates have been found.</string>
+    <string name="found_update_time">Last checked %s</string>
+    <string name="update_exception">Had an error while trying to update app</string>
+    <string name="updater_installing">Installing update...</string>
+    <string name="update_downloading">Downloading update...</string>
+    <string name="updater_error">There was an error while trying to download the (possible) update !</string>
+    <string name="updater_state_prefix">State: %s</string>
+    <string name="show_on_maps">Show on another map</string>
+    <string name="check_for_updates">Check for updates</string>
+    <string name="download_update">Download</string>
+    <string name="setting.category.links">Links</string>
+    <string name="github_icon">Github icon</string>
 </resources>
