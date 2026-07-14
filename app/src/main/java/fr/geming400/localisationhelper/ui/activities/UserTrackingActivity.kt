@@ -86,6 +86,7 @@ import fr.geming400.localisationhelper.utils.centerHorizontally
 import fr.geming400.localisationhelper.utils.getYesOrNo
 import fr.geming400.localisationhelper.utils.nullableStringResource
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
@@ -101,6 +102,8 @@ import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.spatialk.geojson.Position
 import kotlin.time.Duration.Companion.seconds
+import androidx.core.net.toUri
+import org.maplibre.compose.camera.CameraState
 
 // TODO: Use snackbar when sending action request (?)
 // TODO: Add contact dependant settings
@@ -125,10 +128,11 @@ class UserTrackingActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
+            this.snackbarHostState = remember { SnackbarHostState() }
+
             LocalisationHelperTheme {
                 val coroutineScope = rememberCoroutineScope()
                 val jsonDataStore = remember { JsonDataStore(this) }
-                snackbarHostState = remember { SnackbarHostState() }
 
                 val trackedContacts by jsonDataStore.trackedContactsFlow()
                     .collectAsState(initial = emptyList(), coroutineScope.coroutineContext)
@@ -155,7 +159,7 @@ class UserTrackingActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     snackbarHost = {
-                        SnackbarHost(hostState = snackbarHostState)
+                        SnackbarHost(hostState = this.snackbarHostState)
                     }
                 ) { innerPadding ->
                     if (shouldShowMap) {
@@ -402,16 +406,19 @@ private fun ActionButton(
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val activity = getUserTrackingActivity()
 
     Button(
         onClick = {
-            actions.forEach {
-                it.sendInstructionSMS(
-                    activity,
-                    trackingData.linkedPhoneNumber!!,
-                    trackingData.privateKey!!
-                )
+            coroutineScope.launch {
+                actions.forEach {
+                    it.sendInstructionSMS(
+                        activity,
+                        trackingData.linkedPhoneNumber!!,
+                        trackingData.privateKey!!
+                    )
+                }
             }
         },
         modifier = modifier,
@@ -488,7 +495,18 @@ private fun UserLocationMap(
     if (trackingData.geolocation == null) {
         onHideMap()
     } else {
-        UserLocationMapInner(modifier, trackingData)
+        val cameraState =
+            rememberCameraState(
+                firstPosition =
+                    CameraPosition(
+                        target = Position(
+                            latitude = 0.0,
+                            longitude = 0.0
+                        ),
+                        zoom = 15.5
+                    )
+            )
+        UserLocationMapInner(modifier, trackingData, cameraState)
 
 
         var shouldShowActions by rememberSaveable { mutableStateOf(false) }
@@ -559,6 +577,19 @@ private fun UserLocationMap(
                                 ) {
                                     Text(stringResource(R.string.copy_to_clipboard))
                                 }
+
+                                Button(
+                                    onClick = {
+                                        val mapIntent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            "geo:${trackingData.geolocation.value.latitude},${trackingData.geolocation.value.longitude}?z=${cameraState.position.zoom}".toUri()
+                                        )
+
+                                        context.startActivity(mapIntent)
+                                    }
+                                ) {
+                                    Text(stringResource(R.string.show_on_maps))
+                                }
                             }
                         }
                     }
@@ -618,11 +649,12 @@ private fun ChangeContactPrivateKeyDialog(modifier: Modifier = Modifier, contact
 @Composable
 private fun UserLocationMapInner(
     modifier: Modifier = Modifier,
-    trackingData: TrackingData
+    trackingData: TrackingData,
+    cameraStateVal: CameraState? = null
 ) {
     val geolocation = trackingData.geolocation!!
 
-    val camera =
+    val cameraState = cameraStateVal ?:
         rememberCameraState(
             firstPosition =
                 CameraPosition(
@@ -637,9 +669,9 @@ private fun UserLocationMapInner(
     val oldGeolocation = remember { mutableStateOf(geolocation.copy()) }
     if (geolocation != oldGeolocation.value) {
         LaunchedEffect(Unit) {
-            camera.animateTo(
+            cameraState.animateTo(
                 finalPosition =
-                    camera.position.copy(
+                    cameraState.position.copy(
                         target = Position(
                             latitude = geolocation.value.latitude,
                             longitude = geolocation.value.longitude
@@ -653,9 +685,9 @@ private fun UserLocationMapInner(
     }
 
     LaunchedEffect(Unit) {
-        camera.animateTo(
+        cameraState.animateTo(
             finalPosition =
-                camera.position.copy(
+                cameraState.position.copy(
                     target = Position(
                         latitude = geolocation.value.latitude,
                         longitude = geolocation.value.longitude
@@ -675,7 +707,7 @@ private fun UserLocationMapInner(
                         isScaleBarEnabled = false
                     )
             ),
-        cameraState = camera
+        cameraState = cameraState
     ) {
         Marker(trackingData.geolocation.value)
     }
