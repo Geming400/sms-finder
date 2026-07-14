@@ -109,4 +109,7 @@
     <string name="download_update">Télécharger</string>
     <string name="setting.category.links">Liens</string>
     <string name="github_icon">Icone Github</string>
+    <string name="source_code">Code source</string>
+    <string name="created_by">Crée par Geming400</string>
+    <string name="no_app_for_intent">Aucune application peut ouvrir ceci !</string>
 </resources>

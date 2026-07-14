@@ -1,5 +1,6 @@
 package fr.geming400.localisationhelper.ui.activities
 
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -580,12 +581,17 @@ private fun UserLocationMap(
 
                                 Button(
                                     onClick = {
-                                        val mapIntent = Intent(
-                                            Intent.ACTION_VIEW,
-                                            "geo:${trackingData.geolocation.value.latitude},${trackingData.geolocation.value.longitude}?z=${cameraState.position.zoom}".toUri()
-                                        )
+                                        try {
+                                            val mapIntent = Intent(
+                                                Intent.ACTION_VIEW,
+                                                "geo:${trackingData.geolocation.value.latitude},${trackingData.geolocation.value.longitude}?z=${cameraState.position.zoom}".toUri()
+                                            )
 
-                                        context.startActivity(mapIntent)
+                                            context.startActivity(mapIntent)
+                                        } catch (e: ActivityNotFoundException) {
+                                            Log.w(LogTags.USER_TRACKING, "Couldn't find any activities to open a map", e)
+                                            Toast.makeText(context, R.string.no_app_for_intent, Toast.LENGTH_SHORT).show()
+                                        }
                                     }
                                 ) {
                                     Text(stringResource(R.string.show_on_maps))
