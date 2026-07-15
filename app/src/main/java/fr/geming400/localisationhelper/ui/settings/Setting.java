@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -93,7 +94,7 @@ public abstract class Setting<T> {
         return Optional.ofNullable(this.description);
     }
 
-    public boolean areActionsDependant() {
+    public boolean isActionsDependant() {
         if (this instanceof BooleanSetting) {
             return Actions.getAllActions().values()
                     .stream()
@@ -184,7 +185,8 @@ public abstract class Setting<T> {
 
     public enum Category {
         UNKNOWN(R.string.setting_category_unknown, true, 0),
-        ACTIONS(R.string.setting_category_actions, 1);
+        GLOBAL(R.string.setting_category_global, 1),
+        ACTIONS(R.string.setting_category_actions, 2);
 
         @StringRes
         private final int name;
@@ -212,6 +214,10 @@ public abstract class Setting<T> {
 
         public int getOrder() {
             return this.order;
+        }
+
+        public List<Setting<?>> getSettings() {
+            return Settings.getSettingsByCategory().get(this);
         }
     }
 

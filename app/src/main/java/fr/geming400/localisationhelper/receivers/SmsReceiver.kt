@@ -99,7 +99,7 @@ class SmsReceiver : BroadcastReceiver() {
                         val pendingResult = this.goAsync()
                         try {
                             val action = Actions.getByNameTypeless(actionName)!!
-                            if (action.canSendAnyPayload(context)) {
+                            if (payloadType == PayloadType.DATA && action.canSendDataPayload(context)) {
                                 Actions.getByNameTypeless(actionName)?.onReceive(
                                     context,
                                     sender,

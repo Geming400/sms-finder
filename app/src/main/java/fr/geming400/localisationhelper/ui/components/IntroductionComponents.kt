@@ -261,7 +261,6 @@ private fun PermissionButton(modifier: Modifier = Modifier, permission: String) 
     when {
         shouldShowGrantingDialog -> {
             GrantPermissionDialog(modifier, permission) {
-                @Suppress("AssignedValueIsNeverRead")
                 shouldShowGrantingDialog = false
             }
         }
@@ -285,7 +284,6 @@ private fun PermissionButton(modifier: Modifier = Modifier, permission: String) 
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                 activity.requestPermission(permission)
             } else if (!isPermissionGranted) {
-                @Suppress("AssignedValueIsNeverRead")
                 shouldShowGrantingDialog = true
             }
         },
@@ -407,7 +405,7 @@ private fun ActionSettingsMainComponent(): Boolean {
     )
 
     for (setting in Settings.getSettings()) {
-        if (setting.areActionsDependant()) {
+        if (setting.isActionsDependant) {
             SettingItem(setting = setting)
         }
     }

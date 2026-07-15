@@ -33,9 +33,14 @@
     <string name="setting.battery.description">If getting the charge percentage of this device should be allowed</string>
     <string name="setting.extra_info.name">Extra Info</string>
     <string name="setting.extra_info.description">If getting extra info about this device should be allowed</string>
+    <string name="setting.global_enable.name">Enable</string>
+    <string name="setting.global_enable.description">If every action should be enabled</string>
     <string name="setting.category.unknown" translatable="false">UNKNOWN</string>
+    <string name="setting.category.global">Global</string>
     <string name="setting.category.actions">Actions</string>
     <string name="setting.category.debug">Debug</string>
+    <string name="setting.category.update_checker">Update checker</string>
+    <string name="setting.category.about">About</string>
     <string name="introduction.steps.introduction">Introduction</string>
     <string name="introduction.steps.introduction.primary">Hi !\n\n
 
@@ -95,7 +100,6 @@
 
         Since this app can be actively used with bad intentions (eg: looking at someone\'s location), I am not responsible for any leaked information.
     </string>
-    <string name="setting.category.update_checker">Update checker</string>
     <string name="new_update_found">A new update has been found !</string>
     <string name="no_update_found">No updates have been found.</string>
     <string name="found_update_time">Last checked %s</string>
@@ -107,7 +111,6 @@
     <string name="show_on_maps">Show on another map</string>
     <string name="check_for_updates">Check for updates</string>
     <string name="download_update">Download</string>
-    <string name="setting.category.about">About</string>
     <string name="source_code">Source code</string>
     <string name="created_by">Created by Geming400</string>
     <string name="no_app_for_intent">No apps can open this !</string>

@@ -57,9 +57,6 @@ class SettingsActivity : PermissionsWithCallbackActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO: Add global "Enable" setting to
-        // be able to see that you can actually scroll down
-
         enableEdgeToEdge()
         setContent {
             this.snackbarHostState = remember { SnackbarHostState() }

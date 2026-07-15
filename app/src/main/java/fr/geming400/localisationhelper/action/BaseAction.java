@@ -10,10 +10,12 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.Set;
 
 import fr.geming400.localisationhelper.datastore.TrackingData;
 import fr.geming400.localisationhelper.ui.settings.Setting;
+import fr.geming400.localisationhelper.ui.settings.Settings;
 import fr.geming400.localisationhelper.utils.SmsCryptography;
 import fr.geming400.localisationhelper.utils.Utils;
 
@@ -45,7 +47,10 @@ public abstract class BaseAction<T, P> {
 
     @Unmodifiable
     public Set<Setting.BooleanSetting> getDependentSettings() {
-        return Set.copyOf(this.dependentSettings);
+        Set<Setting.BooleanSetting> setCopy = new HashSet<>(this.dependentSettings);
+        setCopy.add(Settings.GLOBAL_ENABLE);
+
+        return Set.copyOf(setCopy);
     }
 
     /**
@@ -142,7 +147,7 @@ public abstract class BaseAction<T, P> {
             @NonNull String rawContent
     );
 
-    public boolean canSendAnyPayload(Context context) {
+    public boolean canSendDataPayload(Context context) {
         return this.dependentSettings
                 .stream()
                 .allMatch(setting -> setting.getValue(context));

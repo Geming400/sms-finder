@@ -33,8 +33,13 @@
     <string name="setting.battery.description">Si l\'obtention du pourcentage de charge est autorisé</string>
     <string name="setting.extra_info.name">Info Supplémentaire</string>
     <string name="setting.extra_info.description">Si l\'obtention d\'info supplémentaire est autorisé</string>
+    <string name="setting.global_enable.name">Activer</string>
+    <string name="setting.global_enable.description">Si toutes les actions devraient être activées</string>
+    <string name="setting.category.global">Globale</string>
     <string name="setting.category.actions">Actions</string>
     <string name="setting.category.debug">Déboggage</string>
+    <string name="setting.category.about">A propos</string>
+    <string name="setting.category.update_checker">Vérificateur de mises à jour</string>
     <string name="introduction.steps.introduction">Introduction</string>
     <string name="introduction.steps.introduction.primary">Salut !\n\n
 
@@ -95,7 +100,6 @@
         Car cette application peut être utilisée avec de mauvaises intentions (ex : regarder la géolocalisation de quelqu\'un), je ne suis pas
         résponsable pour quelconque données divulguées.
     </string>
-    <string name="setting.category.update_checker">Vérificateur de mises à jour</string>
     <string name="no_update_found">Aucune mise à jours ont été trouvées.</string>
     <string name="found_update_time">Dernière vérification %s.</string>
     <string name="new_update_found">Une nouvelle mise à jour a été trouvée !</string>
@@ -107,7 +111,6 @@
     <string name="show_on_maps">Afficher sur une autre carte</string>
     <string name="check_for_updates">Vérifier les mises à jour</string>
     <string name="download_update">Télécharger</string>
-    <string name="setting.category.about">A propos</string>
     <string name="source_code">Code source</string>
     <string name="created_by">Crée par Geming400</string>
     <string name="no_app_for_intent">Aucune application peut ouvrir ceci !</string>
