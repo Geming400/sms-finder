@@ -52,7 +52,6 @@ import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.ui.activities.MainActivity
 import fr.geming400.localisationhelper.ui.activities.PermissionsWithCallbackActivity
 import fr.geming400.localisationhelper.ui.settings.Setting
-import fr.geming400.localisationhelper.ui.settings.Settings
 import fr.geming400.localisationhelper.ui.theme.Colors
 import fr.geming400.localisationhelper.ui.theme.Red80
 import fr.geming400.localisationhelper.utils.Utils
