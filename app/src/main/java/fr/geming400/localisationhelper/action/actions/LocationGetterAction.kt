@@ -86,7 +86,8 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
         pendingResult: PendingResult,
         stage: Stage,
         trackingData: TrackingData,
-        rawContent: String
+        rawContent: String,
+        privateKey: String
     ) {
         val jsonDataStore = JsonDataStore(context)
         if (stage == Stage.RECEIVE_HOST) {
@@ -106,7 +107,7 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
                 }
             }
         } else {
-            this.sendDataSMS(context, sender, trackingData.privateKey!!)
+            this.sendDataSMS(context, sender, privateKey)
         }
     }
 }

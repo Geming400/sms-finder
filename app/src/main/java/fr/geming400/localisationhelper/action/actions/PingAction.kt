@@ -29,7 +29,8 @@ class PingAction(name: String) : VoidAction(name) {
         pendingResult: BroadcastReceiver.PendingResult,
         stage: Stage,
         trackingData: TrackingData,
-        rawContent: String
+        rawContent: String,
+        privateKey: String
     ) {
         if (stage == Stage.RECEIVE_HOST) {
             val jsonDataStore = JsonDataStore(context)
@@ -44,7 +45,7 @@ class PingAction(name: String) : VoidAction(name) {
                 }
             }
         } else {
-            this.sendDataSMS(context, sender, trackingData.privateKey!!)
+            this.sendDataSMS(context, sender, privateKey)
         }
     }
 

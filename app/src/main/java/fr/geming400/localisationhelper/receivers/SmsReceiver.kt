@@ -76,6 +76,8 @@ class SmsReceiver : BroadcastReceiver() {
 
                     val iv = base64Decoded.decode(parts[1])
 
+                    Log.i("Decryption", "Private keys are ${contactInfo.privateKeys}")
+
                     // This second part is in the format "actionName:payloadData"
                     // if the payload type is DATA.
                     // However, if it's INSTRUCTION, then it's "actionName"
@@ -100,13 +102,24 @@ class SmsReceiver : BroadcastReceiver() {
                         try {
                             val action = Actions.getByNameTypeless(actionName)!!
                             if (payloadType == PayloadType.DATA && action.canSendDataPayload(context)) {
-                                Actions.getByNameTypeless(actionName)?.onReceive(
+                                action.onReceive(
                                     context,
                                     sender,
                                     pendingResult,
                                     BaseAction.Stage.fromPayloadType(payloadType),
                                     contactInfo.trackingData,
-                                    actionDataPayload ?: ""
+                                    actionDataPayload ?: "",
+                                    privateKey
+                                )
+                            } else if (payloadType != PayloadType.DATA) {
+                                action.onReceive(
+                                    context,
+                                    sender,
+                                    pendingResult,
+                                    BaseAction.Stage.fromPayloadType(payloadType),
+                                    contactInfo.trackingData,
+                                    actionDataPayload ?: "",
+                                    privateKey
                                 )
                             }
                         } finally {
@@ -133,7 +146,7 @@ class SmsReceiver : BroadcastReceiver() {
          * @throws NullPointerException if the returned private key is null
          */
         fun getRightPrivateKey(payloadType: PayloadType): String {
-            return if (payloadType == PayloadType.INSTRUCTION) {
+            return if (payloadType == PayloadType.DATA) {
                 this.trackedContactKey!!
             } else {
                 this.thisPhoneKey!!

@@ -144,7 +144,8 @@ public abstract class BaseAction<T, P> {
             @NonNull BroadcastReceiver.PendingResult pendingResult,
             @NonNull Stage stage,
             @NonNull TrackingData trackingData,
-            @NonNull String rawContent
+            @NonNull String rawContent,
+            @NonNull String encryptionPrivateKey
     );
 
     public boolean canSendDataPayload(Context context) {

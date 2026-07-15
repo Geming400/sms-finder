@@ -1,5 +1,7 @@
 package fr.geming400.localisationhelper.utils;
 
+import android.util.Log;
+
 import java.nio.charset.StandardCharsets;
 import java.security.AlgorithmParameters;
 import java.security.GeneralSecurityException;
@@ -30,6 +32,7 @@ public final class SmsCryptography {
 
     // https://stackoverflow.com/questions/992019/java-256-bit-aes-password-based-encryption
     public static EncryptedContent encryptContent(byte[] content, String password, byte[] salt) {
+        Log.i("Encryption", "Encrypting with password " + password);
         SecretKey key = getPasswordSecretKey(password.toCharArray(), salt);
 
         try {
@@ -46,6 +49,7 @@ public final class SmsCryptography {
     // https://stackoverflow.com/questions/992019/java-256-bit-aes-password-based-encryption
     public static String decryptContent(byte[] content, byte[] iv, String password, byte[] salt) {
         SecretKey key = getPasswordSecretKey(password.toCharArray(), salt);
+        Log.i("Decryption", "Decrypting with password " + password);
 
         try {
             Cipher cipher = Cipher.getInstance(CRYPTO_ALGORITHM);

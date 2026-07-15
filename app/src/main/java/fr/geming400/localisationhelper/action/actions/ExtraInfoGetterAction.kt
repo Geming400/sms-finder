@@ -56,7 +56,8 @@ class ExtraInfoGetterAction(name: String) : Action<ExtraInfo>(name, Settings.EXT
         pendingResult: BroadcastReceiver.PendingResult,
         stage: Stage,
         trackingData: TrackingData,
-        rawContent: String
+        rawContent: String,
+        privateKey: String
     ) {
         val jsonDataStore = JsonDataStore(context)
         if (stage == Stage.RECEIVE_HOST) {
@@ -73,7 +74,7 @@ class ExtraInfoGetterAction(name: String) : Action<ExtraInfo>(name, Settings.EXT
                 }
             }
         } else {
-            this.sendDataSMS(context, sender, trackingData.privateKey!!)
+            this.sendDataSMS(context, sender, privateKey)
         }
     }
 

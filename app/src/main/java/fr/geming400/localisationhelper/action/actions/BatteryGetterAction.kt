@@ -54,7 +54,8 @@ class BatteryGetterAction(name: String): Action<Float>(name, Settings.BATTERY) {
         pendingResult: BroadcastReceiver.PendingResult,
         stage: Stage,
         trackingData: TrackingData,
-        rawContent: String
+        rawContent: String,
+        privateKey: String
     ) {
         val jsonDataStore = JsonDataStore(context)
         if (stage == Stage.RECEIVE_HOST) {
@@ -71,7 +72,7 @@ class BatteryGetterAction(name: String): Action<Float>(name, Settings.BATTERY) {
                 }
             }
         } else {
-            this.sendDataSMS(context, sender, trackingData.privateKey!!)
+            this.sendDataSMS(context, sender, privateKey)
         }
     }
 }
