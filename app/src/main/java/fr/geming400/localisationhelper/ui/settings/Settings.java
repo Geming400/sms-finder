@@ -23,7 +23,7 @@ public final class Settings {
     public static final Map<String, Setting<?>> SETTINGS = new HashMap<>();
 
     public static final Setting.BooleanSetting GLOBAL_ENABLE = register(
-            Setting.ofBoolean("global_enable", false),
+            Setting.ofBoolean("global_enable", true),
             Setting.Category.GLOBAL,
             R.string.setting_global_enable_name,
             R.string.setting_global_enable_description
