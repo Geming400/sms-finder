@@ -124,7 +124,7 @@ class UserTrackingActivity : ComponentActivity() {
         val contactID = bundle.getLong("contactID")
 
         Log.i(LogTags.USER_TRACKING, "Fetching contact from which this activity was started")
-        contact = getContact(LookupQuery.LookupKeyWithId(lookupKey, contactID))
+        this.contact = getContact(LookupQuery.LookupKeyWithId(lookupKey, contactID))
         Log.i(LogTags.USER_TRACKING, "Found contact $contact !")
 
         enableEdgeToEdge()
@@ -464,6 +464,13 @@ private fun DeleteContactDialog(
 
                     runBlocking {
                         if (jsonDataStore.removeTrackedContact(contact)) {
+                            val appData = context.dataStore.data.first()
+                            context.dataStore.updateData {
+                                it.copy(
+                                    lastAccessedContacts = appData.lastAccessedContacts - contact.lookupKey!!
+                                )
+                            }
+
                             context.startActivity(Intent(context, TrackingActivity::class.java))
                         } else {
                             val deleteErrorMsg = resources.getString(R.string.delete_error, contact.displayNamePrimary)
