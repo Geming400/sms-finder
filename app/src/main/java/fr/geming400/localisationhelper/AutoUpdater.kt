@@ -134,31 +134,6 @@ object AutoUpdater {
 
         val installer = context.packageManager.packageInstaller
 
-        // TODO: Maybe ?
-//        installer.registerSessionCallback(object : PackageInstaller.SessionCallback() {
-//            override fun onActiveChanged(sessionId: Int, active: Boolean) {
-//                if (active) {
-//                    _uiState.tryEmit(LauncherUpdateState.Active)
-//                } else {
-//                    _uiState.tryEmit(LauncherUpdateState.Began)
-//                }
-//            }
-//
-//            override fun onBadgingChanged(sessionId: Int) {}
-//
-//            override fun onCreated(sessionId: Int) {
-//                _uiState.tryEmit(LauncherUpdateState.Began)
-//            }
-//
-//            override fun onFinished(sessionId: Int, success: Boolean) {
-//                _uiState.tryEmit(LauncherUpdateState.Finished)
-//            }
-//
-//            override fun onProgressChanged(sessionId: Int, progress: Float) {
-//                _uiState.tryEmit(LauncherUpdateState.Active)
-//            }
-//        })
-
         setState(UpdaterState.INSTALLING)
         withContext(Dispatchers.IO) {
             runInterruptible {

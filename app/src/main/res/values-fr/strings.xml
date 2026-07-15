@@ -111,4 +111,5 @@
     <string name="source_code">Code source</string>
     <string name="created_by">Crée par Geming400</string>
     <string name="no_app_for_intent">Aucune application peut ouvrir ceci !</string>
+    <string name="app_update_failed">Mise à jour de l\'appli non réussie: %s</string>
 </resources>

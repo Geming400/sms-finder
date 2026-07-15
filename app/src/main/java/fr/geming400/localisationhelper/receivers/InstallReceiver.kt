@@ -6,9 +6,11 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import fr.geming400.localisationhelper.AutoUpdater
 import fr.geming400.localisationhelper.AutoUpdater.setState
 import fr.geming400.localisationhelper.LogTags
+import fr.geming400.localisationhelper.R
 import kotlinx.coroutines.runBlocking
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.isRegularFile
@@ -40,10 +42,8 @@ class InstallReceiver : BroadcastReceiver() {
                 val msg = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
                 Log.e(LogTags.AUTO_UPDATER, "failed to install update: $status, $msg")
 
-                // TODO
-//                val message = context.getString(R.string.launcher_self_update_failed, msg)
-//                Toast.makeText(context, message, Toast.LENGTH_SHORT)
-//                    .show()
+                val message = context.getString(R.string.app_update_failed, msg)
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             }
         }
     }
