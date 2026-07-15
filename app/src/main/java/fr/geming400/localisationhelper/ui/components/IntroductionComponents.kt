@@ -51,6 +51,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.ui.activities.MainActivity
 import fr.geming400.localisationhelper.ui.activities.PermissionsWithCallbackActivity
+import fr.geming400.localisationhelper.ui.settings.Setting
 import fr.geming400.localisationhelper.ui.settings.Settings
 import fr.geming400.localisationhelper.ui.theme.Colors
 import fr.geming400.localisationhelper.ui.theme.Red80
@@ -404,7 +405,7 @@ private fun ActionSettingsMainComponent(): Boolean {
         textAlign = TextAlign.Center
     )
 
-    for (setting in Settings.getSettings()) {
+    for (setting in Setting.Category.ACTIONS.settings) {
         if (setting.isActionsDependant) {
             SettingItem(setting = setting)
         }
