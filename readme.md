@@ -7,5 +7,4 @@ I will work on this later.
 
 ## TODO:
 - Logs in `MainActivity` (eg: `[timestamp] x ask for your location`) (very much not a priority)
-- Finish `AutoUpdater`
-- Add links in `SettingsActivity` (issue, source code, saying that I created it)
+- Finish setting up CI (Github Actions)
