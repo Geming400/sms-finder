@@ -22,6 +22,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.Scaffold
@@ -37,7 +38,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -157,7 +157,10 @@ private fun LocalisationHelperApp(appData: LocalisationHelperData) {
                     .padding(innerPadding)
                     .verticalScroll(scrollState)
             ) {
-                Card(Modifier.padding(12.dp)) {
+                Card(
+                    modifier = Modifier.padding(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                ) {
                     Text(
                         modifier = Modifier
                             .centerHorizontally()
@@ -165,7 +168,7 @@ private fun LocalisationHelperApp(appData: LocalisationHelperData) {
                         text = stringResource(R.string.leak_pii_disclaimer),
                         textAlign = TextAlign.Center,
                         fontSize = 4.em,
-                        color = Color.Red
+                        color = MaterialTheme.colorScheme.onErrorContainer
                     )
                 }
 
