@@ -93,9 +93,8 @@ class MainActivity : PermissionsWithCallbackActivity() {
                             }
                         }
                     } else {
-                        var hasCheckedForUpdates by rememberSaveable { mutableStateOf(false) }
-                        if (!hasCheckedForUpdates) {
-                            hasCheckedForUpdates = true
+                        if (!AutoUpdater.hasDoneInitCheck) {
+                            AutoUpdater.hasDoneInitCheck = true
                             this.checkForUpdates()
                         }
 

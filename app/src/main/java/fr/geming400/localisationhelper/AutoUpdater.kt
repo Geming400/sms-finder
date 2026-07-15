@@ -40,8 +40,9 @@ object AutoUpdater {
     private var repo: GHRepository? = null
     private var foundUpdate: Boolean = false
     private var currentState: UpdaterState = UpdaterState.IDLE
+    var hasDoneInitCheck: Boolean = false
 
-    fun getApkInstallDir(context: Context) = context.filesDir
+    fun getApkInstallDir(context: Context): File = context.filesDir
 
     /**
      * Checks for an app update
