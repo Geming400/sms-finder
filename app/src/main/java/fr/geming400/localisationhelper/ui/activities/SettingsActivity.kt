@@ -57,6 +57,9 @@ class SettingsActivity : PermissionsWithCallbackActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // TODO: Add global "Enable" setting to
+        // be able to see that you can actually scroll down
+
         enableEdgeToEdge()
         setContent {
             this.snackbarHostState = remember { SnackbarHostState() }
@@ -75,8 +78,8 @@ class SettingsActivity : PermissionsWithCallbackActivity() {
                                     UpdateChecker()
                                 }
 
-                                SettingsCategory(title = stringResource(R.string.setting_category_links)) {
-                                    Links()
+                                SettingsCategory(title = stringResource(R.string.setting_category_about)) {
+                                    AboutCategory()
                                 }
 
                                 SettingsCategory(title = stringResource(R.string.setting_category_debug)) {
@@ -202,7 +205,7 @@ private fun UpdateChecker() {
 }
 
 @Composable
-private fun Links() {
+private fun AboutCategory() {
     val context = LocalContext.current
 
     Box(
@@ -235,7 +238,7 @@ private fun Links() {
                 Image(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(R.drawable.ic_github),
-                    contentDescription = stringResource(R.string.github_icon)
+                    contentDescription = null
                 )
 
                 Spacer(Modifier.width(12.dp))
