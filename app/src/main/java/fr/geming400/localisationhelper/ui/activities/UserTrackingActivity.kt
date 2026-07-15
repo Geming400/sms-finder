@@ -33,12 +33,14 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -61,8 +63,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import contacts.core.Contacts
 import contacts.core.LookupQuery
 import contacts.core.entities.Contact
@@ -90,6 +94,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.maplibre.compose.camera.CameraPosition
+import org.maplibre.compose.camera.CameraState
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.image
@@ -103,11 +108,10 @@ import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.spatialk.geojson.Position
 import kotlin.time.Duration.Companion.seconds
-import androidx.core.net.toUri
-import org.maplibre.compose.camera.CameraState
 
 // TODO: Use snackbar when sending action request (?)
 // TODO: Add contact dependant settings
+// TODO: Allow the user to disable a contact without removing it
 class UserTrackingActivity : ComponentActivity() {
     lateinit var contact: Contact
     lateinit var snackbarHostState: SnackbarHostState
@@ -233,6 +237,37 @@ private fun MainUserTrackingComponent(
             .padding(innerPadding)
             .verticalScroll(scrollState)
     ) {
+        if (!trackedContactInfo.hasSeenShouldGetAddedOnBothDevicesDisclaimer) {
+            Card(
+                modifier = Modifier.padding(12.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .centerHorizontally(),
+                    text = stringResource(R.string.mutual_contact_adding_disclaimer),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+
+                Button(
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .centerHorizontally(),
+                    onClick = {
+                        runBlocking {
+                            jsonDataStore.updateTrackedContact(contact) {
+                                it.copy(hasSeenShouldGetAddedOnBothDevicesDisclaimer = true)
+                            }
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.hide))
+                }
+            }
+        }
+
         var shouldShowPrivateKeyChangeDialog by remember { mutableStateOf(false) }
         var shouldShowContactDeletionDialog by remember { mutableStateOf(false) }
         when {

@@ -115,4 +115,6 @@
     <string name="created_by">Created by Geming400</string>
     <string name="no_app_for_intent">No apps can open this !</string>
     <string name="app_update_failed">App update failed: %s</string>
+    <string name="hide">Hide</string>
+    <string name="mutual_contact_adding_disclaimer">For you to be able to ask for information about this contact, they must add you back !</string>
 </resources>
