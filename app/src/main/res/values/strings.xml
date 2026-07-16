@@ -6,6 +6,7 @@
     <string name="linked_phone_number">Linked phone number</string>
     <string name="unknown_contact">Unknown contact</string>
     <string name="content_description_click_to_expand">Click to expand</string>
+    <string name="content_description_click_to_minimize">Click to minimize</string>
     <string name="no_viable_phone_number_error">Please choose a valid phone number</string>
     <string name="back_button_exit">Use the back button to exit the map</string>
     <string name="has_no_valid_numbers_error">This contact has no valid phone numbers !</string>
@@ -123,4 +124,6 @@
     <string name="app_update_failed">App update failed: %s</string>
     <string name="hide">Hide</string>
     <string name="mutual_contact_adding_disclaimer">For you to be able to ask for information about this contact, they must add you back !</string>
+    <string name="content_description_show_password">Click to show password</string>
+    <string name="content_description_hide_password">Click to hide password</string>
 </resources>

@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import coil.compose.AsyncImage
@@ -237,9 +238,14 @@ fun PhoneNumberDropdown(
 
                 Icon(
                     painter = icon,
-                    contentDescription = stringResource(R.string.content_description_click_to_expand),
+                    contentDescription = stringResource(
+                        if (expanded)
+                            R.string.content_description_click_to_minimize
+                        else
+                            R.string.content_description_click_to_expand
+                    ),
                     modifier = Modifier
-                        .clickable { expanded = !expanded }
+                        .clickable(role = Role.Button) { expanded = !expanded }
                 )
             },
         )

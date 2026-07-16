@@ -10,11 +10,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.collection.OrderedScatterSet
 import androidx.collection.orderedScatterSetOf
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -24,11 +27,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedSecureTextField
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldLabelScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,7 +46,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -218,49 +226,86 @@ private fun PasswordInputField(modifier: Modifier = Modifier) {
     }
     val passwordInputState = rememberTextFieldState(if (isPasswordFieldEnabled) "" else "Hi this is a cool app")
 
+    var shouldShowPassword by remember { mutableStateOf(false) }
+
     Column(modifier = modifier) {
-        OutlinedSecureTextField(
-            state = passwordInputState,
-            label = { Text(stringResource(R.string.enter_password)) },
-            enabled = isPasswordFieldEnabled,
-            isError = !Utils.isPasswordValid(passwordInputState.text) && isPasswordFieldEnabled
-        )
+        val isPasswordValid = !Utils.isPasswordValid(passwordInputState.text) && isPasswordFieldEnabled
+        val textFieldLabel: @Composable (TextFieldLabelScope.() -> Unit) = { Text(stringResource(R.string.enter_password)) }
+        val trailingIcon: @Composable (() -> Unit) = {
+            if (isPasswordFieldEnabled) {
+                Icon(
+                    modifier = Modifier
+                        .clickable(role = Role.Button) { shouldShowPassword = !shouldShowPassword }
+                        .alpha(if (shouldShowPassword) 0.7f else 1.0f),
+                    painter = painterResource(R.drawable.ic_eye),
+                    contentDescription = stringResource(R.string.content_description_click_to_expand)
+                )
+            }
+        }
+
+        if (shouldShowPassword) {
+            OutlinedTextField(
+                state = passwordInputState,
+                label = textFieldLabel,
+                enabled = isPasswordFieldEnabled,
+                isError = isPasswordValid,
+                trailingIcon = trailingIcon
+            )
+        } else {
+            OutlinedSecureTextField(
+                state = passwordInputState,
+                label = textFieldLabel,
+                enabled = isPasswordFieldEnabled,
+                isError = isPasswordValid,
+                trailingIcon = trailingIcon
+            )
+        }
 
         Spacer(Modifier.height(10.dp))
 
-        Button(
-            onClick = {
-                isPasswordFieldEnabled = false
+        Row {
+            Button(
+                onClick = {
+                    isPasswordFieldEnabled = false
+                    shouldShowPassword = false
 
-                runBlocking {
-                    context.dataStore.updateData {
-                        it.copy(passwordHash = Utils.hashString("SHA-256", (passwordInputState.text as String).toByteArray()))
+                    runBlocking {
+                        context.dataStore.updateData {
+                            it.copy(
+                                passwordHash = Utils.hashString(
+                                    "SHA-256",
+                                    (passwordInputState.text as String).toByteArray()
+                                )
+                            )
+                        }
                     }
-                }
-            },
-            enabled = isPasswordFieldEnabled && Utils.isPasswordValid(passwordInputState.text)
-        ) {
-            Text(stringResource(R.string.save_password))
-        }
+                },
+                enabled = isPasswordFieldEnabled && Utils.isPasswordValid(passwordInputState.text)
+            ) {
+                Text(stringResource(R.string.save_password))
+            }
 
-        Button(
-            onClick = {
-                runBlocking {
-                    context.dataStore.updateData {
-                        it.copy(passwordHash = null)
+            Spacer(Modifier.width(10.dp))
+
+            Button(
+                onClick = {
+                    runBlocking {
+                        context.dataStore.updateData {
+                            it.copy(passwordHash = null)
+                        }
                     }
-                }
 
-                passwordInputState.clearText()
-                isPasswordFieldEnabled = true
-            },
-            enabled = !isPasswordFieldEnabled,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.error
-            )
-        ) {
-            Text(stringResource(R.string.reset_password))
+                    passwordInputState.clearText()
+                    isPasswordFieldEnabled = true
+                },
+                enabled = !isPasswordFieldEnabled,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text(stringResource(R.string.reset_password))
+            }
         }
     }
 }

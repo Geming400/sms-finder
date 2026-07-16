@@ -6,6 +6,7 @@
     <string name="linked_phone_number">Numéro de tel. rélié</string>
     <string name="unknown_contact">Contact inconnu</string>
     <string name="content_description_click_to_expand">Cliquez pour étendre</string>
+    <string name="content_description_click_to_minimize">Cliquer pour minimizer</string>
     <string name="no_viable_phone_number_error">Choisissez un numéro de tel. valide</string>
     <string name="back_button_exit">Utiliser le boutton de retour pour sortir de la carte</string>
     <string name="has_no_valid_numbers_error">Ce contact n\'a aucun numéro de tel. valide !</string>
@@ -124,4 +125,6 @@
     <string name="app_update_failed">Mise à jour de l\'appli non réussie: %s</string>
     <string name="hide">Cacher</string>
     <string name="mutual_contact_adding_disclaimer">Pour être capable de demander des infos à propos de ce contact, il doit aussi vous rajouter !</string>
+    <string name="content_description_show_password">Cliquez pour afficher le mot de passe</string>
+    <string name="content_description_hide_password">Cliquez pour cacher le mot de passe</string>
 </resources>
