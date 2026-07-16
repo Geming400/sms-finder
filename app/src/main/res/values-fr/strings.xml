@@ -26,7 +26,12 @@
     </string>
     <string name="app_as_bg_service_notice">
         Pour que cette appli fonctionne correctement, vous devez vous assurer que cette appli peut s\'éxécuter comme tache de fond.\n
-        Cela est nécessaire au fonctionnement principal de l\'application : récupérer des sms pour éxecuter certaines actions.
+        Cela est nécessaire au fonctionnement principal de l\'application : récupérer des sms pour éxecuter certaines actions.\n\n
+
+        Cela est générallement fait dans les paramètres de batteries de l\'application, mais si ce n\'est pas le cas:\n
+        - Regarder sur la faq d\'android\n
+        - Regarder sur le site de la marque de votre téléphone\n
+        - Rechercher comment faire en ligne
     </string>
     <string name="warning">Attention !</string>
     <string name="go_back">Retour</string>

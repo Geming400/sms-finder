@@ -26,7 +26,12 @@
     </string>
     <string name="app_as_bg_service_notice">
         For this app to work properly, you must make this app is allowed to execute in the background.\n
-        This is necessary for this app\'s primary goal: pick up sms to execute actions.
+        This is necessary for this app\'s primary goal: pick up sms to execute actions.\n\n
+
+        This can generally be done in the app\'s battery setting, if not:
+        - Check the android faq\n
+        - Check on your phone\'s manufacturer faq/website.\n
+        - Check online
     </string>
     <string name="warning">Warning !</string>
     <string name="go_back">Go back</string>
