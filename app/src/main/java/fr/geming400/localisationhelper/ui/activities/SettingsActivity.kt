@@ -126,6 +126,8 @@ private fun UpdateChecker() {
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val txtModifier = Modifier.padding(4.dp)
+
         ElevatedCard(Modifier.padding(horizontal = 6.dp, vertical = 10.dp)) {
             Column(
                 modifier = Modifier
@@ -133,8 +135,29 @@ private fun UpdateChecker() {
                     .padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val txtModifier = Modifier.padding(4.dp)
+                val packageInfo = activity.packageManager.getPackageInfo(activity.packageName, 0)
 
+                Text(
+                    modifier = txtModifier,
+                    text = stringResource(R.string.app_version, packageInfo.versionName ?: "NO VERSION NAME"),
+                    textAlign = TextAlign.Center
+                )
+
+                Text(
+                    modifier = txtModifier,
+                    text = stringResource(R.string.app_version_code, packageInfo.longVersionCode),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        ElevatedCard(Modifier.padding(horizontal = 6.dp, vertical = 10.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     modifier = txtModifier,
                     text = if (AutoUpdater.hasFoundUpdate())
@@ -151,7 +174,8 @@ private fun UpdateChecker() {
                         textAlign = TextAlign.Center
                     )
 
-                val updaterState by AutoUpdater.stateFlow.collectAsState(AutoUpdater.getCurrentState(), coroutineScope.coroutineContext)
+                val updaterState by AutoUpdater.stateFlow
+                    .collectAsState(AutoUpdater.getCurrentState(), coroutineScope.coroutineContext)
                 if (updaterState.getLocalisedMessage() != null)
                     Text(
                         modifier = txtModifier,

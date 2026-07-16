@@ -126,4 +126,6 @@
     <string name="mutual_contact_adding_disclaimer">For you to be able to ask for information about this contact, they must add you back !</string>
     <string name="content_description_show_password">Click to show password</string>
     <string name="content_description_hide_password">Click to hide password</string>
+    <string name="app_version">App\'s version: %s</string>
+    <string name="app_version_code">App\'s version code: %s</string>
 </resources>
