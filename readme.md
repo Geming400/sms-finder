@@ -7,4 +7,4 @@ I will work on this later.
 
 ## TODO:
 - Logs in `MainActivity` (eg: `[timestamp] x ask for your location`) (very much not a priority)
-- Finish setting up CI (Github Actions)
+- Remove github api lib and do raw requests to reduce the binary size but a little
