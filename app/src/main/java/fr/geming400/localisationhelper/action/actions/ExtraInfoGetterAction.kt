@@ -24,15 +24,14 @@ typealias GlobalSettings = android.provider.Settings.Global
 
 class ExtraInfoGetterAction(name: String) : Action<ExtraInfo>(name, Settings.EXTRA_INFO) {
     override fun serializeResult(obj: ExtraInfo): String =
-        "${obj.isAirplaneModeEnabled.toInt()};${obj.isMobileDataEnabled.toInt()};${obj.isDndEnabled.toInt()}"
+        "${obj.isMobileDataEnabled.toInt()};${obj.isDndEnabled.toInt()}"
 
     override fun parse(rawContent: String): ExtraInfo {
         val vars = rawContent.split(";")
 
         return ExtraInfo(
             vars[0].toBoolFromInt(),
-            vars[1].toBoolFromInt(),
-            vars[2].toBoolFromInt()
+            vars[1].toBoolFromInt()
         )
     }
 
@@ -43,7 +42,6 @@ class ExtraInfoGetterAction(name: String) : Action<ExtraInfo>(name, Settings.EXT
             val notificationManager = context.getSystemService(NotificationManager::class.java)
 
             ExtraInfo(
-                this.getBoolSetting(context, GlobalSettings.AIRPLANE_MODE_ON),
                 telephonyManager.isDataEnabled,
                 notificationManager.currentInterruptionFilter == NotificationManager.INTERRUPTION_FILTER_PRIORITY
             )
@@ -77,7 +75,4 @@ class ExtraInfoGetterAction(name: String) : Action<ExtraInfo>(name, Settings.EXT
             this.sendDataSMS(context, sender, privateKey)
         }
     }
-
-    private fun getBoolSetting(context: Context, setting: String): Boolean =
-        SystemSettings.getInt(context.contentResolver, setting, 0) != 0
 }
