@@ -535,6 +535,9 @@ private fun UserLocationMap(
     trackingData: TrackingData,
     onHideMap: () -> Unit
 ) {
+    val context = LocalContext.current
+    val resources = LocalResources.current
+
     if (trackingData.geolocation == null) {
         onHideMap()
     } else {
@@ -604,7 +607,6 @@ private fun UserLocationMap(
 
                                 Spacer(Modifier.height(3.dp))
 
-                                val context = LocalContext.current
                                 Button(
                                     onClick = {
                                         val clipboard = context.getSystemService(ClipboardManager::class.java)
@@ -624,9 +626,16 @@ private fun UserLocationMap(
                                 Button(
                                     onClick = {
                                         try {
+                                            val latitude = trackingData.geolocation.value.latitude
+                                            val longitude = trackingData.geolocation.value.longitude
+
+                                            val mapLabel = resources.getString(
+                                                R.string.user_location_map,
+                                                trackingData.getContact(context).displayNamePrimary
+                                            )
                                             val mapIntent = Intent(
                                                 Intent.ACTION_VIEW,
-                                                "geo:${trackingData.geolocation.value.latitude},${trackingData.geolocation.value.longitude}?z=${cameraState.position.zoom}".toUri()
+                                                "geo:$latitude,$longitude?q=$latitude,$longitude($mapLabel)".toUri()
                                             )
 
                                             context.startActivity(mapIntent)

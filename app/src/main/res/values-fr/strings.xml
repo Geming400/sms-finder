@@ -134,4 +134,5 @@
     <string name="content_description_hide_password">Cliquez pour cacher le mot de passe</string>
     <string name="app_version">Version de l\'application : %s</string>
     <string name="app_version_code">Code de version de l\'application : %s</string>
+    <string name="user_location_map">Position de %s</string>
 </resources>
