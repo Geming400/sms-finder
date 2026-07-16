@@ -5,7 +5,6 @@ on:
   
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -19,5 +18,13 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+      
     - name: Build with Gradle
       run: ./gradlew build
+
+    - name: Upload APK Debug
+      uses: actions/upload-artifact@v5
+      with:
+        name: smsfinder-debug
+        path: app/build/outputs/apk/**/debug/*.apk
+        
