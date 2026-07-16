@@ -18,8 +18,14 @@
     <string name="cancel">Annuler</string>
     <string name="xiaomi_notice">
         Téléphone Xiaomi detecté !\n\n
-        Pour que cette appli fonctionne correctement, vous devez l\'autoriser à s\'éxécuter comme tache de fond.\n\n
-        Pour faire ceci, dirigez vous dans l\'appli \"Sécurité\", puis dans l\'onglet \"Gérer les applications\", puis dans \"Démarrage automatique en arrière-plan\" et cochez \"SMS Finder\"
+        Pour que cette appli fonctionne correctement, vous devez l\'autoriser à s\'éxécuter comme tache de fond.\n
+        Cela est nécessaire au fonctionnement principal de l\'application : récupérer des sms pour éxecuter certaines actions.\n\n
+
+        Pour faire ceci, dirigez-vous dans l\'appli \"Sécurité\", puis dans l\'onglet \"Gérer les applications\", puis dans \"Démarrage automatique en arrière-plan\" et cochez \"SMS Finder\"
+    </string>
+    <string name="app_as_bg_service_notice">
+        Pour que cette appli fonctionne correctement, vous devez vous assurer que cette appli peut s\'éxécuter comme tache de fond.\n
+        Cela est nécessaire au fonctionnement principal de l\'application : récupérer des sms pour éxecuter certaines actions.
     </string>
     <string name="warning">Attention !</string>
     <string name="go_back">Retour</string>
@@ -51,9 +57,10 @@
     <string name="introduction.steps.introduction.how_does_this_work">Comment cela fonctionne ?</string>
     <string name="introduction.steps.introduction.how_does_this_work_content">
         Vous devez d\'abord selectionner un mot de passe (clé privée) puis rajouter des contacts et depuis là, vous pourrez ensuite leurs envoyer des actions.\n
-        Mais pour que ceci fonctionne, vous devez rajouter VOTRE contact sur un des autres téléphones pour ensuite envoyer des actions, si elles ont été activées.\n\n
+        Mais pour que ceci fonctionne, les deux téléphones doivent avoir le contact de l\'autre rajouté pour ensuite envoyer des actions,
+        si elles ont été activées.\n\n
 
-        Une fois configurée, si vous envoyez des actions, le protocole SMS sera utilisé au lieu d\'utiliser un serveur externe.\n
+        Une fois configurée, si vous envoyez des actions, le protocole SMS sera utilisé au lieu d\'un serveur externe.\n
         Les données envoyées sont encryptées.
     </string>
     <string name="next">Suivant</string>

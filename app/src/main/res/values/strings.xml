@@ -18,8 +18,14 @@
     <string name="cancel">Cancel</string>
     <string name="xiaomi_notice">
         Xiaomi phone detected!\n\n
-        For this app to work properly you must allow it to execute in the background.\n\n
+        For this app to work properly, you must allow it to execute in the background.\n
+        This is necessary for this app\'s primary goal: pick up sms to execute actions.\n\n
+
         To do this, go to the \"Security\" app, then to the \"Manage apps\" tab, then to the \"Automatic startup\" one and check \"SMS Finder\"
+    </string>
+    <string name="app_as_bg_service_notice">
+        For this app to work properly, you must make this app is allowed to execute in the background.\n
+        This is necessary for this app\'s primary goal: pick up sms to execute actions.
     </string>
     <string name="warning">Warning !</string>
     <string name="go_back">Go back</string>
@@ -52,7 +58,7 @@
     <string name="introduction.steps.introduction.how_does_this_work">How does this work ?</string>
     <string name="introduction.steps.introduction.how_does_this_work_content">First of all you select a password (aka a private key),
         add new contacts and from there you can send actions to them (they need to have this app installed)\n
-        For it to actually work, you need to add YOUR contact on the other phone and from there, actions will get sent through if enabled.\n\n
+        For it to actually work, both phones need to have the other\'s one contact added and actions will get sent through if enabled.\n\n
 
         Once configured, if you send actions it will get sent through as an SMS instead of relying on any external server.\n
         The data that\'s sent is encrypted.

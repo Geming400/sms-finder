@@ -3,6 +3,7 @@ package fr.geming400.localisationhelper.ui.activities
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -135,14 +136,14 @@ class MainActivity : PermissionsWithCallbackActivity() {
 private fun LocalisationHelperApp(appData: LocalisationHelperData) {
     val context = LocalContext.current
 
-    var openXiaomiNoticeDialog by rememberSaveable { mutableStateOf(!appData.sawXiaomiNotice) }
+    var openAppAsBgServiceNotice by rememberSaveable { mutableStateOf(!appData.sawBgServiceNotice) }
     when {
-        openXiaomiNoticeDialog -> {
-            XiaomiNoticeDialog() {
-                openXiaomiNoticeDialog = false
+        openAppAsBgServiceNotice -> {
+            AppAsBgServiceNotice() {
+                openAppAsBgServiceNotice = false
                 runBlocking {
                     context.dataStore.updateData {
-                        it.copy(sawXiaomiNotice = true)
+                        it.copy(sawBgServiceNotice = true)
                     }
                 }
             }
@@ -265,10 +266,12 @@ private fun PasswordInputField(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun XiaomiNoticeDialog(
+private fun AppAsBgServiceNotice(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit
 ) {
+    val hasXiaomiPhone = Build.MANUFACTURER == "Xiaomi"
+
     AlertDialog(
         modifier = modifier,
         onDismissRequest = {
@@ -278,7 +281,14 @@ private fun XiaomiNoticeDialog(
             Text(stringResource(R.string.warning))
         },
         text = {
-            Text(stringResource(R.string.xiaomi_notice))
+            Text(
+                stringResource(
+                    if (hasXiaomiPhone)
+                        R.string.xiaomi_notice
+                    else
+                        R.string.app_as_bg_service_notice
+                )
+            )
         },
         confirmButton = {
             TextButton(
