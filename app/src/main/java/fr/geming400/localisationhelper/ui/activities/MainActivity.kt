@@ -103,8 +103,8 @@ class MainActivity : PermissionsWithCallbackActivity() {
                             }
                         }
                     } else {
-                        if (!AutoUpdater.hasDoneInitCheck) {
-                            AutoUpdater.hasDoneInitCheck = true
+                        if (!AutoUpdater.hasDoneStartupCheck) {
+                            AutoUpdater.hasDoneStartupCheck = true
                             this.checkForUpdates()
                         }
 
