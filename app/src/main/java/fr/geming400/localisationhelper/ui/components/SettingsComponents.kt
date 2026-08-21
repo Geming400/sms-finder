@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.geming400.localisationhelper.R
@@ -122,12 +123,13 @@ private fun SettingDescription(modifier: Modifier = Modifier, description: Strin
     Text(
         modifier = modifier
             .centerHorizontally()
-            .padding(horizontal = 6.dp)
+            .padding(horizontal = 10.dp)
             .offset(y = (-10).dp),
         text = description,
         color = Color(180, 180, 180, 200),
-        maxLines = 1,
-        autoSize = TextAutoSize.StepBased(maxFontSize = 22.sp)
+        maxLines = 2,
+        autoSize = TextAutoSize.StepBased(maxFontSize = 22.sp),
+        textAlign = TextAlign.Center
     )
 }
 
