@@ -83,6 +83,7 @@ dependencies {
     implementation libs.accompanist.drawablepainter
     implementation libs.github.api
     implementation libs.java.semver
+    implementation libs.miui.autostart
 
     testImplementation libs.junit
 

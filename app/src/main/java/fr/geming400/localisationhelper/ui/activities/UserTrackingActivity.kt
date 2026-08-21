@@ -673,7 +673,7 @@ private fun ChangeContactPrivateKeyDialog(modifier: Modifier = Modifier, contact
                 onClick = {
                     runBlocking {
                         jsonDataStore.updateTrackedContact(contact) {
-                            trackedContactInfo.copy(privateKey = Utils.hashString("SHA-256", (privateKeyState.text as String).toByteArray()))
+                            trackedContactInfo.copy(privateKey = Utils.hashString("SHA-256", privateKeyState.text.toString().toByteArray()))
                         }
                     }
 

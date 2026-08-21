@@ -135,4 +135,8 @@
     <string name="app_version">Version de l\'application : %s</string>
     <string name="app_version_code">Code de version de l\'application : %s</string>
     <string name="user_location_map">Position de %s</string>
+    <string name="allow_execution_in_bg_prompt">Vous devez autoriser cette appli a s\'éxécuter en arrière-plan</string>
+    <string name="enable_xiaomi_autorun">Activer le démarrage automatique en arrière-plan</string>
+    <string name="disable_battery_optimizations">Désactiver les optimizations de batteries</string>
+    <string name="battery_optimization_notice">Cette appli à été faite pour ne pas consommer beaucoup de batterie une fois en arrière-plan. Désactiver les optimizations de batteries sont nécessaire mais ne vont pas vider votre batterie.</string>
 </resources>

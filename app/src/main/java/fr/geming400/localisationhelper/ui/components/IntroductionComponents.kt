@@ -1,7 +1,14 @@
 package fr.geming400.localisationhelper.ui.components
 
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
+import android.content.ComponentName
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.PowerManager
+import android.provider.Settings
+import android.util.Log
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -48,6 +55,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.ui.activities.MainActivity
 import fr.geming400.localisationhelper.ui.activities.PermissionsWithCallbackActivity
@@ -56,6 +64,8 @@ import fr.geming400.localisationhelper.ui.theme.Colors
 import fr.geming400.localisationhelper.ui.theme.Red80
 import fr.geming400.localisationhelper.utils.Utils
 import fr.geming400.localisationhelper.utils.centerHorizontally
+import xyz.kumaraswamy.autostart.Autostart
+
 
 @Composable
 fun MainIntroductionComponent(currentStepState: MutableState<Step>? = null, onEnd: () -> Unit = {}) {
@@ -168,6 +178,7 @@ private fun NextButton(modifier: Modifier = Modifier, currentStep: Step, isEnabl
 }
 
 @Composable
+@SuppressLint("ComposableNaming") // This is because we need to return something, however it's still a component
 private fun IntroductionMainComponent(): Boolean {
     Text(
         modifier = Modifier
@@ -197,12 +208,14 @@ private fun IntroductionMainComponent(): Boolean {
 }
 
 @Composable
+@SuppressLint("ComposableNaming") // This is because we need to return something, however it's still a component
 private fun PermissionMainComponent(): Boolean {
     val context = LocalContext.current
 
     Text(
         modifier = Modifier
-            .padding(8.dp),
+            .padding(8.dp)
+            .centerHorizontally(),
         text = stringResource(R.string.must_grant_permissions),
         textAlign = TextAlign.Center
     )
@@ -211,7 +224,127 @@ private fun PermissionMainComponent(): Boolean {
         PermissionButton(permission = it)
     }
 
-    return MainActivity.areAllPermissionsGranted(context)
+    // Battery optimization stuff
+
+    val hasXiaomiPhone = xyz.kumaraswamy.autostart.Utils.isOnMiui()
+    val packageName = context.packageName
+    val powerManager = context.getSystemService(PowerManager::class.java)
+
+    var isIgnoringBatteryOptimizations by remember(packageName) {
+        mutableStateOf(powerManager.isIgnoringBatteryOptimizations(packageName))
+    }
+
+    var isAutostartEnabled by remember(packageName) {
+        mutableStateOf(Autostart.isAutoStartEnabled(context))
+    }
+
+    // Live refresh for when the user goes to the
+    // settings/bg thing app
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                isIgnoringBatteryOptimizations = powerManager.isIgnoringBatteryOptimizations(packageName)
+                isAutostartEnabled = Autostart.isAutoStartEnabled(context)
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    HorizontalDivider(Modifier.padding(vertical = 4.dp))
+
+    Text(
+        modifier = Modifier
+            .padding(8.dp)
+            .centerHorizontally(),
+        text = stringResource(R.string.allow_execution_in_bg_prompt),
+        textAlign = TextAlign.Center
+    )
+
+    if (hasXiaomiPhone) {
+        Button(
+            modifier = Modifier
+                .padding(vertical = 8.dp, horizontal = 5.dp)
+                .centerHorizontally(),
+            onClick = {
+                val intent = Intent().apply {
+                    setComponent(ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity"))
+                }
+
+                context.startActivity(intent)
+            },
+            colors = getToggleableButtonColors(isAutostartEnabled),
+            enabled = !isAutostartEnabled
+        ) {
+            Text(
+                text = stringResource(R.string.enable_xiaomi_autorun),
+                fontWeight = if (isAutostartEnabled) FontWeight.Bold else null
+            )
+        }
+    }
+
+    Button(
+        modifier = Modifier
+            .padding(vertical = 8.dp, horizontal = 5.dp)
+            .centerHorizontally(),
+        onClick = {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri = Uri.fromParts("package", context.packageName, null)
+            intent.setData(uri)
+            context.startActivity(intent)
+
+            if (hasXiaomiPhone) {
+                try {
+                    val intent = Intent().apply {
+                        setComponent(
+                            ComponentName(
+                                "com.miui.securitycenter",
+                                "com.miui.powercenter.legacypowerrank.PowerDetailActivity"
+                            )
+                        )
+                    }
+
+                    Utils.addPackageData(context, intent)
+                    context.startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    Log.w(
+                        LogTags.INTRODUCTION,
+                        "There was no activity to handle 'com.miui.powercenter.legacypowerrank.PowerDetailActivity'. Opening base settings activity instead"
+                    )
+
+                    Utils.openSettingAppForContext(context)
+                }
+            } else {
+                Utils.openSettingAppForContext(context)
+            }
+        },
+        colors = getToggleableButtonColors(isIgnoringBatteryOptimizations),
+        enabled = !isIgnoringBatteryOptimizations
+    ) {
+        Text(
+            text = stringResource(R.string.disable_battery_optimizations),
+            fontWeight = if (isIgnoringBatteryOptimizations) FontWeight.Bold else null
+        )
+    }
+
+    Text(
+        modifier = Modifier
+            .padding(3.dp)
+            .centerHorizontally(),
+        text = stringResource(R.string.battery_optimization_notice),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.secondaryFixedDim
+    )
+
+    // We're not using Utils.canUseApp because it won't
+    // refresh state everytime the user
+    // goes into the setting app (aka i'm just lazy to make it change state)
+    return MainActivity.areAllPermissionsGranted(context) && isIgnoringBatteryOptimizations && isAutostartEnabled
 }
 
 @SuppressLint("RestrictedApi")
@@ -261,20 +394,11 @@ private fun PermissionButton(modifier: Modifier = Modifier, permission: String) 
     when {
         shouldShowGrantingDialog -> {
             GrantPermissionDialog(modifier, permission) {
+                @Suppress("AssignedValueIsNeverRead")
                 shouldShowGrantingDialog = false
             }
         }
     }
-
-    val buttonColors = if (isPermissionGranted)
-        ButtonDefaults.buttonColors(
-            disabledContainerColor = Colors.green()
-        )
-    else
-        ButtonDefaults.buttonColors(
-            containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.errorContainer else Red80,
-            contentColor = Color.White
-        )
 
     Button(
         modifier = modifier
@@ -284,14 +408,15 @@ private fun PermissionButton(modifier: Modifier = Modifier, permission: String) 
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                 activity.requestPermission(permission)
             } else if (!isPermissionGranted) {
+                @Suppress("AssignedValueIsNeverRead")
                 shouldShowGrantingDialog = true
             }
         },
-        colors = buttonColors,
+        colors = getToggleableButtonColors(isPermissionGranted),
         enabled = !isPermissionGranted
     ) {
         Text(
-            text = permissionName as String,
+            text = permissionName.toString(),
             fontWeight = if (isPermissionGranted) null else FontWeight.Bold
         )
     }
@@ -325,7 +450,7 @@ fun GrantPermissionDialog(modifier: Modifier = Modifier, permission: String, onE
                         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                             activity.requestPermission(permission)
                         } else {
-                            Utils.openSettingAppForActivity(activity)
+                            Utils.openSettingAppForContext(activity)
                         }
 
                         onEnd()
@@ -378,10 +503,10 @@ fun GrantPermissionsDialog(modifier: Modifier = Modifier, permissions: Collectio
                         if (shouldShowRationale) {
                             activity.requestPermissionsWithCallback(permissions) { success ->
                                 if (!success)
-                                    Utils.openSettingAppForActivity(activity)
+                                    Utils.openSettingAppForContext(activity)
                             }
                         } else {
-                            Utils.openSettingAppForActivity(activity)
+                            Utils.openSettingAppForContext(activity)
                         }
 
                         onEnd()
@@ -395,6 +520,7 @@ fun GrantPermissionsDialog(modifier: Modifier = Modifier, permissions: Collectio
 }
 
 @Composable
+@SuppressLint("ComposableNaming") // This is because we need to return something, however it's still a component
 private fun ActionSettingsMainComponent(): Boolean {
     Text(
         modifier = Modifier
@@ -412,6 +538,18 @@ private fun ActionSettingsMainComponent(): Boolean {
 
     return true
 }
+
+@Composable
+private fun getToggleableButtonColors(state: Boolean) =
+    if (state)
+        ButtonDefaults.buttonColors(
+            disabledContainerColor = Colors.green()
+        )
+    else
+        ButtonDefaults.buttonColors(
+            containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.errorContainer else Red80,
+            contentColor = Color.White
+        )
 
 enum class Step(@field:StringRes val nameID: Int, val component: @Composable () -> Boolean) {
     INTRODUCTION(R.string.introduction_steps_introduction, component = { IntroductionMainComponent() }),

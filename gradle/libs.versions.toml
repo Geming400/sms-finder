@@ -17,6 +17,7 @@ lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
 kotlin = "2.4.0"
 composeBom = "2026.06.00"
+miuiAutostart = "v1.3"
 workRuntimeKtx = "2.11.2"
 appcompat = "1.7.1"
 preference = "1.2.1"
@@ -53,6 +54,7 @@ androidx-preference = { group = "androidx.preference", name = "preference", vers
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version = "0.13.0" }
+miui-autostart = { module = "com.github.XomaDev:MIUI-autostart", version.ref = "miuiAutostart" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

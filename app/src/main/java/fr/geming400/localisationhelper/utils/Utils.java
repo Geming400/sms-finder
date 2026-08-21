@@ -1,11 +1,11 @@
 package fr.geming400.localisationhelper.utils;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsManager;
@@ -33,6 +33,8 @@ import contacts.core.entities.Contact;
 import contacts.core.entities.Phone;
 import contacts.core.entities.RawContact;
 import fr.geming400.localisationhelper.LogTags;
+import fr.geming400.localisationhelper.ui.activities.MainActivity;
+import xyz.kumaraswamy.autostart.Autostart;
 
 public final class Utils {
     private Utils() {}
@@ -209,11 +211,17 @@ public final class Utils {
         return password.length() >= 6;
     }
 
-    public static void openSettingAppForActivity(Activity activity) {
+    public static void openSettingAppForContext(Context context) {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
-        intent.setData(uri);
-        activity.startActivity(intent);
+        addPackageData(context, intent);
+        context.startActivity(intent);
+    }
+
+    public static Intent addPackageData(Context context, Intent baseIntent) {
+        Uri uri = Uri.fromParts("package", context.getPackageName(), null);
+        baseIntent.setData(uri);
+
+        return baseIntent;
     }
 
     public static <T> T[] concatenateArrays(IntFunction<T[]> arrayFactory, T[] a, T[] b) {
@@ -222,5 +230,12 @@ public final class Utils {
         System.arraycopy(b, 0, result, a.length, b.length);
 
         return result;
+    }
+
+    public static boolean canUseApp(Context context) {
+        PowerManager pm = context.getSystemService(PowerManager.class);
+        return MainActivity.Companion.areAllPermissionsGranted(context)
+                && pm.isIgnoringBatteryOptimizations(context.getPackageName())
+                && Autostart.INSTANCE.isAutoStartEnabled(context, true);
     }
 }

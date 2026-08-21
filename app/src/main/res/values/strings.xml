@@ -134,4 +134,8 @@
     <string name="app_version">App\'s version: %s</string>
     <string name="app_version_code">App\'s version code: %s</string>
     <string name="user_location_map">%s\'s location</string>
+    <string name="allow_execution_in_bg_prompt">You must allow this app to run in the background</string>
+    <string name="enable_xiaomi_autorun">Enable autorun</string>
+    <string name="disable_battery_optimizations">Disable battery optimizations</string>
+    <string name="battery_optimization_notice">This app is made to not consume a lot of battery once in the background. Disabling battery optimizations are needed but won\'t drain your battery.</string>
 </resources>

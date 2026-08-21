@@ -150,6 +150,7 @@ val Context.dataStore: DataStore<LocalisationHelperData> by dataStore(
 data class LocalisationHelperData(
     val trackedContacts: List<TrackingData> = arrayListOf(),
     val passwordHash: String? = null,
+    @Deprecated("This is no longer used because this is now handled in the app's introduction", level = DeprecationLevel.ERROR)
     val sawBgServiceNotice: Boolean = false,
     val lastAccessedContacts: List<String> = arrayListOf(),
     val firstTimeOpening: Boolean = true

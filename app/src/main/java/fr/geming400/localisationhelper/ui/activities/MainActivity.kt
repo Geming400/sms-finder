@@ -41,7 +41,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -88,13 +87,15 @@ class MainActivity : PermissionsWithCallbackActivity() {
                 if (appData == null) {
                     LoadingCircle()
                 } else {
-                    if (!areAllPermissionsGranted(this) || appData!!.firstTimeOpening) {
+                    var canUseApp by remember { mutableStateOf(Utils.canUseApp(this)) }
+                    if (!canUseApp || appData!!.firstTimeOpening) {
                         val currentStep = if (appData!!.firstTimeOpening)
                             null
                         else
                             rememberCurrentStep(Step.PERMISSIONS)
 
                         MainIntroductionComponent(currentStep) {
+                            canUseApp = Utils.canUseApp(this)
                             runBlocking {
                                 dataStore.updateData {
                                     it.copy(firstTimeOpening = false)
@@ -117,7 +118,7 @@ class MainActivity : PermissionsWithCallbackActivity() {
     fun checkForUpdates() {
         Log.i(LogTags.AUTO_UPDATER, "Checking for updates in MainActivity on startup")
 
-        val thread = Thread() {
+        val thread = Thread {
             runBlocking {
                 AutoUpdater.checkForUpdates(this@MainActivity)
             }
@@ -143,20 +144,6 @@ class MainActivity : PermissionsWithCallbackActivity() {
 @Composable
 private fun LocalisationHelperApp(appData: LocalisationHelperData) {
     val context = LocalContext.current
-
-    var openAppAsBgServiceNotice by rememberSaveable { mutableStateOf(!appData.sawBgServiceNotice) }
-    when {
-        openAppAsBgServiceNotice -> {
-            AppAsBgServiceNotice() {
-                openAppAsBgServiceNotice = false
-                runBlocking {
-                    context.dataStore.updateData {
-                        it.copy(sawBgServiceNotice = true)
-                    }
-                }
-            }
-        }
-    }
 
     ActivitySelector(AppDestinations.HOME) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -274,7 +261,7 @@ private fun PasswordInputField(modifier: Modifier = Modifier) {
                             it.copy(
                                 passwordHash = Utils.hashString(
                                     "SHA-256",
-                                    (passwordInputState.text as String).toByteArray()
+                                    passwordInputState.text.toString().toByteArray()
                                 )
                             )
                         }
