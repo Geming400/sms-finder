@@ -44,7 +44,7 @@
     <string name="setting.battery.name">Battery</string>
     <string name="setting.battery.description">If getting the charge percentage of this device should be allowed</string>
     <string name="setting.extra_info.name">Extra Info</string>
-    <string name="setting.extra_info.description">If getting extra info about this device should be allowed</string>
+    <string name="setting.extra_info.description">Enables checking if \"Do not disturb\" and the device\'s mobile data are enabled</string>
     <string name="setting.global_enable.name">Enable</string>
     <string name="setting.global_enable.description">If every action should be enabled</string>
     <string name="setting.category.unknown" translatable="false">UNKNOWN</string>
