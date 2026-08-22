@@ -148,7 +148,7 @@ public abstract class BaseAction<T, P> {
             @NonNull String encryptionPrivateKey
     );
 
-    public boolean canSendDataPayload(Context context) {
+    public boolean canReceiveDataPayload(Context context) {
         return this.dependentSettings
                 .stream()
                 .allMatch(setting -> setting.getValue(context));
