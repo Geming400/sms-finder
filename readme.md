@@ -14,8 +14,8 @@ No. There are multiple reasons:
 - Like I said it's just a silly app
 
 ## TODO:
-- Logs in `MainActivity` (eg: `[timestamp] x ask for your location`) (very much not a priority)
-- Remove github api lib and do raw requests to reduce the binary size by a little
-- Actually explain the purpose of the "Extra Info" permission
-- If possible, remove the sms to not clutter the sms app
-- Add a "precision circle" to know the precision of the gps in the map
+- [ ] Logs in `MainActivity` (eg: `[timestamp] x ask for your location`) (very much not a priority)
+- [ ] Remove github api lib and do raw requests to reduce the binary size by a little
+- [x] Actually explain the purpose of the "Extra Info" permission
+- [ ] If possible, remove the sms to not clutter the sms app
+- [x] Add a "precision circle" to know the precision of the gps in the map

@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver.PendingResult
 import android.content.Context
 import android.location.LocationManager
+import android.util.Log
 import androidx.core.location.LocationRequestCompat
+import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.action.Action
 import fr.geming400.localisationhelper.action.MalformedRawActionException
 import fr.geming400.localisationhelper.datastore.JsonDataStore
@@ -27,15 +29,16 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
     override fun parse(rawContent: String): SimpleLocation {
         val geolocation = rawContent.split(";")
 
-        if (geolocation.size == 2) {
+        if (geolocation.size == 3) {
             try {
                 val latitude = Math.clamp(geolocation[0].toDouble(), -90.0, 90.0)
                 val longitude = Math.clamp(geolocation[1].toDouble(), -180.0, 180.0)
+                val accuracy = geolocation[2].toFloat()
 
-                return SimpleLocation(latitude, longitude)
+                return SimpleLocation(latitude, longitude, accuracy)
             } catch (e: NumberFormatException) {
                 throw MalformedRawActionException(
-                    "Couldn't parse latitude/longitude doubles",
+                    "Couldn't parse latitude/longitude/accuracy doubles",
                     e,
                     this,
                     rawContent
@@ -43,7 +46,7 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
             }
         } else {
             throw MalformedRawActionException(
-                "Geolocation data doesn't contain 2 entries",
+                "Geolocation data doesn't contain 3 entries",
                 this,
                 rawContent
             )
@@ -51,7 +54,7 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
     }
 
     override fun serializeResult(location: SimpleLocation): String =
-        String.format("%s;%s", location.latitude, location.longitude)
+        listOf<Any>(location.latitude, location.longitude, location.accuracy).joinToString(";")
 
     @SuppressLint("MissingPermission")
     override fun execute(context: Context): CompletableFuture<SimpleLocation>? {
@@ -67,11 +70,7 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
                 LocationRequestCompat.PASSIVE_INTERVAL,
                 Int.MAX_VALUE.toFloat()
             ) { location ->
-                completableFuture.complete(
-                    SimpleLocation.ofLocation(
-                        location
-                    )
-                )
+                completableFuture.complete(SimpleLocation.ofLocation(location))
             }
 
             return completableFuture
@@ -97,11 +96,9 @@ class LocationGetterAction(name: String) : Action<SimpleLocation>(name, Settings
 
             CoroutineScope(Dispatchers.IO.limitedParallelism(1, "LocationGetterAction's onReceive (Stage.RECEIVE_HOST)")).launch {
                 jsonDataStore.updateTrackedContact(asContact) {
+                    Log.i(LogTags.USER_TRACKING, "Updated geolocation: $it -> ${it.copy(geolocation = BoxedTimestamp.now(geolocation), lastPingAnswer = Timestamp.now())}")
                     it.copy(
-                        geolocation = BoxedTimestamp.now(SimpleLocation(
-                            geolocation.latitude,
-                            geolocation.longitude,
-                        )),
+                        geolocation = BoxedTimestamp.now(geolocation),
                         lastPingAnswer = Timestamp.now()
                     )
                 }

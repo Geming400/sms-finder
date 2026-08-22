@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -84,6 +85,8 @@ import fr.geming400.localisationhelper.ui.components.DeletableContactProfile
 import fr.geming400.localisationhelper.ui.components.LoadingCircle
 import fr.geming400.localisationhelper.ui.components.PhoneNumberDropdown
 import fr.geming400.localisationhelper.ui.components.rememberJsonDatastore
+import fr.geming400.localisationhelper.ui.theme.Blue40
+import fr.geming400.localisationhelper.ui.theme.Blue80
 import fr.geming400.localisationhelper.ui.theme.LocalisationHelperTheme
 import fr.geming400.localisationhelper.utils.SimpleLocation
 import fr.geming400.localisationhelper.utils.Utils
@@ -98,11 +101,9 @@ import org.maplibre.compose.camera.CameraState
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.image
-import org.maplibre.compose.expressions.value.SymbolAnchor
+import org.maplibre.compose.layers.CircleLayer
 import org.maplibre.compose.layers.SymbolLayer
-import org.maplibre.compose.map.MapOptions
 import org.maplibre.compose.map.MaplibreMap
-import org.maplibre.compose.map.OrnamentOptions
 import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
@@ -750,44 +751,32 @@ private fun UserLocationMapInner(
                         longitude = geolocation.value.longitude
                     )
                 ),
-            duration = 3.seconds,
+            duration = 3.seconds
         )
     }
 
     MaplibreMap(
         modifier = modifier.fillMaxSize(),
         baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
-        options =
-            MapOptions(
-                ornamentOptions =
-                    OrnamentOptions(
-                        isScaleBarEnabled = false
-                    )
-            ),
         cameraState = cameraState
     ) {
-        Marker(trackingData.geolocation.value)
+        MapAccuracyCircle(cameraState, trackingData.geolocation.value)
+        MapMarker(trackingData.geolocation.value)
     }
 }
 
 @Composable
-private fun Marker(geolocation: SimpleLocation) {
+private fun MapMarker(geolocation: SimpleLocation) {
     val markerJson = """
 {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [${geolocation.longitude},
-${geolocation.latitude}]
-      },
-      "properties": {}
-    }
-  ]
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [${geolocation.longitude}, ${geolocation.latitude}]
+  },
+  "properties": {}
 }
-        """.trimIndent()
+    """.trimIndent()
 
     val markerSource = rememberGeoJsonSource(GeoJsonData.JsonString(markerJson))
 
@@ -795,7 +784,45 @@ ${geolocation.latitude}]
         id = "marker-layer",
         source = markerSource,
         iconImage = image(painterResource(org.maplibre.android.R.drawable.maplibre_marker_icon_default)),
-        iconAnchor = const(SymbolAnchor.Bottom),
         iconAllowOverlap = const(true)
     )
+}
+
+@Composable
+private fun MapAccuracyCircle(cameraState: CameraState, geolocation: SimpleLocation, radius: Float = geolocation.accuracy) {
+    if (radius == -1f || cameraState.metersPerDpAtTarget == 0.0) {
+        Log.i(LogTags.USER_TRACKING, "Cannot render circle for location $geolocation because there are no radius (= -1f)")
+        return
+    }
+
+    val markerJson = """
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [${geolocation.longitude}, ${geolocation.latitude}]
+  },
+  "properties": {
+    "radius": $radius
+  }
+}
+    """.trimIndent()
+
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5f, LocalResources.current.displayMetrics)
+
+    val actualRadius = radius / cameraState.metersPerDpAtTarget
+
+    val markerSource = rememberGeoJsonSource(GeoJsonData.JsonString(markerJson))
+    CircleLayer(
+        "location-accuracy-layer",
+        markerSource,
+        radius = const(actualRadius.dp),
+        opacity = const(.3f),
+        color = const(Blue80),
+        strokeOpacity = const(.8f),
+        strokeColor = const(Blue40),
+        strokeWidth = const(1.5.dp)
+    )
+
+    Log.d(LogTags.USER_TRACKING, "Showing circle with radius $radius")
 }
