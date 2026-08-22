@@ -14,6 +14,7 @@ import fr.geming400.localisationhelper.datastore.JsonDataStore
 import fr.geming400.localisationhelper.datastore.TrackingData
 import fr.geming400.localisationhelper.datastore.dataStore
 import fr.geming400.localisationhelper.utils.SmsCryptography
+import fr.geming400.localisationhelper.utils.Utils
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.Base64
@@ -35,6 +36,11 @@ class SmsReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val base64Decoded = Base64.getDecoder()
+
+        if (!Utils.canUseApp(context)) {
+            Log.i(LogTags.SMS_RECEIVER, "Cannot check for sms' content since the app is not marked as usable yet")
+            return
+        }
 
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
             try {
