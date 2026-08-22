@@ -57,6 +57,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -101,9 +102,12 @@ import org.maplibre.compose.camera.CameraState
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.image
+import org.maplibre.compose.expressions.value.CirclePitchAlignment
 import org.maplibre.compose.layers.CircleLayer
 import org.maplibre.compose.layers.SymbolLayer
+import org.maplibre.compose.map.MapOptions
 import org.maplibre.compose.map.MaplibreMap
+import org.maplibre.compose.map.OrnamentOptions
 import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
@@ -710,6 +714,9 @@ private fun UserLocationMapInner(
     trackingData: TrackingData,
     cameraStateVal: CameraState? = null
 ) {
+    val context = LocalContext.current
+    val resources = LocalResources.current
+
     val geolocation = trackingData.geolocation!!
 
     val cameraState = cameraStateVal ?:
@@ -758,6 +765,16 @@ private fun UserLocationMapInner(
     MaplibreMap(
         modifier = modifier.fillMaxSize(),
         baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
+        options =
+            MapOptions(
+                ornamentOptions =
+                    OrnamentOptions(
+                        scaleBarAlignment = Alignment.BottomEnd
+                    )
+            ),
+        onMapLoadFailed = {
+            Toast.makeText(context, resources.getString(R.string.map_load_error, it), Toast.LENGTH_LONG).show()
+        },
         cameraState = cameraState
     ) {
         MapAccuracyCircle(cameraState, trackingData.geolocation.value)

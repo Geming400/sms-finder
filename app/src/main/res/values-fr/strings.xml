@@ -139,4 +139,5 @@
     <string name="enable_xiaomi_autorun">Activer le démarrage automatique en arrière-plan</string>
     <string name="disable_battery_optimizations">Désactiver les optimizations de batteries</string>
     <string name="battery_optimization_notice">Cette appli à été faite pour ne pas consommer beaucoup de batterie une fois en arrière-plan. Désactiver les optimizations de batteries sont nécessaire mais ne vont pas vider votre batterie.</string>
+    <string name="map_load_error">La carte n\'a pas réussi à se charger correctement: %s</string>
 </resources>
