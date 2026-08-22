@@ -14,6 +14,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import fr.geming400.localisationhelper.BuildConfig;
+import fr.geming400.localisationhelper.LogTags;
+
 public final class SmsCryptography {
     public static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
     public static final byte[] STATIC_SALT = new byte[] {
@@ -32,8 +35,9 @@ public final class SmsCryptography {
 
     // https://stackoverflow.com/questions/992019/java-256-bit-aes-password-based-encryption
     public static EncryptedContent encryptContent(byte[] content, String password, byte[] salt) {
-        Log.i("Encryption", "Encrypting with password " + password);
         SecretKey key = getPasswordSecretKey(password.toCharArray(), salt);
+        if (BuildConfig.DEBUG)
+            Log.d(LogTags.ENCRYPTION, "Encrypting with password " + password);
 
         try {
             Cipher cipher = Cipher.getInstance(CRYPTO_ALGORITHM);
@@ -49,7 +53,8 @@ public final class SmsCryptography {
     // https://stackoverflow.com/questions/992019/java-256-bit-aes-password-based-encryption
     public static String decryptContent(byte[] content, byte[] iv, String password, byte[] salt) {
         SecretKey key = getPasswordSecretKey(password.toCharArray(), salt);
-        Log.i("Decryption", "Decrypting with password " + password);
+        if (BuildConfig.DEBUG)
+            Log.d(LogTags.DECRYPTION, "Decrypting with password " + password);
 
         try {
             Cipher cipher = Cipher.getInstance(CRYPTO_ALGORITHM);

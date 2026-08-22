@@ -12,4 +12,7 @@ public final class LogTags {
     public static final String AUTO_UPDATER = "autoUpdater";
 
     public static final String INTRODUCTION = "introduction";
+
+    public static final String ENCRYPTION = "encryption";
+    public static final String DECRYPTION = "decryption";
 }
