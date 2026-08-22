@@ -825,8 +825,6 @@ private fun MapAccuracyCircle(cameraState: CameraState, geolocation: SimpleLocat
 }
     """.trimIndent()
 
-    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5f, LocalResources.current.displayMetrics)
-
     val actualRadius = radius / cameraState.metersPerDpAtTarget
 
     val markerSource = rememberGeoJsonSource(GeoJsonData.JsonString(markerJson))
