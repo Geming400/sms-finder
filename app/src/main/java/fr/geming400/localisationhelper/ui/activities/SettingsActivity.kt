@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import fr.geming400.localisationhelper.AutoUpdater
+import fr.geming400.localisationhelper.BuildConfig
 import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.R
 import fr.geming400.localisationhelper.datastore.LocalisationHelperData
@@ -80,7 +81,7 @@ class SettingsActivity : PermissionsWithCallbackActivity() {
                                 }
 
                                 SettingsCategory(title = stringResource(R.string.setting_category_debug)) {
-                                    ResetAppButton()
+                                    DebugCategory()
                                 }
                             }
                         }
@@ -92,7 +93,7 @@ class SettingsActivity : PermissionsWithCallbackActivity() {
 }
 
 @Composable
-private fun ResetAppButton(modifier: Modifier = Modifier) {
+private fun DebugCategory(modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     Button(
@@ -148,6 +149,14 @@ private fun UpdateChecker() {
                     text = stringResource(R.string.app_version_code, packageInfo.longVersionCode),
                     textAlign = TextAlign.Center
                 )
+
+                if (BuildConfig.DEBUG)
+                    Text(
+                        modifier = txtModifier,
+                        text = "DEBUG BUILD",
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primaryFixed
+                    )
             }
         }
 
