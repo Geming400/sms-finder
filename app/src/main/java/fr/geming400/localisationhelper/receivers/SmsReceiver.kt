@@ -6,6 +6,7 @@ import android.content.Intent
 import android.provider.Telephony
 import android.telephony.SmsMessage
 import android.util.Log
+import fr.geming400.localisationhelper.BuildConfig
 import fr.geming400.localisationhelper.LogTags
 import fr.geming400.localisationhelper.action.actions.Actions
 import fr.geming400.localisationhelper.action.BaseAction
@@ -82,7 +83,8 @@ class SmsReceiver : BroadcastReceiver() {
 
                     val iv = base64Decoded.decode(parts[1])
 
-                    Log.i("Decryption", "Private keys are ${contactInfo.privateKeys}")
+                    if (BuildConfig.DEBUG)
+                        Log.d(LogTags.SMS_RECEIVER, "Private keys are ${contactInfo.privateKeys}")
 
                     // This second part is in the format "actionName:payloadData"
                     // if the payload type is DATA.
@@ -97,6 +99,9 @@ class SmsReceiver : BroadcastReceiver() {
 
                     val actionName = actionNameAndContent[0]
                     val actionDataPayload = actionNameAndContent.getOrNull(1)
+
+                    if (BuildConfig.DEBUG)
+                        Log.d(LogTags.SMS_RECEIVER, "Got payload data $actionDataPayload")
 
                     if (actionNameAndContent.size == 2 || actionNameAndContent.size == 1) {
                         Log.i(
