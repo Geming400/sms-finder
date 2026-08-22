@@ -838,7 +838,8 @@ private fun MapAccuracyCircle(cameraState: CameraState, geolocation: SimpleLocat
         color = const(Blue80),
         strokeOpacity = const(.8f),
         strokeColor = const(Blue40),
-        strokeWidth = const(1.5.dp)
+        strokeWidth = const(1.5.dp),
+        pitchAlignment = const(CirclePitchAlignment.Map)
     )
 
     Log.d(LogTags.USER_TRACKING, "Showing circle with radius $radius")
