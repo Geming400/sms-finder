@@ -30,12 +30,8 @@ android {
         }
 
         customDebugType {
-            debuggable true
-        }
-
-        debug {
             applicationIdSuffix = ".debug"
-//            isDebuggable = true
+            debuggable true
         }
 
         /**
